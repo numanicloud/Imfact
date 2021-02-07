@@ -1,0 +1,11 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup Label="Main">
+    <TargetFramework>net5</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <WarningsAsErrors>NU1605;8600;8601;8602;8603;8604;8618;8619;8622;8625</WarningsAsErrors>
+  </PropertyGroup>
+
+</Project>
