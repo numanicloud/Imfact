@@ -1,9 +1,7 @@
 ﻿using System.Linq;
-using Deptorygen.Utilities;
-using Deptorygen2.Core.Syntaxes;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen.Generator.Syntaxes
+namespace Deptorygen2.Core.Syntaxes
 {
 	class ResolutionSyntax
 	{

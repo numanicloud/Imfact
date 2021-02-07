@@ -3,64 +3,63 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Deptorygen.Utilities;
+using Deptorygen2.Core.Structure;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.FindSymbols;
-using IServiceProvider = Deptorygen.Generator.Interfaces.IServiceProvider;
 
-namespace Deptorygen.Generator.Syntaxes
+namespace Deptorygen2.Core.Syntaxes
 {
-	class FactorySyntax : IServiceProvider
+	class FactorySyntax : Interfaces.IServiceProvider
 	{
-		public INamedTypeSymbol InterfaceSymbol { get; }
+		public INamedTypeSymbol ItselfSymbol { get; }
 		public ResolverSyntax[] Resolvers { get; }
 		public CollectionResolverSyntax[] CollectionResolvers { get; }
-		public CaptureSyntax[] Captures { get; }
+		public DelegationSyntax[] Delegations { get; }
 
-		public FactorySyntax(INamedTypeSymbol interfaceSymbol,
+		public FactorySyntax(INamedTypeSymbol itselfSymbol,
 			ResolverSyntax[] resolvers,
 			CollectionResolverSyntax[] collectionResolvers,
-			CaptureSyntax[] captures)
+			DelegationSyntax[] delegations)
 		{
-			InterfaceSymbol = interfaceSymbol;
+			ItselfSymbol = itselfSymbol;
 			Resolvers = resolvers;
 			CollectionResolvers = collectionResolvers;
-			Captures = captures;
+			Delegations = delegations;
 		}
 
-		public static async Task<FactorySyntax> FromDeclarationAsync(InterfaceDeclarationSyntax syntax, Document document, CancellationToken ct)
+		public static async Task<FactorySyntax> FromDeclarationAsync(
+			ClassDeclarationSyntax syntax,
+			SourceGenAnalysisContext context)
 		{
-			async Task<INamedTypeSymbol> GetSymbol()
-			{
-				var ns = syntax.Parent is NamespaceDeclarationSyntax nsds
-					? (nsds.Name is QualifiedNameSyntax qns ? qns.ToString() : throw new Exception())
-					: throw new Exception();
+			var symbol = await GetSymbolOf(syntax, context);
+			var structure = new FactoryAnalysisContext(syntax, symbol, context);
 
-				var symbols = await SymbolFinder.FindSourceDeclarationsAsync(
-					document.Project,
-					syntax.Identifier.ValueText,
-					false,
-					ct);
+			var resolvers = ResolverSyntax.FromParent(structure);
+			var delegations = DelegationSyntax.FromFactory(symbol).ToArray();
 
-				var namedTypeSymbol = symbols.OfType<INamedTypeSymbol>()
-					.First(x => x.GetFullNameSpace() == ns);
-				return namedTypeSymbol;
-			}
+			return new FactorySyntax(symbol, resolvers.Item1, resolvers.Item2, delegations);
+		}
 
-			var symbol = await GetSymbol();
-			var resolvers = ResolverSyntax.FromParent(symbol);
-			var captures = CaptureSyntax.FromFactory(symbol);
+		private static async Task<INamedTypeSymbol> GetSymbolOf(
+			TypeDeclarationSyntax syntax,
+			SourceGenAnalysisContext context)
+		{
+			var symbols = await context.FindSourceDeclarationSymbolAsync(syntax);
 
-			return new FactorySyntax(symbol, resolvers.Item1, resolvers.Item2, captures);
+			var @namespace = syntax.Parent is not NamespaceDeclarationSyntax nsds ? throw new Exception()
+				: nsds.Name is not QualifiedNameSyntax qns ? throw new Exception()
+				: qns.ToString();
+
+			return symbols.OfType<INamedTypeSymbol>().First(x => x.GetFullNameSpace() == @namespace);
 		}
 
 		public IEnumerable<TypeName> GetCapableServiceTypes()
 		{
-			yield return TypeName.FromSymbol(InterfaceSymbol);
-			foreach (var capture in Captures)
+			yield return TypeName.FromSymbol(ItselfSymbol);
+			foreach (var delegation in Delegations)
 			{
-				yield return capture.TypeName;
+				yield return delegation.TypeName;
 			}
 		}
 	}

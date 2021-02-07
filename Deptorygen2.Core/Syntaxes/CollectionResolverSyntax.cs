@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen.Generator.Interfaces;
-using Deptorygen.Utilities;
-using Deptorygen2.Core.Syntaxes;
+using Deptorygen2.Core.Interfaces;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen.Generator.Syntaxes
+namespace Deptorygen2.Core.Syntaxes
 {
 	class CollectionResolverSyntax : IServiceConsumer, IServiceProvider
 	{

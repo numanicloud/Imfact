@@ -10,6 +10,19 @@ namespace Deptorygen2.Core
 	{
 		Type FindType(string fullName);
 	}
+
+	partial class MyPartialBase
+	{
+	}
+
+	partial class MyPartial : MyPartialBase, ISymbolFinder
+	{
+		public partial int Add(int x, int y);
+		public Type FindType(string fullName)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }
 
 /* デコレーションクラスを示す属性をメソッドに付けたい。どう検知する？

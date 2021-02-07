@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Deptorygen.Utilities;
 
-namespace Deptorygen.Generator.Interfaces
+namespace Deptorygen2.Core.Interfaces
 {
 	interface IServiceProvider
 	{

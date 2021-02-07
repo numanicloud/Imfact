@@ -1,11 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen.Generator.Interfaces;
-using Deptorygen.Utilities;
-using Deptorygen2.Core.Syntaxes;
+using System.Threading;
+using System.Threading.Tasks;
+using Deptorygen2.Core.Interfaces;
+using Deptorygen2.Core.Structure;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.FindSymbols;
 
-namespace Deptorygen.Generator.Syntaxes
+namespace Deptorygen2.Core.Syntaxes
 {
 	class ResolverSyntax : IServiceConsumer, IServiceProvider
 	{
@@ -33,28 +37,20 @@ namespace Deptorygen.Generator.Syntaxes
 			DelegationKey = delegationKey;
 		}
 
-		public static (ResolverSyntax[], CollectionResolverSyntax[]) FromParent(INamedTypeSymbol factory)
+		public static (ResolverSyntax[], CollectionResolverSyntax[]) FromParent(FactoryAnalysisContext factory)
 		{
-			var baseInterfaces = factory.AllInterfaces
-				.SelectMany(x => x.GetMembers())
-				.OfType<IMethodSymbol>();
-
-			var resolvers = factory.GetMembers()
-				.OfType<IMethodSymbol>()
-				.Concat(baseInterfaces)
-				.Where(x => x.MethodKind == MethodKind.Ordinary)
-				.ToArray();
+			var resolvers = ExtractResolverMethods(factory);
 
 			var resolverResult = new List<ResolverSyntax>();
 			var collectionResult = new List<CollectionResolverSyntax>();
 
 			foreach (var item in resolvers)
 			{
-				if (CollectionResolverSyntax.FromResolver(item) is {} cr)
+				if (CollectionResolverSyntax.FromResolver(item) is { } cr)
 				{
 					collectionResult.Add(cr);
 				}
-				else if(item.ReturnType is INamedTypeSymbol returnType)
+				else if (item.ReturnType is INamedTypeSymbol returnType)
 				{
 					var delegation = item.GetAttributes()
 						.FirstOrDefault(x => x.AttributeClass?.Name == nameof(DelegationAttribute))
@@ -73,6 +69,34 @@ namespace Deptorygen.Generator.Syntaxes
 			}
 
 			return (resolverResult.ToArray(), collectionResult.ToArray());
+		}
+
+		private static async Task<IEnumerable<IMethodSymbol>> ExtractResolverMethods(FactoryAnalysisContext factory)
+		{
+			// partial情報の取り方：
+			// https://stackoverflow.com/questions/23026884/how-to-determine-that-a-partial-method-has-no-implementation
+			// https://github.com/dotnet/roslyn/issues/48
+
+			static bool IsPartialMethod(IMethodSymbol method)
+			{
+				return method.DeclaringSyntaxReferences
+					.Select(x => x.GetSyntax())
+					.OfType<MethodDeclarationSyntax>()
+					.FilterNull()
+					.Where(node => node.Body != null)
+					.Any(node => node.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)));
+			}
+
+			// TODO: holderを探す
+			var holders = new[] { factory.Symbol, factory.Symbol.BaseType };
+
+			return from members in
+					   from holder in holders.FilterNull()
+					   select holder.GetMembers()
+				   from member in members.OfType<IMethodSymbol>()
+				   where member.MethodKind == MethodKind.Ordinary
+				   where IsPartialMethod(member)
+				   select member;
 		}
 
 		public IEnumerable<TypeName> GetRequiredServiceTypes()

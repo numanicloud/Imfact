@@ -1,8 +1,7 @@
 ﻿using System.Linq;
-using Deptorygen.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen.Generator.Syntaxes
+namespace Deptorygen2.Core.Syntaxes
 {
 	class ParameterSyntax
 	{
