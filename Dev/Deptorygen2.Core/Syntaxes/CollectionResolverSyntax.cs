@@ -26,48 +26,41 @@ namespace Deptorygen2.Core.Syntaxes
 
 		public static CollectionResolverSyntax? FromResolver(IMethodSymbol resolver)
 		{
-			static ResolutionSyntax? GetResolutionAsElement(AttributeData resolutionAttr, TypeName type)
+			if (TryGetIEnumerableType(resolver.ReturnType) is not ({} collection, {} element))
 			{
-				if (resolutionAttr.ConstructorArguments[0].Value is INamedTypeSymbol nts)
-				{
-					if (nts.BaseType is {} bt && TypeName.FromSymbol(bt) == type)
-					{
-						return ResolutionSyntax.FromType(nts);
-					}
-
-					foreach (var @interface in nts.AllInterfaces)
-					{
-						if (TypeName.FromSymbol(@interface) == type)
-						{
-							return ResolutionSyntax.FromType(nts);
-						}
-					}
-				}
-
 				return null;
 			}
 
-			var typeName = TypeName.FromSymbol(resolver.ReturnType);
-			if (typeName.NameWithoutArguments == "IEnumerable" && typeName.TypeArguments.Length == 1)
+			var resolutions = ResolutionSyntax.FromResolversAttribute(resolver,
+				x => IsElementType(x, element) ? ResolutionSyntax.FromType(x) : null);
+
+			if (resolutions.Any())
 			{
-				var elementType = typeName.TypeArguments[0];
-
 				var parameters = ParameterSyntax.FromResolver(resolver);
-
-				var resolutions = resolver.GetAttributes()
-					.Where(x => x.AttributeClass?.Name == nameof(ResolutionAttribute))
-					.Where(x => x.AttributeConstructor?.Parameters.Length == 1)
-					.Select(x => GetResolutionAsElement(x, elementType))
-					.FilterNull()
-					.ToArray();
-
-				if (resolutions.Any())
-				{
-					return new CollectionResolverSyntax(resolver.Name, typeName, parameters, resolutions);
-				}
+				return new CollectionResolverSyntax(resolver.Name, collection, parameters, resolutions);
 			}
 
 			return null;
+		}
+
+		private static (TypeName? collection, TypeName? element) TryGetIEnumerableType(ITypeSymbol symbol)
+		{
+			var type = TypeName.FromSymbol(symbol);
+
+			if (type.NameWithoutArguments != "IEnumerable"
+				|| type.TypeArguments.Length != 1)
+			{
+				return (null, null);
+			}
+
+			return (type, type.TypeArguments[0]);
+		}
+
+		private static bool IsElementType(INamedTypeSymbol nts, TypeName elementType)
+		{
+			return nts.AllInterfaces.Append(nts.BaseType).Append(nts)
+				.FilterNull()
+				.Any(x => TypeName.FromSymbol(x) == elementType);
 		}
 
 		public IEnumerable<TypeName> GetRequiredServiceTypes()

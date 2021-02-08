@@ -10,25 +10,50 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deptorygen2.Core", "Deptorygen2.Core\Deptorygen2.Core.csproj", "{D3A7A013-2881-4167-A104-01F485F84F4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deptorygen2.Core", "Deptorygen2.Core\Deptorygen2.Core.csproj", "{D3A7A013-2881-4167-A104-01F485F84F4C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NacHelpers", "..\Modules\NacHelper\NacHelpers\NacHelpers.csproj", "{1794604B-BD31-4AC2-9DE3-AD8230F34FE0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{A9843142-9F22-47C7-8806-BDF42341BD6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C7E01680-667E-4CF1-8B39-3D0884532273}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C7E01680-667E-4CF1-8B39-3D0884532273}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7E01680-667E-4CF1-8B39-3D0884532273}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C7E01680-667E-4CF1-8B39-3D0884532273}.Debug|x64.Build.0 = Debug|Any CPU
 		{C7E01680-667E-4CF1-8B39-3D0884532273}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7E01680-667E-4CF1-8B39-3D0884532273}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7E01680-667E-4CF1-8B39-3D0884532273}.Release|x64.ActiveCfg = Release|Any CPU
+		{C7E01680-667E-4CF1-8B39-3D0884532273}.Release|x64.Build.0 = Release|Any CPU
 		{D3A7A013-2881-4167-A104-01F485F84F4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D3A7A013-2881-4167-A104-01F485F84F4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3A7A013-2881-4167-A104-01F485F84F4C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D3A7A013-2881-4167-A104-01F485F84F4C}.Debug|x64.Build.0 = Debug|Any CPU
 		{D3A7A013-2881-4167-A104-01F485F84F4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3A7A013-2881-4167-A104-01F485F84F4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3A7A013-2881-4167-A104-01F485F84F4C}.Release|x64.ActiveCfg = Release|Any CPU
+		{D3A7A013-2881-4167-A104-01F485F84F4C}.Release|x64.Build.0 = Release|Any CPU
+		{1794604B-BD31-4AC2-9DE3-AD8230F34FE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1794604B-BD31-4AC2-9DE3-AD8230F34FE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1794604B-BD31-4AC2-9DE3-AD8230F34FE0}.Debug|x64.ActiveCfg = Debug|x64
+		{1794604B-BD31-4AC2-9DE3-AD8230F34FE0}.Debug|x64.Build.0 = Debug|x64
+		{1794604B-BD31-4AC2-9DE3-AD8230F34FE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1794604B-BD31-4AC2-9DE3-AD8230F34FE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1794604B-BD31-4AC2-9DE3-AD8230F34FE0}.Release|x64.ActiveCfg = Release|x64
+		{1794604B-BD31-4AC2-9DE3-AD8230F34FE0}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1794604B-BD31-4AC2-9DE3-AD8230F34FE0} = {A9843142-9F22-47C7-8806-BDF42341BD6F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2B35888E-D7BD-4F06-BB52-E53B4BC7E766}

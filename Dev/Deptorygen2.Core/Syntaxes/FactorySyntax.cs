@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Deptorygen2.Core.Structure;
+using Deptorygen2.Core.Syntaxes.Parser;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.FindSymbols;
 
 namespace Deptorygen2.Core.Syntaxes
 {
@@ -32,26 +30,13 @@ namespace Deptorygen2.Core.Syntaxes
 			ClassDeclarationSyntax syntax,
 			SourceGenAnalysisContext context)
 		{
-			var symbol = await GetSymbolOf(syntax, context);
-			var structure = new FactoryAnalysisContext(syntax, symbol, context);
+			var factoryLoader = new FactoryLoader();
+			var structure = await factoryLoader.GetContextAsync(syntax, context);
 
 			var resolvers = ResolverSyntax.FromParent(structure);
-			var delegations = DelegationSyntax.FromFactory(symbol).ToArray();
+			var delegations = DelegationSyntax.FromFactory(structure).ToArray();
 
-			return new FactorySyntax(symbol, resolvers.Item1, resolvers.Item2, delegations);
-		}
-
-		private static async Task<INamedTypeSymbol> GetSymbolOf(
-			TypeDeclarationSyntax syntax,
-			SourceGenAnalysisContext context)
-		{
-			var symbols = await context.FindSourceDeclarationSymbolAsync(syntax);
-
-			var @namespace = syntax.Parent is not NamespaceDeclarationSyntax nsds ? throw new Exception()
-				: nsds.Name is not QualifiedNameSyntax qns ? throw new Exception()
-				: qns.ToString();
-
-			return symbols.OfType<INamedTypeSymbol>().First(x => x.GetFullNameSpace() == @namespace);
+			return new FactorySyntax(structure.Symbol, resolvers.Item1, resolvers.Item2, delegations);
 		}
 
 		public IEnumerable<TypeName> GetCapableServiceTypes()

@@ -2,19 +2,13 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Syntaxes
+namespace Deptorygen2.Core.Syntaxes.Parser
 {
-	class ResolutionSyntax
+	internal class ResolutionLoader
 	{
-		public TypeName TypeName { get; }
-		public TypeName[] Dependencies { get; }
-		public bool IsDisposable { get; }
-
-		public ResolutionSyntax(TypeName typeName, TypeName[] dependencies, bool isDisposable)
+		public static ResolutionSyntax[] FromResolversAttribute(IMethodSymbol resolver)
 		{
-			TypeName = typeName;
-			Dependencies = dependencies;
-			IsDisposable = isDisposable;
+			return FromResolversAttribute(resolver, FromType);
 		}
 
 		public static ResolutionSyntax? FromType(INamedTypeSymbol symbol)
@@ -49,11 +43,6 @@ namespace Deptorygen2.Core.Syntaxes
 				.Select(symbolToSyntax)
 				.FilterNull()
 				.ToArray();
-		}
-
-		public static ResolutionSyntax[] FromResolversAttribute(IMethodSymbol resolver)
-		{
-			return FromResolversAttribute(resolver, FromType);
 		}
 	}
 }

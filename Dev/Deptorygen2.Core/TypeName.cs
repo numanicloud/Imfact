@@ -72,6 +72,16 @@ namespace Deptorygen2.Core
 			return new TypeName(symbol.GetFullNameSpace(), symbol.Name, symbol.DeclaredAccessibility, typeArguments);
 		}
 
+		public static TypeName FromType(Type type)
+		{
+			var accessibility = type.IsPublic ? Accessibility.Public : Accessibility.Internal;
+
+			return new TypeName(
+				type.Namespace ?? "",
+				type.Name,
+				accessibility);
+		}
+
 		public static bool operator ==(TypeName lop, TypeName rop) => lop?.Equals(rop) ?? false;
 
 		public static bool operator !=(TypeName lop, TypeName rop) => !(lop?.Equals(rop) ?? true);
