@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace Deptorygen2.Core
+namespace Deptorygen2.Core.Utilities
 {
 	class BlockStringBuilder : IDisposable
 	{

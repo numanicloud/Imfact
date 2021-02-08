@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using Deptorygen2.Core.Structure;
+using Deptorygen2.Core.Syntaxes;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Syntaxes.Parser
+namespace Deptorygen2.Core.Parser
 {
 	internal class ResolutionLoader
 	{

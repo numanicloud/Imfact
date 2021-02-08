@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Syntaxes

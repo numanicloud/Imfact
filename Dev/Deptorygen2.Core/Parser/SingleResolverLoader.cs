@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Deptorygen2.Core.Structure;
+using Deptorygen2.Core.Syntaxes;
+using Deptorygen2.Core.Utilities;
 
-namespace Deptorygen2.Core.Syntaxes.Parser
+namespace Deptorygen2.Core.Parser
 {
 	internal class SingleResolverLoader
 	{

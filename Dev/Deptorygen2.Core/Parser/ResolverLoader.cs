@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Structure;
+using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Deptorygen2.Core.Syntaxes.Parser
+namespace Deptorygen2.Core.Parser
 {
 	internal class ResolverLoader
 	{

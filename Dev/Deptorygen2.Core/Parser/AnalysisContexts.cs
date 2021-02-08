@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.FindSymbols;
 
-namespace Deptorygen2.Core.Structure
+namespace Deptorygen2.Core.Parser
 {
 	internal record SourceGenAnalysisContext(Document Document, CancellationToken Token)
 	{

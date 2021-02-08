@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core
+namespace Deptorygen2.Core.Utilities
 {
 	public static class Helpers
 	{

@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Deptorygen2.Core.Structure;
+using Deptorygen2.Core.Syntaxes;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NacHelpers.Extensions;
 
-namespace Deptorygen2.Core.Syntaxes.Parser
+namespace Deptorygen2.Core.Parser
 {
 	internal class SourceLoader
 	{
@@ -37,7 +37,7 @@ namespace Deptorygen2.Core.Syntaxes.Parser
 				_resolutionLoader);
 
 			_delegationLoader = new DelegationLoader(property =>
-				property.TypeSymbol.HasAttribute(nameof(FactoryAttribute))
+				Helpers.HasAttribute(property.TypeSymbol, nameof(FactoryAttribute))
 				&& property.Symbol.IsReadOnly);
 		}
 
@@ -68,12 +68,10 @@ namespace Deptorygen2.Core.Syntaxes.Parser
 						_resolutionLoader.GetStructures(symbol).AddRangeTo(resolutionList);
 					}).ToArray();
 
-				methods.Select(m => _singleResolverLoader.FromStructure(m))
-					.FilterNull()
+				Helpers.FilterNull(methods.Select(m => _singleResolverLoader.FromStructure(m)))
 					.AddRangeTo(singles);
 
-				methods.Select(s => _collectionResolverLoader.FromResolver(s))
-					.FilterNull()
+				Helpers.FilterNull(methods.Select(s => _collectionResolverLoader.FromResolver(s)))
 					.AddRangeTo(collections);
 			}
 		}
@@ -100,8 +98,7 @@ namespace Deptorygen2.Core.Syntaxes.Parser
 
 			static bool CanBeElement(INamedTypeSymbol nts, TypeName elementType)
 			{
-				return nts.AllInterfaces.Append(nts.BaseType).Append(nts)
-					.FilterNull()
+				return Helpers.FilterNull(nts.AllInterfaces.Append(nts.BaseType).Append(nts))
 					.Any(x => TypeName.FromSymbol(x) == elementType);
 			}
 		}
