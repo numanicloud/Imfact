@@ -86,8 +86,7 @@ namespace Deptorygen2.Core.Syntaxes
 					.Where(node => node.Body != null)
 					.Any(node => node.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)));
 			}
-
-			// TODO: holderを探す
+			
 			var holders = new[] { factory.Symbol, factory.Symbol.BaseType };
 
 			return from members in
