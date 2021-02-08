@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Syntaxes
@@ -49,11 +50,6 @@ namespace Deptorygen2.Core.Syntaxes
 				.Select(symbolToSyntax)
 				.FilterNull()
 				.ToArray();
-		}
-
-		public static ResolutionSyntax[] FromResolversAttribute(IMethodSymbol resolver)
-		{
-			return FromResolversAttribute(resolver, FromType);
 		}
 	}
 }

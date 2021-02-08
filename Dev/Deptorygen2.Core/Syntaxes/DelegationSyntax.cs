@@ -3,6 +3,7 @@ using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Structure;
 using Deptorygen2.Core.Syntaxes.Parser;
+using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Syntaxes
 {
@@ -26,18 +27,6 @@ namespace Deptorygen2.Core.Syntaxes
 			return Resolvers.Cast<IServiceProvider>()
 				.Concat(CollectionResolvers)
 				.SelectMany(x => x.GetCapableServiceTypes());
-		}
-
-		public static IEnumerable<DelegationSyntax> FromFactory(FactoryAnalysisContext factory)
-		{
-			// 解析都合の絞り込みなどはLoader内でやる
-			// 仕様都合の絞り込みなどはここでやる
-			var loader = new DelegationLoader(prop =>
-				prop.TypeSymbol.HasAttribute(nameof(FactoryAttribute))
-				&& prop.Symbol.IsReadOnly);
-
-			return loader.ExtractProperties(factory)
-				.Select(x => loader.FromPropertyInfo(factory.Context, x));
 		}
 	}
 }

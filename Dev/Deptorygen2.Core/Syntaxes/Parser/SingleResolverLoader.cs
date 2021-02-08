@@ -1,27 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Deptorygen2.Core.Structure;
-using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Syntaxes.Parser
 {
 	internal class SingleResolverLoader
 	{
-		public ResolverSyntax? FromResolver(ResolverStructure item)
+		private readonly Predicate<ResolverStructure> _filter;
+		private readonly ResolutionLoader _resolutionLoader;
+
+		public SingleResolverLoader(Predicate<ResolverStructure> filter, ResolutionLoader resolutionLoader)
 		{
-			if (item.Symbol.ReturnType is not INamedTypeSymbol returnType)
+			_filter = filter;
+			_resolutionLoader = resolutionLoader;
+		}
+
+		public ResolverSyntax? FromStructure(ResolverStructure item)
+		{
+			if (!_filter(item))
 			{
 				return null;
 			}
 
+			var resolutions = item.Resolutions.Select(s => _resolutionLoader.FromStructure(s))
+				.FilterNull()
+				.ToArray();
+
 			return new ResolverSyntax(
 				item.Symbol.Name,
-				TypeName.FromSymbol(returnType),
-				ResolutionSyntax.FromType(returnType),
-				ResolutionSyntax.FromResolversAttribute(item.Symbol),
+				TypeName.FromSymbol(item.Return),
+				ResolutionSyntax.FromType(item.Return),
+				resolutions,
 				ParameterSyntax.FromResolver(item.Symbol),
 				item.Symbol.DeclaredAccessibility);
 		}

@@ -1,55 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
+using Deptorygen2.Core.Structure;
 
 namespace Deptorygen2.Core.Syntaxes.Parser
 {
 	internal class CollectionResolverLoader
 	{
+		private readonly Predicate<ResolverStructure> _filter;
+
+		private readonly ResolutionLoader _resolutionLoader;
 		/* 仕様都合の条件：
 		 *		IEnumerable<T> 型である
 		 *		Resolution属性で指定された型のうち、T に代入できるものが1つ以上ある
 		 */
 
-		public CollectionResolverSyntax? FromResolver(IMethodSymbol resolver)
+		public CollectionResolverLoader(Predicate<ResolverStructure> filter, ResolutionLoader resolutionLoader)
 		{
-			if (TryGetIEnumerableType(resolver.ReturnType) is not ({ } collection, { } element))
+			_filter = filter;
+			_resolutionLoader = resolutionLoader;
+		}
+
+		public CollectionResolverSyntax? FromResolver(ResolverStructure resolver)
+		{
+			if (!_filter(resolver))
 			{
 				return null;
 			}
 
-			var resolutions = ResolutionSyntax.FromResolversAttribute(resolver,
-				x => IsElementType(x, element) ? ResolutionSyntax.FromType(x) : null);
-
-			if (resolutions.Any())
-			{
-				var parameters = ParameterSyntax.FromResolver(resolver);
-				return new CollectionResolverSyntax(resolver.Name, collection, parameters, resolutions);
-			}
-
-			return null;
-		}
-
-		private (TypeName? collection, TypeName? element) TryGetIEnumerableType(ITypeSymbol symbol)
-		{
-			var type = TypeName.FromSymbol(symbol);
-
-			if (type.NameWithoutArguments != "IEnumerable" || type.TypeArguments.Length != 1)
-			{
-				return (null, null);
-			}
-
-			return (type, type.TypeArguments[0]);
-		}
-
-		private bool IsElementType(INamedTypeSymbol nts, TypeName elementType)
-		{
-			return nts.AllInterfaces.Append(nts.BaseType).Append(nts)
+			var parameters = ParameterSyntax.FromResolver(resolver.Symbol);
+			var resolutions = resolver.Resolutions.Select(_resolutionLoader.FromStructure)
 				.FilterNull()
-				.Any(x => TypeName.FromSymbol(x) == elementType);
+				.ToArray();
+
+			return new CollectionResolverSyntax(
+				resolver.Symbol.Name,
+				TypeName.FromSymbol(resolver.Return),
+				parameters,
+				resolutions);
 		}
 	}
 }

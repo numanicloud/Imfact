@@ -57,5 +57,15 @@ namespace Deptorygen2.Core.Structure
 	internal record ResolverStructure(
 		MethodDeclarationSyntax Syntax,
 		IMethodSymbol Symbol,
+		INamedTypeSymbol Return,
+		ResolutionStructure[] Resolutions,
 		FactoryAnalysisContext Factory);
+
+	internal record CollectionResolverStructure(
+		MethodDeclarationSyntax Syntax,
+		IMethodSymbol Symbol,
+		ResolutionStructure[] Resolutions,
+		FactoryAnalysisContext Factory);
+
+	internal record ResolutionStructure(INamedTypeSymbol Symbol);
 }

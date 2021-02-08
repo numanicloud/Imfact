@@ -7,6 +7,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Deptorygen2.Core.Syntaxes.Parser
 {
+	internal delegate void DelegationResolverLoader(FactoryAnalysisContext delegated,
+		List<ResolverSyntax> delegatedResolvers,
+		List<CollectionResolverSyntax> delegatedCollectionResolvers);
+
 	// 構文解析担当。
 	// どのようなプロパティを探すか、という条件を外から与える
 	internal class DelegationLoader
@@ -18,24 +22,33 @@ namespace Deptorygen2.Core.Syntaxes.Parser
 			_filter = filter;
 		}
 
+		public IEnumerable<DelegationSyntax> BuildDelegationSyntaxes(
+			FactoryAnalysisContext factory,
+			DelegationResolverLoader loadResolvers)
+		{
+			var properties = ExtractProperties(factory);
+
+			foreach (var prop in properties)
+			{
+				var factoryContext = new FactoryAnalysisContext(
+					prop.TypeSyntax,
+					prop.TypeSymbol,
+					factory.Context);
+				var singleList = new List<ResolverSyntax>();
+				var collectionList = new List<CollectionResolverSyntax>();
+
+				loadResolvers(factoryContext, singleList, collectionList);
+
+				yield return new DelegationSyntax(prop.Symbol.Name,
+					TypeName.FromSymbol(prop.TypeSymbol),
+					singleList.ToArray(),
+					collectionList.ToArray());
+			}
+		}
+
 		public IEnumerable<PropertyInfo> ExtractProperties(FactoryAnalysisContext factory)
 		{
 			return ExtractProperties(factory.Symbol, factory.Symbol.BaseType);
-		}
-
-		public DelegationSyntax FromPropertyInfo(SourceGenAnalysisContext context, PropertyInfo prop)
-		{
-			var factoryContext = new FactoryAnalysisContext(
-				prop.TypeSyntax,
-				prop.TypeSymbol,
-				context);
-
-			var resolvers = ResolverSyntax.FromParent(factoryContext);
-
-			return new DelegationSyntax(prop.Symbol.Name,
-				TypeName.FromSymbol(prop.TypeSymbol),
-				resolvers.Item1,
-				resolvers.Item2);
 		}
 
 		private IEnumerable<PropertyInfo> ExtractProperties(params INamedTypeSymbol?[] containers)

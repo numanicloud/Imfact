@@ -1,17 +1,28 @@
 ﻿using System;
 using System.Linq;
+using Deptorygen2.Core.Structure;
+using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Syntaxes.Parser
 {
 	internal class ResolutionLoader
 	{
-		public static ResolutionSyntax[] FromResolversAttribute(IMethodSymbol resolver)
+		private readonly Predicate<AttributeData> _filter;
+
+		public ResolutionLoader(Predicate<AttributeData> filter)
 		{
-			return FromResolversAttribute(resolver, FromType);
+			/* 仕様都合の条件：
+			 *		ResolutionAttribute型である
+			 *		コンストラクタ引数が1つである
+			 * 実装都合の条件：
+			 *		コンストラクタ引数が1つ以上である
+			 *		1番目のコンストラクタ引数の型がTypeである
+			 */
+			_filter = filter;
 		}
 
-		public static ResolutionSyntax? FromType(INamedTypeSymbol symbol)
+		public static ResolutionSyntax? FromTypeSymbol(INamedTypeSymbol symbol)
 		{
 			if (symbol.Constructors.SingleOrDefault() is not { } constructor)
 			{
@@ -32,17 +43,20 @@ namespace Deptorygen2.Core.Syntaxes.Parser
 			return new ResolutionSyntax(TypeName.FromSymbol(symbol), dependencies, isDisposable);
 		}
 
-		public static ResolutionSyntax[] FromResolversAttribute(IMethodSymbol resolver,
-			Func<INamedTypeSymbol, ResolutionSyntax?> symbolToSyntax)
+		public ResolutionStructure[] GetStructures(IMethodSymbol resolver)
 		{
 			return resolver.GetAttributes()
-				.Where(x => x.AttributeClass?.Name == nameof(ResolutionAttribute))
-				.Where(x => x.ConstructorArguments.Length == 1)
-				.Select(x => x.ConstructorArguments[0].Value)
-				.OfType<INamedTypeSymbol>()
-				.Select(symbolToSyntax)
+				.Where(x => _filter(x))
+				.Select(x => x.ConstructorArguments.FirstOrDefault().Value)
 				.FilterNull()
+				.OfType<INamedTypeSymbol>()
+				.Select(x => new ResolutionStructure(x))
 				.ToArray();
+		}
+
+		public ResolutionSyntax? FromStructure(ResolutionStructure structure)
+		{
+			return FromTypeSymbol(structure.Symbol);
 		}
 	}
 }
