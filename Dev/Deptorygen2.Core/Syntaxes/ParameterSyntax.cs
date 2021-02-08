@@ -3,17 +3,8 @@ using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Syntaxes
 {
-	class ParameterSyntax
+	internal record ParameterSyntax(TypeName TypeName, string ParameterName)
 	{
-		public TypeName TypeName { get; }
-		public string ParameterName { get; }
-
-		public ParameterSyntax(TypeName typeName, string parameterName)
-		{
-			TypeName = typeName;
-			ParameterName = parameterName;
-		}
-
 		public static ParameterSyntax[] FromResolver(IMethodSymbol symbol)
 		{
 			return symbol.Parameters

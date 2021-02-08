@@ -9,10 +9,10 @@ namespace Deptorygen2.Core.Syntaxes.Parser
 {
 	internal class ResolverLoader
 	{
-		private readonly Predicate<ResolverStructure> _filter;
+		private readonly Predicate<ResolverAnalysisContext> _filter;
 		private readonly ResolutionLoader _resolutionLoader;
 
-		public ResolverLoader(Predicate<ResolverStructure> filter, ResolutionLoader resolutionLoader)
+		public ResolverLoader(Predicate<ResolverAnalysisContext> filter, ResolutionLoader resolutionLoader)
 		{
 			/* 仕様都合の条件：
 			 *		partialである
@@ -22,15 +22,15 @@ namespace Deptorygen2.Core.Syntaxes.Parser
 			_resolutionLoader = resolutionLoader;
 		}
 
-		public IEnumerable<ResolverStructure> BuildResolverStructures(
+		public IEnumerable<ResolverAnalysisContext> BuildResolverStructures(
 			FactoryAnalysisContext container,
-			Action<IMethodSymbol, List<ResolutionStructure>> isolation)
+			Action<IMethodSymbol, List<ResolutionAnalysisContext>> isolation)
 		{
 			var methods = Extract(container.Symbol, container.Symbol.BaseType);
 
 			foreach (var methodSymbol in methods)
 			{
-				var resolutionList = new List<ResolutionStructure>();
+				var resolutionList = new List<ResolutionAnalysisContext>();
 
 				isolation(methodSymbol, resolutionList);
 
@@ -52,14 +52,14 @@ namespace Deptorygen2.Core.Syntaxes.Parser
 				select member;
 		}
 
-		private ResolverStructure? GetStructure(
+		private ResolverAnalysisContext? GetStructure(
 			IMethodSymbol symbol,
-			ResolutionStructure[] resolutions,
+			ResolutionAnalysisContext[] resolutions,
 			FactoryAnalysisContext factoryContext)
 		{
 			return MethodDeclarationSyntax(symbol) is not { } syntax ? null
 				: symbol.ReturnType is not INamedTypeSymbol nts ? null
-				: new ResolverStructure(syntax, symbol, nts, resolutions, factoryContext);
+				: new ResolverAnalysisContext(syntax, symbol, nts, resolutions, factoryContext);
 		}
 
 		private MethodDeclarationSyntax? MethodDeclarationSyntax(IMethodSymbol symbol)
@@ -71,12 +71,12 @@ namespace Deptorygen2.Core.Syntaxes.Parser
 				.FirstOrDefault();
 		}
 
-		public IEnumerable<ResolverStructure> ExtractResolverMethods(FactoryAnalysisContext container)
+		public IEnumerable<ResolverAnalysisContext> ExtractResolverMethods(FactoryAnalysisContext container)
 		{
 			return ResolverStructures(container, container.Symbol, container.Symbol.BaseType);
 		}
 
-		private IEnumerable<ResolverStructure> ResolverStructures(
+		private IEnumerable<ResolverAnalysisContext> ResolverStructures(
 			FactoryAnalysisContext container, params INamedTypeSymbol?[] holders)
 		{
 			var structures = from members in
@@ -91,7 +91,7 @@ namespace Deptorygen2.Core.Syntaxes.Parser
 				   select structure;
 		}
 
-		private ResolverStructure? GetStructure(IMethodSymbol symbol, FactoryAnalysisContext factoryContext)
+		private ResolverAnalysisContext? GetStructure(IMethodSymbol symbol, FactoryAnalysisContext factoryContext)
 		{
 			var resolutions = _resolutionLoader.GetStructures(symbol);
 			return GetStructure(symbol, resolutions, factoryContext);

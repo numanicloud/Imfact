@@ -78,7 +78,7 @@ namespace Deptorygen2.Core.Syntaxes.Parser
 			}
 		}
 
-		private bool SatisfyCollectionResolverCondition(ResolverStructure method)
+		private bool SatisfyCollectionResolverCondition(ResolverAnalysisContext method)
 		{
 			if (!IsCollectionType(method.Symbol.ReturnType))
 			{

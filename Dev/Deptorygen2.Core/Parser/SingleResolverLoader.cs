@@ -6,16 +6,16 @@ namespace Deptorygen2.Core.Syntaxes.Parser
 {
 	internal class SingleResolverLoader
 	{
-		private readonly Predicate<ResolverStructure> _filter;
+		private readonly Predicate<ResolverAnalysisContext> _filter;
 		private readonly ResolutionLoader _resolutionLoader;
 
-		public SingleResolverLoader(Predicate<ResolverStructure> filter, ResolutionLoader resolutionLoader)
+		public SingleResolverLoader(Predicate<ResolverAnalysisContext> filter, ResolutionLoader resolutionLoader)
 		{
 			_filter = filter;
 			_resolutionLoader = resolutionLoader;
 		}
 
-		public ResolverSyntax? FromStructure(ResolverStructure item)
+		public ResolverSyntax? FromStructure(ResolverAnalysisContext item)
 		{
 			if (!_filter(item))
 			{
@@ -29,7 +29,7 @@ namespace Deptorygen2.Core.Syntaxes.Parser
 			return new ResolverSyntax(
 				item.Symbol.Name,
 				TypeName.FromSymbol(item.Return),
-				ResolutionSyntax.FromType(item.Return),
+				_resolutionLoader.FromTypeSymbol(item.Return),
 				resolutions,
 				ParameterSyntax.FromResolver(item.Symbol),
 				item.Symbol.DeclaredAccessibility);
