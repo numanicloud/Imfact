@@ -9,9 +9,9 @@ namespace Deptorygen2.Core
 		DelegationDefinition[] Delegations,
 		DependencyDefinition[] Fields)
 	{
-		public static FactoryDefinition Build(FactorySyntax syntax, ChildrenBuilder childrenBuilder)
+		public static FactoryDefinition Build(FactorySemantics semantics, ChildrenBuilder childrenBuilder)
 		{
-			return childrenBuilder(syntax.ItselfSymbol.Name);
+			return childrenBuilder(semantics.ItselfSymbol.Name);
 		}
 
 		public delegate FactoryDefinition ChildrenBuilder(string className);

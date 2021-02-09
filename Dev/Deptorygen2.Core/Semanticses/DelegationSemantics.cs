@@ -5,10 +5,10 @@ using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Syntaxes
 {
-	internal record DelegationSyntax(string PropertyName,
+	internal record DelegationSemantics(string PropertyName,
 		TypeName TypeName,
-		ResolverSyntax[] Resolvers,
-		CollectionResolverSyntax[] CollectionResolvers) : IServiceProvider, INamespaceClaimer
+		ResolverSemantics[] Resolvers,
+		CollectionResolverSemantics[] CollectionResolvers) : IServiceProvider, INamespaceClaimer
 	{
 		public IEnumerable<TypeName> GetCapableServiceTypes()
 		{

@@ -41,7 +41,7 @@ namespace Deptorygen2.Core.Parser
 				&& property.Symbol.IsReadOnly);
 		}
 
-		public async Task<FactorySyntax> LoadAsync(
+		public async Task<FactorySemantics> LoadAsync(
 			ClassDeclarationSyntax classDeclarationSyntax,
 			SourceGenAnalysisContext context)
 		{
@@ -59,8 +59,8 @@ namespace Deptorygen2.Core.Parser
 				});
 
 			void LoadResolvers(FactoryAnalysisContext factory,
-				List<ResolverSyntax> singles,
-				List<CollectionResolverSyntax> collections)
+				List<ResolverSemantics> singles,
+				List<CollectionResolverSemantics> collections)
 			{
 				var methods = _resolverLoader.BuildResolverStructures(factory,
 					(symbol, resolutionList) =>

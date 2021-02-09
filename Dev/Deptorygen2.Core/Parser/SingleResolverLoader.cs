@@ -16,7 +16,7 @@ namespace Deptorygen2.Core.Parser
 			_resolutionLoader = resolutionLoader;
 		}
 
-		public ResolverSyntax? FromStructure(ResolverAnalysisContext item)
+		public ResolverSemantics? FromStructure(ResolverAnalysisContext item)
 		{
 			if (!_filter(item))
 			{
@@ -27,12 +27,12 @@ namespace Deptorygen2.Core.Parser
 				.FilterNull()
 				.ToArray();
 
-			return new ResolverSyntax(
+			return new ResolverSemantics(
 				item.Symbol.Name,
 				TypeName.FromSymbol(item.Return),
 				_resolutionLoader.FromTypeSymbol(item.Return),
 				resolutions,
-				ParameterSyntax.FromResolver(item.Symbol),
+				ParameterSemantics.FromResolver(item.Symbol),
 				item.Symbol.DeclaredAccessibility);
 		}
 	}

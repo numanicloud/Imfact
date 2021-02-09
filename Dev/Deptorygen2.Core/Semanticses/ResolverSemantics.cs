@@ -6,11 +6,11 @@ using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Syntaxes
 {
-	internal record ResolverSyntax(string MethodName,
+	internal record ResolverSemantics(string MethodName,
 		TypeName ReturnTypeName,
-		ResolutionSyntax? ReturnTypeResolution,
-		ResolutionSyntax[] Resolutions,
-		ParameterSyntax[] Parameters,
+		ResolutionSemantics? ReturnTypeResolution,
+		ResolutionSemantics[] Resolutions,
+		ParameterSemantics[] Parameters,
 		Accessibility Accessibility) : IServiceConsumer, IServiceProvider, INamespaceClaimer
 	{
 		public IEnumerable<TypeName> GetRequiredServiceTypes()

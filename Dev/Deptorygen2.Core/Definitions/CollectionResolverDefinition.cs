@@ -23,7 +23,7 @@ namespace Deptorygen2.Core
 		}
 
 		public static IEnumerable<CollectionResolverDefinition> Build(
-			FactorySyntax factory,
+			FactorySemantics factory,
 			ChildrenBuilder childrenBuilder)
 		{
 			return factory.CollectionResolvers.Select(resolver =>
@@ -35,7 +35,7 @@ namespace Deptorygen2.Core
 		}
 
 		public delegate CollectionResolverDefinition ChildrenBuilder(
-			CollectionResolverSyntax resolver,
+			CollectionResolverSemantics resolver,
 			CollectionResolverNodeData nodeData);
 	}
 

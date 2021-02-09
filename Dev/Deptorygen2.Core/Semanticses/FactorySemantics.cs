@@ -4,10 +4,10 @@ using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Syntaxes
 {
-	internal record FactorySyntax(INamedTypeSymbol ItselfSymbol,
-		ResolverSyntax[] Resolvers,
-		CollectionResolverSyntax[] CollectionResolvers,
-		DelegationSyntax[] Delegations) : Interfaces.IServiceProvider
+	internal record FactorySemantics(INamedTypeSymbol ItselfSymbol,
+		ResolverSemantics[] Resolvers,
+		CollectionResolverSemantics[] CollectionResolvers,
+		DelegationSemantics[] Delegations) : Interfaces.IServiceProvider
 	{
 		public IEnumerable<TypeName> GetCapableServiceTypes()
 		{

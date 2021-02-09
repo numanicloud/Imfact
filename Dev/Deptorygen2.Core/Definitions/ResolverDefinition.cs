@@ -24,8 +24,8 @@ namespace Deptorygen2.Core
 		{
 		}
 
-		public static IEnumerable<ResolverDefinition> Build(FactorySyntax factory,
-			Func<ResolverSyntax, ResolverNodeData, ResolverDefinition> childrenBuilder)
+		public static IEnumerable<ResolverDefinition> Build(FactorySemantics factory,
+			Func<ResolverSemantics, ResolverNodeData, ResolverDefinition> childrenBuilder)
 		{
 			return factory.Resolvers.Select(resolver =>
 			{

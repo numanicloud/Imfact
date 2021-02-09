@@ -7,12 +7,12 @@ namespace Deptorygen2.Core.Coder
 {
 	internal class ArgumentResolver
 	{
-		private readonly FactorySyntax _factory;
+		private readonly FactorySemantics _factory;
 		private readonly DependencyDefinition[] _fields;
 		private readonly TypeName _factoryType;
 		private readonly Dictionary<TypeName, string> _cache = new();
 
-		public ArgumentResolver(FactorySyntax factory, DependencyDefinition[] fields)
+		public ArgumentResolver(FactorySemantics factory, DependencyDefinition[] fields)
 		{
 			_factory = factory;
 			_fields = fields;

@@ -9,8 +9,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Deptorygen2.Core.Parser
 {
 	internal delegate void DelegationResolverLoader(FactoryAnalysisContext delegated,
-		List<ResolverSyntax> delegatedResolvers,
-		List<CollectionResolverSyntax> delegatedCollectionResolvers);
+		List<ResolverSemantics> delegatedResolvers,
+		List<CollectionResolverSemantics> delegatedCollectionResolvers);
 
 	// 構文解析担当。
 	// どのようなプロパティを探すか、という条件を外から与える
@@ -23,7 +23,7 @@ namespace Deptorygen2.Core.Parser
 			_filter = filter;
 		}
 
-		public IEnumerable<DelegationSyntax> BuildDelegationSyntaxes(
+		public IEnumerable<DelegationSemantics> BuildDelegationSyntaxes(
 			FactoryAnalysisContext factory,
 			DelegationResolverLoader loadResolvers)
 		{
@@ -35,12 +35,12 @@ namespace Deptorygen2.Core.Parser
 					prop.TypeSyntax,
 					prop.TypeSymbol,
 					factory.Context);
-				var singleList = new List<ResolverSyntax>();
-				var collectionList = new List<CollectionResolverSyntax>();
+				var singleList = new List<ResolverSemantics>();
+				var collectionList = new List<CollectionResolverSemantics>();
 
 				loadResolvers(factoryContext, singleList, collectionList);
 
-				yield return new DelegationSyntax(prop.Symbol.Name,
+				yield return new DelegationSemantics(prop.Symbol.Name,
 					TypeName.FromSymbol(prop.TypeSymbol),
 					singleList.ToArray(),
 					collectionList.ToArray());

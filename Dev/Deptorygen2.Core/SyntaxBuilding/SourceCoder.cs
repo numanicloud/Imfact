@@ -9,19 +9,19 @@ namespace Deptorygen2.Core.Coder
 {
 	internal class SourceCoder
 	{
-		public SourceCodeDefinition Encode(FactorySyntax syntax)
+		public SourceCodeDefinition Encode(FactorySemantics semantics)
 		{
-			string[] usings = AggregateNamespaces(syntax).ToArray();
-			string ns = syntax.ItselfSymbol.GetFullNameSpace();
+			string[] usings = AggregateNamespaces(semantics).ToArray();
+			string ns = semantics.ItselfSymbol.GetFullNameSpace();
 
-			var factory = FactoryDefinition.Build(syntax, name =>
+			var factory = FactoryDefinition.Build(semantics, name =>
 			{
-				var fields = AggregateDependencies(syntax);
-				var argumentResolver = new ArgumentResolver(syntax, fields);
+				var fields = AggregateDependencies(semantics);
+				var argumentResolver = new ArgumentResolver(semantics, fields);
 
-				var resolvers = AggregateResolvers(syntax, argumentResolver);
-				var collectionResolvers = AggregateCollectionResolvers(syntax, argumentResolver);
-				var delegations = syntax.Delegations.Select(BuildDelegation).ToArray();
+				var resolvers = AggregateResolvers(semantics, argumentResolver);
+				var collectionResolvers = AggregateCollectionResolvers(semantics, argumentResolver);
+				var delegations = semantics.Delegations.Select(BuildDelegation).ToArray();
 
 				return new FactoryDefinition(name, resolvers, collectionResolvers, delegations,
 					fields);
@@ -30,9 +30,9 @@ namespace Deptorygen2.Core.Coder
 			return new SourceCodeDefinition(usings, ns, factory);
 		}
 
-		private static CollectionResolverDefinition[] AggregateCollectionResolvers(FactorySyntax syntax, ArgumentResolver argumentResolver)
+		private static CollectionResolverDefinition[] AggregateCollectionResolvers(FactorySemantics semantics, ArgumentResolver argumentResolver)
 		{
-			return CollectionResolverDefinition.Build(syntax, (resolver, data) =>
+			return CollectionResolverDefinition.Build(semantics, (resolver, data) =>
 			{
 				var parameters = BuildParameters(resolver.Parameters);
 				var resolutions = resolver.Resolutions
@@ -45,9 +45,9 @@ namespace Deptorygen2.Core.Coder
 			}).ToArray();
 		}
 
-		private static ResolverDefinition[] AggregateResolvers(FactorySyntax syntax, ArgumentResolver argumentResolver)
+		private static ResolverDefinition[] AggregateResolvers(FactorySemantics semantics, ArgumentResolver argumentResolver)
 		{
-			return ResolverDefinition.Build(syntax, (resolver, data) =>
+			return ResolverDefinition.Build(semantics, (resolver, data) =>
 			{
 				var primalResolution = resolver.ReturnTypeResolution ?? resolver.Resolutions[0];
 				var parameters = BuildParameters(resolver.Parameters);
@@ -59,19 +59,19 @@ namespace Deptorygen2.Core.Coder
 			}).ToArray();
 		}
 
-		private DelegationDefinition BuildDelegation(DelegationSyntax delegation)
+		private DelegationDefinition BuildDelegation(DelegationSemantics delegation)
 		{
 			return new(delegation.TypeName, delegation.PropertyName);
 		}
 
-		private static ResolverParameterDefinition[] BuildParameters(ParameterSyntax[] parameters)
+		private static ResolverParameterDefinition[] BuildParameters(ParameterSemantics[] parameters)
 		{
 			return parameters
 				.Select(p => new ResolverParameterDefinition(p.TypeName, p.ParameterName))
 				.ToArray();
 		}
 
-		private static ResolutionDefinition BuildResolution(ResolutionSyntax resolution,
+		private static ResolutionDefinition BuildResolution(ResolutionSemantics resolution,
 			ArgumentResolver argumentResolver,
 			ResolverParameterDefinition[] parameters)
 		{
@@ -81,16 +81,16 @@ namespace Deptorygen2.Core.Coder
 			return new ResolutionDefinition(type, arguments);
 		}
 
-		private static DependencyDefinition[] AggregateDependencies(FactorySyntax syntax)
+		private static DependencyDefinition[] AggregateDependencies(FactorySemantics semantics)
 		{
-			var consumers = syntax.Resolvers.Cast<IServiceConsumer>()
-				.Concat(syntax.CollectionResolvers)
+			var consumers = semantics.Resolvers.Cast<IServiceConsumer>()
+				.Concat(semantics.CollectionResolvers)
 				.SelectMany(x => x.GetRequiredServiceTypes())
 				.Distinct();
 
-			var providers = syntax.Resolvers.Cast<IServiceProvider>()
-				.Concat(syntax.CollectionResolvers)
-				.Concat(syntax.Delegations)
+			var providers = semantics.Resolvers.Cast<IServiceProvider>()
+				.Concat(semantics.CollectionResolvers)
+				.Concat(semantics.Delegations)
 				.SelectMany(x => x.GetCapableServiceTypes())
 				.Distinct();
 
@@ -99,11 +99,11 @@ namespace Deptorygen2.Core.Coder
 				.ToArray();
 		}
 
-		private static IEnumerable<string> AggregateNamespaces(FactorySyntax syntax)
+		private static IEnumerable<string> AggregateNamespaces(FactorySemantics semantics)
 		{
-			return syntax.Resolvers.Cast<INamespaceClaimer>()
-				.Concat(syntax.CollectionResolvers)
-				.Concat(syntax.Delegations)
+			return semantics.Resolvers.Cast<INamespaceClaimer>()
+				.Concat(semantics.CollectionResolvers)
+				.Concat(semantics.Delegations)
 				.SelectMany(x => x.GetRequiredNamespaces())
 				.Distinct();
 		}

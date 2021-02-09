@@ -21,19 +21,19 @@ namespace Deptorygen2.Core.Parser
 			_resolutionLoader = resolutionLoader;
 		}
 
-		public CollectionResolverSyntax? FromResolver(ResolverAnalysisContext resolver)
+		public CollectionResolverSemantics? FromResolver(ResolverAnalysisContext resolver)
 		{
 			if (!_filter(resolver))
 			{
 				return null;
 			}
 
-			var parameters = ParameterSyntax.FromResolver(resolver.Symbol);
+			var parameters = ParameterSemantics.FromResolver(resolver.Symbol);
 			var resolutions = resolver.Resolutions.Select(_resolutionLoader.FromStructure)
 				.FilterNull()
 				.ToArray();
 
-			return new CollectionResolverSyntax(
+			return new CollectionResolverSemantics(
 				resolver.Symbol.Name,
 				TypeName.FromSymbol(resolver.Return),
 				parameters,

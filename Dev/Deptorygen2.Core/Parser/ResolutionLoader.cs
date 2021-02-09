@@ -22,7 +22,7 @@ namespace Deptorygen2.Core.Parser
 			_filter = filter;
 		}
 
-		public ResolutionSyntax? FromTypeSymbol(INamedTypeSymbol symbol)
+		public ResolutionSemantics? FromTypeSymbol(INamedTypeSymbol symbol)
 		{
 			if (symbol.Constructors.SingleOrDefault() is not { } constructor)
 			{
@@ -32,7 +32,7 @@ namespace Deptorygen2.Core.Parser
 			return FromConstructor(symbol, constructor);
 		}
 
-		private ResolutionSyntax FromConstructor(INamedTypeSymbol symbol, IMethodSymbol constructor)
+		private ResolutionSemantics FromConstructor(INamedTypeSymbol symbol, IMethodSymbol constructor)
 		{
 			var isDisposable = symbol.IsImplementing(typeof(IDisposable));
 
@@ -40,7 +40,7 @@ namespace Deptorygen2.Core.Parser
 				.Select(x => TypeName.FromSymbol(x.Type))
 				.ToArray();
 
-			return new ResolutionSyntax(TypeName.FromSymbol(symbol), dependencies, isDisposable);
+			return new ResolutionSemantics(TypeName.FromSymbol(symbol), dependencies, isDisposable);
 		}
 
 		public ResolutionAnalysisContext[] GetStructures(IMethodSymbol resolver)
@@ -54,7 +54,7 @@ namespace Deptorygen2.Core.Parser
 				.ToArray();
 		}
 
-		public ResolutionSyntax? FromStructure(ResolutionAnalysisContext analysisContext)
+		public ResolutionSemantics? FromStructure(ResolutionAnalysisContext analysisContext)
 		{
 			return FromTypeSymbol(analysisContext.Symbol);
 		}

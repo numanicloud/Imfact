@@ -6,10 +6,10 @@ using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Syntaxes
 {
-	internal record CollectionResolverSyntax(string MethodName,
+	internal record CollectionResolverSemantics(string MethodName,
 		TypeName CollectionType,
-		ParameterSyntax[] Parameters,
-		ResolutionSyntax[] Resolutions,
+		ParameterSemantics[] Parameters,
+		ResolutionSemantics[] Resolutions,
 		Accessibility Accessibility) : IServiceConsumer, IServiceProvider, INamespaceClaimer
 	{
 		public TypeName ElementType => CollectionType.TypeArguments[0];

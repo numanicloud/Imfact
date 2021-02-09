@@ -10,25 +10,25 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Deptorygen2.Core.Parser
 {
 	internal delegate void FactoryContentsLoader(FactoryAnalysisContext factory,
-		List<ResolverSyntax> singles,
-		List<CollectionResolverSyntax> collections,
-		List<DelegationSyntax> delegations);
+		List<ResolverSemantics> singles,
+		List<CollectionResolverSemantics> collections,
+		List<DelegationSemantics> delegations);
 
 	internal class FactoryLoader
 	{
-		public async Task<FactorySyntax> BuildFactorySyntaxAsync(
+		public async Task<FactorySemantics> BuildFactorySyntaxAsync(
 			ClassDeclarationSyntax classDeclarationSyntax,
 			SourceGenAnalysisContext context,
 			FactoryContentsLoader loadContents)
 		{
 			var factory = await GetContextAsync(classDeclarationSyntax, context);
-			var singles = new List<ResolverSyntax>();
-			var collections = new List<CollectionResolverSyntax>();
-			var delegations = new List<DelegationSyntax>();
+			var singles = new List<ResolverSemantics>();
+			var collections = new List<CollectionResolverSemantics>();
+			var delegations = new List<DelegationSemantics>();
 
 			loadContents.Invoke(factory, singles, collections, delegations);
 
-			return new FactorySyntax(factory.Symbol, singles.ToArray(), collections.ToArray(), delegations.ToArray());
+			return new FactorySemantics(factory.Symbol, singles.ToArray(), collections.ToArray(), delegations.ToArray());
 		}
 
 		public async Task<FactoryAnalysisContext> GetContextAsync(
