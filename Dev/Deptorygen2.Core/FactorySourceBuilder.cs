@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using Deptorygen2.Core.Definitions;
 using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core

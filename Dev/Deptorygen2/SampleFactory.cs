@@ -1,5 +1,6 @@
 ﻿using System;
 using Deptorygen2.Core;
+using Deptorygen2.Core.Definitions;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
@@ -32,7 +33,10 @@ namespace Deptorygen2
 							new(Make("Int32", "System"), "hoge")
 						},
 						new HookDefinition[0]),
-				}, new DependencyDefinition[]
+				},
+				new CollectionResolverDefinition[0],
+				new DelegationDefinition[0],
+				new DependencyDefinition[]
 				{
 					new(Make("Other"), "_other")
 				});

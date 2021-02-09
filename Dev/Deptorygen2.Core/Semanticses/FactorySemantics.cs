@@ -2,7 +2,7 @@
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Syntaxes
+namespace Deptorygen2.Core.Semanticses
 {
 	internal record FactorySemantics(INamedTypeSymbol ItselfSymbol,
 		ResolverSemantics[] Resolvers,

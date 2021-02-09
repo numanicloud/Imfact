@@ -1,22 +1,66 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Syntaxes;
+using Deptorygen2.Core.Definitions;
+using Deptorygen2.Core.Interfaces;
+using Deptorygen2.Core.Semanticses;
 using Deptorygen2.Core.Utilities;
 
-namespace Deptorygen2.Core.Coder
+namespace Deptorygen2.Core.SyntaxBuilding
 {
 	internal class ArgumentResolver
 	{
-		private readonly FactorySemantics _factory;
-		private readonly DependencyDefinition[] _fields;
-		private readonly TypeName _factoryType;
-		private readonly Dictionary<TypeName, string> _cache = new();
+		private readonly InjectionMatch<FactorySemantics> _factoryMatch;
+		private readonly InjectionMatch<DelegationSemantics> _delegationMatch;
+		private readonly InjectionMatch<(DelegationSemantics, ResolverSemantics)> _delegationResolverMatch;
+		private readonly InjectionMatch<(DelegationSemantics, CollectionResolverSemantics)> _delegationCollectionMatch;
+		private readonly InjectionMatch<ResolverSemantics> _resolverMatch;
+		private readonly InjectionMatch<CollectionResolverSemantics> _collectionResolverMatch;
+		private readonly InjectionMatch<DependencyDefinition> _fieldMatch;
 
 		public ArgumentResolver(FactorySemantics factory, DependencyDefinition[] fields)
 		{
-			_factory = factory;
-			_fields = fields;
-			_factoryType = TypeName.FromSymbol(factory.ItselfSymbol);
+			_factoryMatch = Create(factory.AsEnumerable(),
+				f => TypeName.FromSymbol(factory.ItselfSymbol),
+				(f, ps) => "this");
+
+			_delegationMatch = Create(factory.Delegations,
+				delegation => delegation.TypeName,
+				(delegation, ps) => delegation.PropertyName);
+			
+			_delegationResolverMatch = Create(Dig(d => d.Resolvers),
+				t => t.resolver.ReturnTypeName,
+				(t, ps) => $"{t.delegation.PropertyName}.{GetMethodInvocation(t.resolver, ps)}");
+
+			_delegationCollectionMatch = Create(Dig(d => d.CollectionResolvers),
+				t => t.resolver.CollectionType,
+				(t, ps) => $"{t.delegation.PropertyName}.{GetMethodInvocation(t.resolver, ps)}");
+
+			_resolverMatch = Create(factory.Resolvers,
+				resolver => resolver.ReturnTypeName,
+				(resolver, ps) => GetMethodInvocation(resolver, ps));
+
+			_collectionResolverMatch = Create(factory.CollectionResolvers,
+				resolver => resolver.CollectionType,
+				(resolver, ps) => GetMethodInvocation(resolver, ps));
+
+			_fieldMatch = Create(fields,
+				field => field.FieldType,
+				(field, ps) => field.FieldName);
+
+			IEnumerable<(DelegationSemantics delegation, T resolver)> Dig<T>(
+				Func<DelegationSemantics, IEnumerable<T>> selector)
+			{
+				return factory.Delegations.SelectMany(delegation =>
+					selector(delegation).Select(inner => (delegation, inner)));
+			}
+
+			string GetMethodInvocation(IResolverSemantics resolver, ResolverParameterDefinition[] given)
+			{
+				var argTypes = resolver.Parameters.Select(x => x.TypeName).ToArray();
+				var argList = GetArgumentCodes(argTypes, given).Join(", ");
+				return $"{resolver.MethodName}({argList})";
+			}
 		}
 
 		public string[] GetArgumentCodes(TypeName[] argumentTypes, ResolverParameterDefinition[] parameters)
@@ -33,65 +77,40 @@ namespace Deptorygen2.Core.Coder
 				}
 				else
 				{
-					return GetArgumentCode(t, parameters) ?? "<Error>";
+					return GetInjection(t, parameters) ?? "<Error>";
 				}
 			}).ToArray();
 		}
 
-		public string? GetArgumentCode(TypeName typeName, ResolverParameterDefinition[] parameters)
+		public string? GetInjection(TypeName typeName, ResolverParameterDefinition[] parameters)
 		{
-			if (_cache.GetValueOrDefault(typeName) is { } resolution)
+			string? Try<T>(InjectionMatch<T> injection)
 			{
-				return resolution;
+				return injection.GetCode(typeName, parameters);
 			}
 
-			if (typeName == _factoryType)
-			{
-				return _cache[typeName] = "this";
-			}
+			return Try(_factoryMatch) ?? Try(_delegationMatch)
+				?? Try(_delegationResolverMatch) ?? Try(_delegationCollectionMatch)
+				?? Try(_resolverMatch) ?? Try(_collectionResolverMatch)
+				?? Try(_fieldMatch);
+		}
 
-			foreach (var delegation in _factory.Delegations)
-			{
-				if (typeName == delegation.TypeName)
-				{
-					return _cache[typeName] = delegation.PropertyName;
-				}
-			}
+		private static InjectionMatch<T> Create<T>(IEnumerable<T> source,
+			Func<T, TypeName> typeSelector,
+			Func<T, ResolverParameterDefinition[], string> codeGetter)
+		{
+			return new(source, typeSelector, codeGetter);
+		}
 
-			foreach (var delegation in _factory.Delegations)
+		private record InjectionMatch<T>(IEnumerable<T> Source, Func<T, TypeName> TypeSelector,
+			Func<T, ResolverParameterDefinition[], string> CodeGetter)
+		{
+			public string? GetCode(TypeName type, ResolverParameterDefinition[] parameters)
 			{
-				foreach (var resolver in delegation.Resolvers)
-				{
-					if (typeName == resolver.ReturnTypeName)
-					{
-						var argTypes = resolver.Parameters.Select(x => x.TypeName).ToArray();
-						var argList = GetArgumentCodes(argTypes, parameters)
-							.Join(", ");
-						return _cache[typeName] = $"{delegation.PropertyName}.{resolver}({argList})";
-					}
-				}
+				return Source.Where(x => TypeSelector(x) == type)
+					.Select(x => CodeGetter(x, parameters))
+					.FirstOrDefault();
 			}
-
-			foreach (var resolver in _factory.Resolvers)
-			{
-				if (typeName == resolver.ReturnTypeName)
-				{
-					var argTypes = resolver.Parameters.Select(x => x.TypeName).ToArray();
-					var argList = GetArgumentCodes(argTypes, parameters)
-						.Join(", ");
-					return _cache[typeName] = $"{resolver}({argList})";
-				}
-			}
-
-			foreach (var field in _fields)
-			{
-				if (typeName == field.FieldType)
-				{
-					return _cache[typeName] = field.FieldName;
-				}
-			}
-
-			return null;
 		}
 	}
 }

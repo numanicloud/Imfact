@@ -3,7 +3,7 @@ using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Utilities;
 
-namespace Deptorygen2.Core.Syntaxes
+namespace Deptorygen2.Core.Semanticses
 {
 	internal record DelegationSemantics(string PropertyName,
 		TypeName TypeName,

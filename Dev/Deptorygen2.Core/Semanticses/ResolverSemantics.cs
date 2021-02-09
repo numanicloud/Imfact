@@ -4,14 +4,14 @@ using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Syntaxes
+namespace Deptorygen2.Core.Semanticses
 {
 	internal record ResolverSemantics(string MethodName,
 		TypeName ReturnTypeName,
 		ResolutionSemantics? ReturnTypeResolution,
 		ResolutionSemantics[] Resolutions,
 		ParameterSemantics[] Parameters,
-		Accessibility Accessibility) : IServiceConsumer, IServiceProvider, INamespaceClaimer
+		Accessibility Accessibility) : IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
 	{
 		public IEnumerable<TypeName> GetRequiredServiceTypes()
 		{

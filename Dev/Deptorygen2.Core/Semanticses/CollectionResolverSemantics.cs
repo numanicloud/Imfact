@@ -4,13 +4,13 @@ using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Syntaxes
+namespace Deptorygen2.Core.Semanticses
 {
 	internal record CollectionResolverSemantics(string MethodName,
 		TypeName CollectionType,
 		ParameterSemantics[] Parameters,
 		ResolutionSemantics[] Resolutions,
-		Accessibility Accessibility) : IServiceConsumer, IServiceProvider, INamespaceClaimer
+		Accessibility Accessibility) : IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
 	{
 		public TypeName ElementType => CollectionType.TypeArguments[0];
 

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Deptorygen2.Core.Syntaxes
+namespace Deptorygen2.Core.Semanticses
 {
 	[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 	sealed class FactoryAttribute : Attribute

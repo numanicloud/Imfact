@@ -1,6 +1,6 @@
 ﻿using Deptorygen2.Core.Utilities;
 
-namespace Deptorygen2.Core
+namespace Deptorygen2.Core.Definitions
 {
 	internal record SourceCodeDefinition(string[] Usings, string Namespace,
 		FactoryDefinition Factory);
@@ -9,8 +9,6 @@ namespace Deptorygen2.Core
 
 	public record DelegationDefinition(TypeName PropertyType,
 		string PropertyName);
-
-	public record TypeInfo(string Namespace, string Name);
 
 	public record ResolverParameterDefinition(TypeName Type, string Name);
 

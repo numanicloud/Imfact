@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Deptorygen2.Core.Definitions;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Syntaxes;
+using Deptorygen2.Core.Semanticses;
 using Deptorygen2.Core.Utilities;
 using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
-namespace Deptorygen2.Core.Coder
+namespace Deptorygen2.Core.SyntaxBuilding
 {
-	internal class SourceCoder
+	internal class SourceSyntaxBuilder
 	{
 		public SourceCodeDefinition Encode(FactorySemantics semantics)
 		{

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Deptorygen2.Core.Syntaxes;
+using Deptorygen2.Core.Semanticses;
 using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Parser

@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Syntaxes;
+using Deptorygen2.Core.Semanticses;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core
+namespace Deptorygen2.Core.Definitions
 {
-	internal record ResolverDefinition(Accessibility AccessLevel,
+	public record ResolverDefinition(Accessibility AccessLevel,
 		string Name,
 		TypeName ReturnType,
 		ResolutionDefinition Resolution,
 		ResolverParameterDefinition[] Parameters,
 		HookDefinition[] Hooks)
 	{
-		public ResolverDefinition(
+		internal ResolverDefinition(
 			ResolverNodeData nodeData,
 			ResolutionDefinition resolution,
 			ResolverParameterDefinition[] parameters,
@@ -24,7 +24,7 @@ namespace Deptorygen2.Core
 		{
 		}
 
-		public static IEnumerable<ResolverDefinition> Build(FactorySemantics factory,
+		internal static IEnumerable<ResolverDefinition> Build(FactorySemantics factory,
 			Func<ResolverSemantics, ResolverNodeData, ResolverDefinition> childrenBuilder)
 		{
 			return factory.Resolvers.Select(resolver =>

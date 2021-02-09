@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Syntaxes;
+using Deptorygen2.Core.Semanticses;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core
+namespace Deptorygen2.Core.Definitions
 {
-	internal record CollectionResolverDefinition(Accessibility AccessLevel,
+	public record CollectionResolverDefinition(Accessibility AccessLevel,
 		string Name,
 		TypeName ReturnType,
 		ResolutionDefinition[] Resolutions,
 		ResolverParameterDefinition[] Parameters,
 		HookDefinition[] Hooks)
 	{
-		public CollectionResolverDefinition(CollectionResolverNodeData nodeData,
+		internal CollectionResolverDefinition(CollectionResolverNodeData nodeData,
 			ResolutionDefinition[] resolutions,
 			ResolverParameterDefinition[] parameters,
 			HookDefinition[] hooks)
@@ -22,7 +22,7 @@ namespace Deptorygen2.Core
 		{
 		}
 
-		public static IEnumerable<CollectionResolverDefinition> Build(
+		internal static IEnumerable<CollectionResolverDefinition> Build(
 			FactorySemantics factory,
 			ChildrenBuilder childrenBuilder)
 		{
@@ -34,12 +34,12 @@ namespace Deptorygen2.Core
 			});
 		}
 
-		public delegate CollectionResolverDefinition ChildrenBuilder(
+		internal delegate CollectionResolverDefinition ChildrenBuilder(
 			CollectionResolverSemantics resolver,
 			CollectionResolverNodeData nodeData);
 	}
 
-	public record CollectionResolverNodeData(
+	internal record CollectionResolverNodeData(
 		Accessibility AccessLevel,
 		string Name,
 		TypeName ReturnType);
