@@ -7,12 +7,12 @@ namespace Deptorygen2.Core
 {
 	public class FactorySourceBuilder
 	{
-		public string Build(FactoryClass factory)
+		public string Build(FactoryDefinition factory)
 		{
 			return RenderFactory(factory);
 		}
 
-		public string RenderFactory(FactoryClass factory)
+		public string RenderFactory(FactoryDefinition factory)
 		{
 			var builder = new StringBuilder();
 
@@ -32,7 +32,7 @@ namespace Deptorygen2.Core
 			return builder.ToString();
 		}
 
-		public string RenderMethod(FactoryMethod method)
+		public string RenderMethod(ResolverDefinition method)
 		{
 			var parameterList = method.Parameters.Select(RenderParameter).Join(", ");
 			var signature = string.Format("{0} partial {1} {2}({3})",
@@ -55,7 +55,7 @@ namespace Deptorygen2.Core
 			return builder.ToString();
 		}
 
-		private string RenderAnnotations(Span<HookAnnotation> annotations, string plainCode, string methodName)
+		private string RenderAnnotations(Span<HookDefinition> annotations, string plainCode, string methodName)
 		{
 			if (annotations.IsEmpty)
 			{
@@ -67,19 +67,19 @@ namespace Deptorygen2.Core
 			return $"_{methodName}_{annotations[0].HookClass.Name}.Hook(\n{argument})";
 		}
 
-		public string RenderParameter(FactoryMethodParameter parameter)
+		public string RenderParameter(ResolverParameterDefinition parameterDefinition)
 		{
-			return $"{parameter.Type.Name} {parameter.Name}";
+			return $"{parameterDefinition.Type.Name} {parameterDefinition.Name}";
 		}
 
-		public string RenderField(DependencyField field)
+		public string RenderField(DependencyDefinition definition)
 		{
-			return $"private readonly {field.Type.Name} {field.Name};";
+			return $"private readonly {definition.FieldType.Name} {definition.FieldName};";
 		}
 
-		public string RenderResolution(ResolutionConstructor resolution)
+		public string RenderResolution(ResolutionDefinition resolution)
 		{
-			return $"new {resolution.ResolutionType.Name}({resolution.Arguments.Join(", ")})";
+			return $"new {resolution.ResolutionType.Name}({resolution.ConstructorArguments.Join(", ")})";
 		}
 	}
 }

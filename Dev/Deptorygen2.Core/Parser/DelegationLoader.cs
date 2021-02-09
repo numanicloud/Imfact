@@ -67,7 +67,7 @@ namespace Deptorygen2.Core.Parser
 		private PropertyInfo? GetPropertyInfo(ISymbol symbol)
 		{
 			/* 解析都合の条件:
-			 *		Type is INamedTypeSymbol
+			 *		FieldType is INamedTypeSymbol
 			 *		シンボルからシンタックスへ辿ることができる
 			 * 仕様都合の条件
 			 *		FactoryAttributeが付いてる

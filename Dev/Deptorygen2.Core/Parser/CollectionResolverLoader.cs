@@ -37,7 +37,8 @@ namespace Deptorygen2.Core.Parser
 				resolver.Symbol.Name,
 				TypeName.FromSymbol(resolver.Return),
 				parameters,
-				resolutions);
+				resolutions,
+				resolver.Symbol.DeclaredAccessibility);
 		}
 	}
 }

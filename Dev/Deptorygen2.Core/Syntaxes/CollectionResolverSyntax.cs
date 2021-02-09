@@ -2,13 +2,15 @@
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Utilities;
+using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Syntaxes
 {
 	internal record CollectionResolverSyntax(string MethodName,
 		TypeName CollectionType,
 		ParameterSyntax[] Parameters,
-		ResolutionSyntax[] Resolutions) : IServiceConsumer, IServiceProvider
+		ResolutionSyntax[] Resolutions,
+		Accessibility Accessibility) : IServiceConsumer, IServiceProvider, INamespaceClaimer
 	{
 		public TypeName ElementType => CollectionType.TypeArguments[0];
 
@@ -22,6 +24,22 @@ namespace Deptorygen2.Core.Syntaxes
 		public IEnumerable<TypeName> GetCapableServiceTypes()
 		{
 			yield return CollectionType;
+		}
+
+		public IEnumerable<string> GetRequiredNamespaces()
+		{
+			yield return "System.Collections.Generic";
+			yield return CollectionType.TypeArguments[0].FullNamespace;
+
+			foreach (var parameter in Parameters)
+			{
+				yield return parameter.TypeName.FullNamespace;
+			}
+
+			foreach (var resolution in Resolutions)
+			{
+				yield return resolution.TypeName.FullNamespace;
+			}
 		}
 	}
 }

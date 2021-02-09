@@ -1,38 +1,40 @@
 ﻿using System;
 using Deptorygen2.Core;
+using Deptorygen2.Core.Utilities;
+using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2
 {
 	class SampleFactory
 	{
-		public FactoryClass Create()
+		public FactoryDefinition Create()
 		{
-			return new FactoryClass("MyFactory",
-				new FactoryMethod[]
+			TypeName Make(string name, string @namespace = "MyDomain")
+			{
+				return new TypeName(@namespace, name, Accessibility.Internal);
+			}
+
+			return new FactoryDefinition("MyFactory",
+				new ResolverDefinition[]
 				{
-					new FactoryMethod(AccessLevel.Public,
-						"Hoge",
-						new TypeInfo("MyDomain", "Service"),
-						new ResolutionConstructor(new TypeInfo("MyDomain", "Service"), new string[0]),
-						new FactoryMethodParameter[0],
-						new []
+					new(Accessibility.Public, "Hoge", Make("Service"),
+						new ResolutionDefinition(Make("Service"), new string[0]),
+						new ResolverParameterDefinition[0],
+						new HookDefinition[]
 						{
-							new HookAnnotation(new TypeInfo("MyDomain", "LogHook")),
-							new HookAnnotation(new TypeInfo("MyDomain", "CacheHook")),
+							new(Make("LogHook")),
+							new(Make("CacheHook")),
 						}),
-					new FactoryMethod(AccessLevel.Private,
-						"Fuga",
-						new TypeInfo("MyDomain", "Client"),
-						new ResolutionConstructor(new TypeInfo("MyDomain", "Client"),
-							new string[]{ "hoge", "_service" }),
-						new FactoryMethodParameter[]
+					new(Accessibility.Private, "Fuga", Make("Client"),
+						new ResolutionDefinition(Make("Client"), new[]{ "hoge", "_service" }),
+						new ResolverParameterDefinition[]
 						{
-							new FactoryMethodParameter(new TypeInfo("System", "Int32"), "hoge")
+							new(Make("Int32", "System"), "hoge")
 						},
-						new HookAnnotation[0]),
-				}, new DependencyField[]
+						new HookDefinition[0]),
+				}, new DependencyDefinition[]
 				{
-					new DependencyField(new TypeInfo("MyDomain", "Other"), "_other")
+					new(Make("Other"), "_other")
 				});
 		}
 	}

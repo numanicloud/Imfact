@@ -11,7 +11,7 @@ namespace Deptorygen2.Core.Syntaxes
 		ResolutionSyntax? ReturnTypeResolution,
 		ResolutionSyntax[] Resolutions,
 		ParameterSyntax[] Parameters,
-		Accessibility Accessibility) : IServiceConsumer, IServiceProvider
+		Accessibility Accessibility) : IServiceConsumer, IServiceProvider, INamespaceClaimer
 	{
 		public IEnumerable<TypeName> GetRequiredServiceTypes()
 		{
@@ -24,6 +24,20 @@ namespace Deptorygen2.Core.Syntaxes
 		public IEnumerable<TypeName> GetCapableServiceTypes()
 		{
 			yield return ReturnTypeName;
+		}
+
+		public IEnumerable<string> GetRequiredNamespaces()
+		{
+			yield return ReturnTypeName.FullNamespace;
+			foreach (var parameter in Parameters)
+			{
+				yield return parameter.TypeName.FullNamespace;
+			}
+
+			if (Resolutions.Any())
+			{
+				yield return Resolutions[0].TypeName.FullNamespace;
+			}
 		}
 	}
 }
