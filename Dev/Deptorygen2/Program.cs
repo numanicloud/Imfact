@@ -7,10 +7,8 @@ namespace Deptorygen2
 	{
 		static void Main(string[] args)
 		{
-			var sample = new SampleFactory().Create();
-			var renderer = new FactorySourceBuilder();
-
-			Console.WriteLine(renderer.Build(sample));
+			var analyzer = new Analyzer();
+			analyzer.Analyze(SampleSourceCode.Code1);
 		}
 	}
 }

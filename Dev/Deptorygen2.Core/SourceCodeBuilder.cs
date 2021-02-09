@@ -3,14 +3,17 @@ using System.Linq;
 using System.Text;
 using Deptorygen2.Core.Definitions;
 using Deptorygen2.Core.Utilities;
+using Deptorygen2.Core.Writing;
 
 namespace Deptorygen2.Core
 {
-	public class FactorySourceBuilder
+	public class SourceCodeBuilder
 	{
-		public string Build(FactoryDefinition factory)
+		internal SourceFile Build(SourceCodeDefinition sourceCode)
 		{
-			return RenderFactory(factory);
+			var fileName = sourceCode.Factory.Name + ".g.cs";
+			var contents = RenderFactory(sourceCode.Factory);
+			return new SourceFile(fileName, contents);
 		}
 
 		public string RenderFactory(FactoryDefinition factory)
