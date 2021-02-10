@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using Deptorygen2.Core.Facade;
-using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using CSharpExtensions = Microsoft.CodeAnalysis.CSharp.CSharpExtensions;
 
 namespace Deptorygen2.Generator
 {
@@ -18,7 +15,7 @@ namespace Deptorygen2.Generator
 			context.RegisterForSyntaxNotifications(() => new FactorySyntaxReceiver());
 		}
 
-		public async void Execute(GeneratorExecutionContext context)
+		public void Execute(GeneratorExecutionContext context)
 		{
 			if (context.SyntaxReceiver is not FactorySyntaxReceiver receiver
 				|| receiver.SyntaxTree is null)
@@ -27,17 +24,21 @@ namespace Deptorygen2.Generator
 			}
 
 			var semanticModel = context.Compilation.GetSemanticModel(receiver.SyntaxTree);
+			var analysis = new CompilationAnalysisContext(semanticModel);
 
-			var facade = new GenerationFacade();
+			var facade = new GenerationFacade(analysis);
 			foreach (var candidateClass in receiver.CandidateClasses)
 			{
+				var definition = facade.AspectStep(candidateClass) is not { } aspect ? null
+					: facade.SemanticsStep(aspect) is not { } semantics ? null
+					: facade.DefinitionStep(semantics);
 
-				var semantics = await facade.SemanticsStep(candidateClass);
-				var definition = facade.DefinitionStep(semantics);
-				var sourceFile = facade.ConvertToSourceCode(definition);
-
-				var sourceText = SourceText.From(sourceFile.Contents, Encoding.UTF8);
-				context.AddSource(sourceFile.FileName, sourceText);
+				if (definition is not null)
+				{
+					var sourceFile = facade.ConvertToSourceCode(definition);
+					var sourceText = SourceText.From(sourceFile.Contents, Encoding.UTF8);
+					context.AddSource(sourceFile.FileName, sourceText);
+				}
 			}
 		}
 	}
@@ -56,41 +57,6 @@ namespace Deptorygen2.Generator
 			{
 				CandidateClasses.Add(classDeclarationSyntax);
 			}
-		}
-	}
-
-	internal class CompilationAnalysisContext : IAnalysisContext
-	{
-		private readonly SemanticModel _semanticModel;
-
-		public CompilationAnalysisContext(SemanticModel semanticModel)
-		{
-			_semanticModel = semanticModel;
-		}
-
-		public ITypeSymbol? GeTypeSymbol(TypeSyntax syntax)
-		{
-			return _semanticModel.GetSymbolInfo(syntax).Symbol is ITypeSymbol type ? type
-				: null;
-		}
-
-		public IMethodSymbol? GetMethodSymbol(MethodDeclarationSyntax syntax)
-		{
-			return _semanticModel.GetDeclaredSymbol(syntax) is IMethodSymbol method ? method
-					: null;
-		}
-
-		public IPropertySymbol? GetPropertySymbol(PropertyDeclarationSyntax syntax)
-		{
-			return _semanticModel.GetDeclaredSymbol(syntax) is IPropertySymbol prop ? prop
-				: null;
-		}
-
-		public INamedTypeSymbol? GetNamedTypeSymbol(TypeDeclarationSyntax syntax)
-		{
-			return _semanticModel.GetDeclaredSymbol(syntax) is INamedTypeSymbol type
-				? type
-				: null;
 		}
 	}
 }
