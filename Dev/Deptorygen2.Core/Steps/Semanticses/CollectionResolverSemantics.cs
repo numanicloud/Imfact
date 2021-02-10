@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Deptorygen2.Core.Aggregation;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
+using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
 namespace Deptorygen2.Core.Semanticses
 {
@@ -39,6 +42,33 @@ namespace Deptorygen2.Core.Semanticses
 			foreach (var resolution in Resolutions)
 			{
 				yield return resolution.TypeName.FullNamespace;
+			}
+		}
+
+		public static CollectionResolverSemantics? Build(MethodToAnalyze method,
+			Func<Partial, CollectionResolverSemantics> completion)
+		{
+			if (!method.IsCollectionResolver())
+			{
+				return null;
+			}
+
+			var partial = new Partial(method.Symbol.Name,
+				TypeName.FromSymbol(method.Symbol.ReturnType),
+				method.Symbol.DeclaredAccessibility);
+
+			return completion(partial);
+		}
+
+		public record Partial(string MethodName,
+			TypeName CollectionType,
+			Accessibility Accessibility)
+		{
+			public CollectionResolverSemantics Complete(ParameterSemantics[] parameters,
+				ResolutionSemantics[] resolutions)
+			{
+				return new CollectionResolverSemantics(MethodName, CollectionType, parameters,
+					resolutions, Accessibility);
 			}
 		}
 	}

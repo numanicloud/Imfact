@@ -52,6 +52,7 @@ namespace Deptorygen2
 	{
 		private T? _cache = null;
 
+		[Resolution(typeof(IHook<>))]
 		public T Hook(Func<T> generation)
 		{
 			return _cache ??= generation();
@@ -63,6 +64,7 @@ namespace Deptorygen2
 		Type HookType { get; }
 	}
 
+	[AttributeUsageAttribute(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
 	public class CacheHookAttribute : Attribute, IHookAttribute
 	{
 		public Type HookType => typeof(ResolutionCache<>);

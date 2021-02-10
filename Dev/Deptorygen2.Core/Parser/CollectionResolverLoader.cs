@@ -2,6 +2,7 @@
 using System.Linq;
 using Deptorygen2.Core.Semanticses;
 using Deptorygen2.Core.Utilities;
+using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Parser
 {
@@ -19,6 +20,21 @@ namespace Deptorygen2.Core.Parser
 		{
 			_filter = filter;
 			_resolutionLoader = resolutionLoader;
+		}
+
+		public CollectionResolverSemantics? Build(ResolverBaseSemantics semantics)
+		{
+			if (!semantics.ReturnType.IsCollectionType())
+			{
+				return null;
+			}
+
+			return new CollectionResolverSemantics(
+				semantics.MethodName,
+				semantics.ReturnType,
+				semantics.Parameters,
+				semantics.Resolutions,
+				semantics.Accessibility);
 		}
 
 		public CollectionResolverSemantics? FromResolver(ResolverAnalysisContext resolver)

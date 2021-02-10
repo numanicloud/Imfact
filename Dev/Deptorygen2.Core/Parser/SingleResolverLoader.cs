@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Semanticses;
 using Deptorygen2.Core.Utilities;
+using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Parser
 {
@@ -14,6 +16,20 @@ namespace Deptorygen2.Core.Parser
 		{
 			_filter = filter;
 			_resolutionLoader = resolutionLoader;
+		}
+
+		public ResolverSemantics? Build(ResolverBaseSemantics semantics,
+			Func<ResolutionFact, ResolverBaseSemantics, ResolverSemantics> completion)
+		{
+			if (semantics.ReturnType.IsCollectionType())
+			{
+				return null;
+			}
+
+			var returnSyntax = semantics.Fact.Syntax.ReturnType;
+			var returnType = new ResolutionFact(returnSyntax);
+
+			return completion(returnType, semantics);
 		}
 
 		public ResolverSemantics? FromStructure(ResolverAnalysisContext item)

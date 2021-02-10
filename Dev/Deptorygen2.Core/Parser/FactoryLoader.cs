@@ -1,55 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Semanticses;
 using Deptorygen2.Core.Utilities;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Deptorygen2.Core.Parser
 {
-	internal delegate void FactoryContentsLoader(FactoryAnalysisContext factory,
-		List<ResolverSemantics> singles,
-		List<CollectionResolverSemantics> collections,
-		List<DelegationSemantics> delegations);
+	internal delegate FactorySemantics FactoryContentsLoader(FactoryFact fact);
+
+	internal record FactoryFact(ClassDeclarationSyntax Syntax,
+		TypeName Type,
+		MethodDeclarationSyntax[] Methods,
+		PropertyDeclarationSyntax[] Properties)
+	{
+	}
 
 	internal class FactoryLoader
 	{
-		public async Task<FactorySemantics> BuildFactorySyntaxAsync(
+		private readonly IAnalysisContext _context;
+
+		public FactoryLoader(IAnalysisContext context)
+		{
+			_context = context;
+		}
+
+		public FactorySemantics? BuildFactorySyntaxAsync(
 			ClassDeclarationSyntax classDeclarationSyntax,
-			SourceGenAnalysisContext context,
 			FactoryContentsLoader loadContents)
 		{
-			var factory = await GetContextAsync(classDeclarationSyntax, context);
-			var singles = new List<ResolverSemantics>();
-			var collections = new List<CollectionResolverSemantics>();
-			var delegations = new List<DelegationSemantics>();
+			if (GetFact(classDeclarationSyntax) is not {} factory)
+			{
+				return null;
+			}
 
-			loadContents.Invoke(factory, singles, collections, delegations);
-
-			return new FactorySemantics(factory.Symbol, singles.ToArray(), collections.ToArray(), delegations.ToArray());
+			return loadContents.Invoke(factory);
 		}
 
-		public async Task<FactoryAnalysisContext> GetContextAsync(
-			ClassDeclarationSyntax syntax,
-			SourceGenAnalysisContext context)
+		private FactoryFact? GetFact(ClassDeclarationSyntax syntax)
 		{
-			var symbol = await GetSymbolOf(syntax, context);
-			return new FactoryAnalysisContext(syntax, symbol, context);
-		}
+			var factoryAttribute = new AttributeName("FactoryAttribute");
+			if (!syntax.AttributeLists.HasAttribute(factoryAttribute))
+			{
+				return null;
+			}
 
-		private async Task<INamedTypeSymbol> GetSymbolOf(
-			TypeDeclarationSyntax syntax,
-			SourceGenAnalysisContext context)
-		{
-			var symbols = await context.FindSourceDeclarationSymbolAsync(syntax);
+			if (_context.GetNamedTypeSymbol(syntax) is not {} symbol)
+			{
+				return null;
+			}
 
-			var @namespace = syntax.Parent is not NamespaceDeclarationSyntax nsds ? throw new Exception()
-				: nsds.Name is not QualifiedNameSyntax qns ? throw new Exception()
-				: qns.ToString();
+			var typeName = TypeName.FromSymbol(symbol);
 
-			return symbols.OfType<INamedTypeSymbol>().First(x => x.GetFullNameSpace() == @namespace);
+			var methods = syntax.Members.OfType<MethodDeclarationSyntax>()
+				.ToArray();
+
+			var properties = syntax.Members.OfType<PropertyDeclarationSyntax>()
+				.ToArray();
+
+			return new FactoryFact(syntax, typeName, methods, properties);
 		}
 	}
 }

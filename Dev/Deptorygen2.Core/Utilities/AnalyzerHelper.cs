@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -13,7 +14,7 @@ namespace Deptorygen2.Core.Utilities
 			var typeName = TypeName.FromType(@interface);
 			return symbol.AllInterfaces
 				.Any(x => x.Name == typeName.Name
-				          && x.GetFullNameSpace() == typeName.FullNamespace);
+						  && x.GetFullNameSpace() == typeName.FullNamespace);
 		}
 
 		public static bool IsPartial(this MethodDeclarationSyntax method)
@@ -23,13 +24,27 @@ namespace Deptorygen2.Core.Utilities
 			// https://github.com/dotnet/roslyn/issues/48
 
 			return method.Body != null
-			       && method.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
+				   && method.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
 		}
 
 		public static bool HasAttribute(this INamedTypeSymbol symbol, string attributeName)
 		{
 			return symbol.GetAttributes()
 				.Any(attr => attr.AttributeClass?.Name == attributeName);
+		}
+
+		public static bool HasAttribute(this IEnumerable<AttributeListSyntax> attributes, AttributeName attributeName)
+		{
+			return attributes.SelectMany(a => a.Attributes)
+				.Any(a => attributeName.MatchWithAnyName(a.Name.ToString()));
+		}
+
+		public static bool IsCollectionType(this TypeName type)
+		{
+			var enumerableType = TypeName.FromType(typeof(IEnumerable<>));
+
+			return type.NameWithoutArguments != enumerableType.NameWithoutArguments
+			       && type.TypeArguments.Length != enumerableType.TypeArguments.Length;
 		}
 	}
 }

@@ -1,32 +1,36 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Semanticses;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Parser
 {
 	internal class SourceLoader
 	{
-		private readonly FactoryLoader _factoryLoader = new();
+		private readonly FactoryLoader _factoryLoader;
 		private readonly ResolverLoader _resolverLoader;
 		private readonly SingleResolverLoader _singleResolverLoader;
 		private readonly CollectionResolverLoader _collectionResolverLoader;
 		private readonly DelegationLoader _delegationLoader;
 		private readonly ResolutionLoader _resolutionLoader;
+		private readonly ParameterLoader _parameterLoader;
 
-		public SourceLoader()
+		public SourceLoader(IAnalysisContext context)
 		{
+			_factoryLoader = new FactoryLoader(context);
+
 			_resolutionLoader = new ResolutionLoader(attr =>
 				attr.AttributeClass?.Name == nameof(ResolutionAttribute)
-				&& attr.ConstructorArguments.Length == 1);
+				&& attr.ConstructorArguments.Length == 1,
+				context);
 
 			_resolverLoader = new ResolverLoader(method =>
 				method.Syntax.IsPartial() && method.Symbol.MethodKind == MethodKind.Ordinary,
-				_resolutionLoader);
+				_resolutionLoader,
+				context);
 
 			_collectionResolverLoader = new CollectionResolverLoader(
 				method => SatisfyCollectionResolverCondition(method),
@@ -39,41 +43,8 @@ namespace Deptorygen2.Core.Parser
 			_delegationLoader = new DelegationLoader(property =>
 				Helpers.HasAttribute(property.TypeSymbol, nameof(FactoryAttribute))
 				&& property.Symbol.IsReadOnly);
-		}
 
-		public async Task<FactorySemantics> LoadAsync(
-			ClassDeclarationSyntax classDeclarationSyntax,
-			SourceGenAnalysisContext context)
-		{
-			return await _factoryLoader.BuildFactorySyntaxAsync(classDeclarationSyntax, context,
-				(factory, singles, collections, delegations) =>
-				{
-					LoadResolvers(factory, singles, collections);
-
-					_delegationLoader.BuildDelegationSyntaxes(factory,
-							(delegated, delegatedResolvers, delegatedCollectionResolvers) =>
-							{
-								LoadResolvers(delegated, delegatedResolvers, delegatedCollectionResolvers);
-							})
-						.AddRangeTo(delegations);
-				});
-
-			void LoadResolvers(FactoryAnalysisContext factory,
-				List<ResolverSemantics> singles,
-				List<CollectionResolverSemantics> collections)
-			{
-				var methods = _resolverLoader.BuildResolverStructures(factory,
-					(symbol, resolutionList) =>
-					{
-						_resolutionLoader.GetStructures(symbol).AddRangeTo(resolutionList);
-					}).ToArray();
-
-				Helpers.FilterNull(methods.Select(m => _singleResolverLoader.FromStructure(m)))
-					.AddRangeTo(singles);
-
-				Helpers.FilterNull(methods.Select(s => _collectionResolverLoader.FromResolver(s)))
-					.AddRangeTo(collections);
-			}
+			_parameterLoader = new ParameterLoader(context);
 		}
 
 		private bool SatisfyCollectionResolverCondition(ResolverAnalysisContext method)
@@ -93,14 +64,18 @@ namespace Deptorygen2.Core.Parser
 				var enumerableType = TypeName.FromType(typeof(IEnumerable<>));
 
 				return type.NameWithoutArguments != enumerableType.NameWithoutArguments
-				       && type.TypeArguments.Length != enumerableType.TypeArguments.Length;
+					   && type.TypeArguments.Length != enumerableType.TypeArguments.Length;
 			}
 
 			static bool CanBeElement(INamedTypeSymbol nts, TypeName elementType)
 			{
-				return Helpers.FilterNull(nts.AllInterfaces.Append(nts.BaseType).Append(nts))
+				return nts.AllInterfaces.Append(nts.BaseType).Append(nts)
+					.FilterNull()
 					.Any(x => TypeName.FromSymbol(x) == elementType);
 			}
 		}
 	}
+
+	internal record FactContext(FactoryFact Factory,
+		ResolverFact[] Resolvers);
 }

@@ -8,7 +8,7 @@ using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
 namespace Deptorygen2.Core.SyntaxBuilding
 {
-	internal class SourceSyntaxBuilder
+	internal class DefinitionAggregator
 	{
 		public SourceCodeDefinition Encode(FactorySemantics semantics)
 		{

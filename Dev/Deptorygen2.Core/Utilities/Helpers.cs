@@ -82,17 +82,6 @@ namespace Deptorygen2.Core.Utilities
 			return name[0].ToString().ToLower() + name.Substring(1);
 		}
 
-		public static IEnumerable<T> FilterNull<T>(this IEnumerable<T?> source) where T : class
-		{
-			foreach (var item in source)
-			{
-				if (item is {})
-				{
-					yield return item;
-				}
-			}
-		}
-
 		public static IEnumerable<T> AsEnumerable<T>(this T? source) where T : class
 		{
 			return source is null

@@ -5,12 +5,18 @@ using Deptorygen2.Core.Semanticses;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Parser
 {
 	internal delegate void DelegationResolverLoader(FactoryAnalysisContext delegated,
 		List<ResolverSemantics> delegatedResolvers,
 		List<CollectionResolverSemantics> delegatedCollectionResolvers);
+
+	internal record DelegationFact(PropertyDeclarationSyntax Syntax)
+	{
+
+	}
 
 	// 構文解析担当。
 	// どのようなプロパティを探すか、という条件を外から与える
