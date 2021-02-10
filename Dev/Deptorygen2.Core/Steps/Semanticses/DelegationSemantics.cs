@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Aggregation;
 using Deptorygen2.Core.Interfaces;
+using Deptorygen2.Core.Steps.Aggregation;
 using Deptorygen2.Core.Utilities;
 using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
-namespace Deptorygen2.Core.Semanticses
+namespace Deptorygen2.Core.Steps.Semanticses
 {
 	internal record DelegationSemantics(string PropertyName,
 		TypeName TypeName,

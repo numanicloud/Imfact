@@ -1,6 +1,6 @@
 ﻿using Deptorygen2.Core.Utilities;
 
-namespace Deptorygen2.Core.Definitions
+namespace Deptorygen2.Core.Steps.Definitions
 {
 	internal record SourceCodeDefinition(string[] Usings, string Namespace,
 		FactoryDefinition Factory);

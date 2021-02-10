@@ -1,6 +1,6 @@
-﻿using Deptorygen2.Core.Aggregation;
-using Deptorygen2.Core.Definitions;
-using Deptorygen2.Core.Semanticses;
+﻿using Deptorygen2.Core.Steps.Aggregation;
+using Deptorygen2.Core.Steps.Definitions;
+using Deptorygen2.Core.Steps.Semanticses;
 
 namespace Deptorygen2.Core.Steps.Api
 {

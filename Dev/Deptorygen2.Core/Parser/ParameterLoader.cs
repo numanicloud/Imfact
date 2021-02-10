@@ -1,5 +1,5 @@
 ﻿using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Semanticses;
+using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 

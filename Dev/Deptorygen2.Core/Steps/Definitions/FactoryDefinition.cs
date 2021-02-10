@@ -1,6 +1,6 @@
-﻿using Deptorygen2.Core.Semanticses;
+﻿using Deptorygen2.Core.Steps.Semanticses;
 
-namespace Deptorygen2.Core.Definitions
+namespace Deptorygen2.Core.Steps.Definitions
 {
 	public record FactoryDefinition(string Name,
 		ResolverDefinition[] Methods,

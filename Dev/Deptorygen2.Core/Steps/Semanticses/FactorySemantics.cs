@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Deptorygen2.Core.Aggregation;
+using Deptorygen2.Core.Steps.Aggregation;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Semanticses
+namespace Deptorygen2.Core.Steps.Semanticses
 {
 	internal record FactorySemantics(INamedTypeSymbol ItselfSymbol,
 		ResolverSemantics[] Resolvers,

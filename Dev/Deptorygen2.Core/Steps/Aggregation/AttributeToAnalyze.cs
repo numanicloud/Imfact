@@ -1,7 +1,7 @@
 ﻿using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Deptorygen2.Core.Aggregation
+namespace Deptorygen2.Core.Steps.Aggregation
 {
 	internal record AttributeToAnalyze(AttributeSyntax Syntax)
 	{

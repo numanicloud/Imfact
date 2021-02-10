@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Deptorygen2.Core.Semanticses
+namespace Deptorygen2.Core
 {
 	[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 	sealed class FactoryAttribute : Attribute

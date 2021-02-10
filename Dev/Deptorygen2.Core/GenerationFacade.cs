@@ -1,12 +1,12 @@
-﻿using Deptorygen2.Core.Aggregation;
-using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Semanticses;
+﻿using Deptorygen2.Core.Interfaces;
+using Deptorygen2.Core.Steps.Aggregation;
 using Deptorygen2.Core.Steps.Api;
-using Deptorygen2.Core.SyntaxBuilding;
-using Deptorygen2.Core.Writing;
+using Deptorygen2.Core.Steps.Definitions;
+using Deptorygen2.Core.Steps.Semanticses;
+using Deptorygen2.Core.Steps.Writing;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Deptorygen2.Core.Facade
+namespace Deptorygen2.Core
 {
 	public class GenerationFacade
 	{

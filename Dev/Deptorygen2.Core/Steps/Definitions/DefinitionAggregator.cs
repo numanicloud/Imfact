@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Definitions;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Semanticses;
+using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Utilities;
 using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
-namespace Deptorygen2.Core.SyntaxBuilding
+namespace Deptorygen2.Core.Steps.Definitions
 {
 	internal class DefinitionAggregator
 	{

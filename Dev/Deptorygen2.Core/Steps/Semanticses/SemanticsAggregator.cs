@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Aggregation;
 using Deptorygen2.Core.Interfaces;
+using Deptorygen2.Core.Steps.Aggregation;
 using NacHelpers.Extensions;
 
-namespace Deptorygen2.Core.Semanticses
+namespace Deptorygen2.Core.Steps.Semanticses
 {
 	internal class SemanticsAggregator
 	{

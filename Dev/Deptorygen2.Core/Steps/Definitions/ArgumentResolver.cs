@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Definitions;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Semanticses;
+using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Utilities;
 
-namespace Deptorygen2.Core.SyntaxBuilding
+namespace Deptorygen2.Core.Steps.Definitions
 {
 	internal class ArgumentResolver
 	{

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Semanticses;
+using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Definitions
+namespace Deptorygen2.Core.Steps.Definitions
 {
 	public record ResolverDefinition(Accessibility AccessLevel,
 		string Name,

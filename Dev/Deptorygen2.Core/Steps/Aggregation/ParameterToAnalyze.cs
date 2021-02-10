@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Deptorygen2.Core.Aggregation
+namespace Deptorygen2.Core.Steps.Aggregation
 {
 	internal record ParameterToAnalyze(ParameterSyntax Syntax)
 	{

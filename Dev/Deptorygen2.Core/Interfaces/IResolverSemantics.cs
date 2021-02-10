@@ -1,4 +1,4 @@
-﻿using Deptorygen2.Core.Semanticses;
+﻿using Deptorygen2.Core.Steps.Semanticses;
 using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Interfaces

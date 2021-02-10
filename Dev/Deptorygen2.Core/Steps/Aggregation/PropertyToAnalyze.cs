@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NacHelpers.Extensions;
 
-namespace Deptorygen2.Core.Aggregation
+namespace Deptorygen2.Core.Steps.Aggregation
 {
 	internal record PropertyToAnalyze(PropertyDeclarationSyntax Syntax, IPropertySymbol Symbol)
 	{

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
-using Deptorygen2.Core.Aggregation;
 using Deptorygen2.Core.Interfaces;
+using Deptorygen2.Core.Steps.Aggregation;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Deptorygen2.Core.Semanticses
+namespace Deptorygen2.Core.Steps.Semanticses
 {
 	internal record ResolutionSemantics(TypeName TypeName,
 		TypeName[] Dependencies,

@@ -1,6 +1,6 @@
 ﻿using System;
 using Deptorygen2.Core;
-using Deptorygen2.Core.Definitions;
+using Deptorygen2.Core.Steps.Definitions;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 

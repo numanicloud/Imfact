@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using Deptorygen2.Core.Definitions;
+using Deptorygen2.Core.Steps.Definitions;
 using Deptorygen2.Core.Utilities;
-using Deptorygen2.Core.Writing;
 
-namespace Deptorygen2.Core
+namespace Deptorygen2.Core.Steps.Writing
 {
 	public class SourceCodeBuilder
 	{

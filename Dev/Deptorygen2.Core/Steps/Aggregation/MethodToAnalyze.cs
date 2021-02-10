@@ -4,7 +4,7 @@ using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Deptorygen2.Core.Aggregation
+namespace Deptorygen2.Core.Steps.Aggregation
 {
 	internal record MethodToAnalyze(MethodDeclarationSyntax Syntax, IMethodSymbol Symbol)
 	{
