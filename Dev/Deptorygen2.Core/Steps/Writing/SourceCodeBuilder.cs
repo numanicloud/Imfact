@@ -15,27 +15,68 @@ namespace Deptorygen2.Core.Steps.Writing
 			return new SourceFile(fileName, contents);
 		}
 
+		private void AppendBlock(StringBuilder builder, string header, Action<StringBuilder> build)
+		{
+			builder.AppendLine(header);
+			builder.AppendLine("{");
+
+			var innerBuilder = new StringBuilder();
+			build(innerBuilder);
+
+			builder.AppendLine(innerBuilder.ToString().Indent(1).TrimEnd());
+			builder.AppendLine("}");
+		}
+
 		public string RenderFactory(FactoryDefinition factory)
 		{
 			var builder = new StringBuilder();
 
-			using (new BlockStringBuilder($"internal class {factory.Name}", builder, 0))
+			AppendBlock(builder, $"internal partial class {factory.Name}", innerBuilder =>
 			{
 				foreach (var factoryField in factory.Fields)
 				{
-					builder.AppendLine(RenderField(factoryField).Indent(1));
+					innerBuilder.AppendLine(RenderField(factoryField));
+				}
+
+				if (factory.Fields.Any())
+				{
+					innerBuilder.AppendLine();
+					RenderConstructor(factory, innerBuilder);
+					innerBuilder.AppendLine();
 				}
 
 				foreach (var factoryMethod in factory.Methods)
 				{
-					builder.AppendLine(RenderMethod(factoryMethod).Indent(1));
+					RenderMethod(factoryMethod, innerBuilder);
 				}
-			}
+			});
 
 			return builder.ToString();
 		}
 
-		public string RenderMethod(ResolverDefinition method)
+		private void RenderConstructor(FactoryDefinition factory, StringBuilder builder)
+		{
+			var constructor = factory.Constructor;
+			var argList = constructor.FieldParameter.Values
+				.Concat(constructor.PropertyParameter.Values)
+				.Select(RenderParameter)
+				.Join(", ");
+
+			AppendBlock(builder, $"public {factory.Name}({argList})", innerBuilder =>
+			{
+				foreach (var item in constructor.FieldParameter)
+				{
+					innerBuilder.AppendLine($"{item.Key.FieldName} = {item.Value.Name}");
+				}
+
+				foreach (var item in constructor.PropertyParameter)
+				{
+					innerBuilder.AppendLine($"{item.Key.PropertyName} = {item.Value.Name}");
+				}
+			});
+		}
+
+		public void RenderMethod(ResolverDefinition method, StringBuilder builder)
 		{
 			var parameterList = method.Parameters.Select(RenderParameter).Join(", ");
 			var signature = string.Format("{0} partial {1} {2}({3})",
@@ -43,19 +84,16 @@ namespace Deptorygen2.Core.Steps.Writing
 				method.ReturnType.Name,
 				method.Name,
 				parameterList);
-
-			var builder = new StringBuilder();
-			using (new BlockStringBuilder(signature, builder, 0))
+			
+			AppendBlock(builder, signature, innerBuilder =>
 			{
 				var code = RenderAnnotations(
 					method.Hooks.AsSpan(),
 					RenderResolution(method.Resolution),
 					method.Name);
 
-				builder.AppendLine($"return {code};".Indent(1));
-			}
-
-			return builder.ToString();
+				innerBuilder.AppendLine($"return {code};");
+			});
 		}
 
 		private string RenderAnnotations(Span<HookDefinition> annotations, string plainCode, string methodName)
@@ -80,9 +118,10 @@ namespace Deptorygen2.Core.Steps.Writing
 			return $"private readonly {definition.FieldType.Name} {definition.FieldName};";
 		}
 
+		// TODO: コンストラクタではなく、コンストラクタの引数に与えるような値を直接返すパターンも欲しい
 		public string RenderResolution(ResolutionDefinition resolution)
 		{
-			return $"new {resolution.ResolutionType.Name}({resolution.ConstructorArguments.Join(", ")})";
+			return resolution.ResolutionCode;
 		}
 	}
 }

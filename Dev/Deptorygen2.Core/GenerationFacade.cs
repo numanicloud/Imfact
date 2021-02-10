@@ -22,9 +22,16 @@ namespace Deptorygen2.Core
 			_semanticsAggregator = new SemanticsAggregator(context);
 		}
 
+		public SourceFile? RunGeneration(ClassDeclarationSyntax syntax)
+		{
+			return AspectStep(syntax) is not { } aspect ? null
+				: SemanticsStep(aspect) is not { } semantics ? null
+				: SourceCodeStep(DefinitionStep(semantics));
+		}
+
 		public SyntaxOnAspect? AspectStep(ClassDeclarationSyntax syntax)
 		{
-			return _aspectAggregator.Aggregate(syntax, _context) is {} aspect
+			return _aspectAggregator.Aggregate(syntax, _context) is { } aspect
 				? new SyntaxOnAspect(aspect) : null;
 		}
 
@@ -40,7 +47,7 @@ namespace Deptorygen2.Core
 			return new DeptorygenDefinition(definition);
 		}
 
-		public SourceFile ConvertToSourceCode(DeptorygenDefinition definition)
+		public SourceFile SourceCodeStep(DeptorygenDefinition definition)
 		{
 			return _writer.Build(definition.Definition);
 		}

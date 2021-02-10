@@ -7,7 +7,7 @@ using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Definitions
 {
-	internal class ArgumentResolver
+	internal class InstantiationResolver
 	{
 		private readonly InjectionMatch<FactorySemantics> _factoryMatch;
 		private readonly InjectionMatch<DelegationSemantics> _delegationMatch;
@@ -16,8 +16,9 @@ namespace Deptorygen2.Core.Steps.Definitions
 		private readonly InjectionMatch<ResolverSemantics> _resolverMatch;
 		private readonly InjectionMatch<CollectionResolverSemantics> _collectionResolverMatch;
 		private readonly InjectionMatch<DependencyDefinition> _fieldMatch;
+		private readonly InjectionMatch<ResolutionSemantics> _constructorMatch;
 
-		public ArgumentResolver(FactorySemantics factory, DependencyDefinition[] fields)
+		public InstantiationResolver(FactorySemantics factory, DependencyDefinition[] fields)
 		{
 			_factoryMatch = Create(factory.AsEnumerable(),
 				f => TypeName.FromSymbol(factory.ItselfSymbol),
@@ -47,6 +48,12 @@ namespace Deptorygen2.Core.Steps.Definitions
 				field => field.FieldType,
 				(field, ps) => field.FieldName);
 
+			var resolutions = factory.Resolvers.SelectMany(x => x.Resolutions)
+				.Concat(factory.CollectionResolvers.SelectMany(x => x.Resolutions));
+			_constructorMatch = Create(resolutions,
+				resolution => resolution.TypeName,
+				(resolution, ps) => GetConstructorInvocation(resolution, ps));
+
 			IEnumerable<(DelegationSemantics delegation, T resolver)> Dig<T>(
 				Func<DelegationSemantics, IEnumerable<T>> selector)
 			{
@@ -60,28 +67,40 @@ namespace Deptorygen2.Core.Steps.Definitions
 				var argList = GetArgumentCodes(argTypes, given).Join(", ");
 				return $"{resolver.MethodName}({argList})";
 			}
+
+			string GetConstructorInvocation(ResolutionSemantics resolution, ResolverParameterDefinition[] given)
+			{
+				var argTypes = resolution.Dependencies;
+				var argList = GetArgumentCodes(argTypes, given).Join(", ");
+				return $"new {resolution.TypeName}({argList})";
+			}
 		}
 
-		public string[] GetArgumentCodes(TypeName[] argumentTypes, ResolverParameterDefinition[] parameters)
+		private string[] GetArgumentCodes(TypeName[] argumentTypes, ResolverParameterDefinition[] parameters)
+		{
+			return argumentTypes.Select(t => GetInjectionUsingParameter(t, parameters))
+				.ToArray();
+		}
+
+		public string GetInjectionUsingParameter(TypeName t,
+			ResolverParameterDefinition[] parameters)
 		{
 			var table = parameters.GroupBy(x => x.Type)
 				.ToDictionary(x => x.Key, x => x.ToList());
-			return argumentTypes.Select(t =>
+
+			if (table.GetValueOrDefault(t) is { } onType)
 			{
-				if (table.GetValueOrDefault(t) is { } onType)
-				{
-					var result = onType[0].Name;
-					onType.RemoveAt(0);
-					return result;
-				}
-				else
-				{
-					return GetInjection(t, parameters) ?? "<Error>";
-				}
-			}).ToArray();
+				var result = onType[0].Name;
+				onType.RemoveAt(0);
+				return result;
+			}
+			else
+			{
+				return GetInjection(t, parameters) ?? "<Error>";
+			}
 		}
 
-		public string? GetInjection(TypeName typeName, ResolverParameterDefinition[] parameters)
+		private string? GetInjection(TypeName typeName, ResolverParameterDefinition[] parameters)
 		{
 			string? Try<T>(InjectionMatch<T> injection)
 			{
@@ -91,7 +110,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 			return Try(_factoryMatch) ?? Try(_delegationMatch)
 				?? Try(_delegationResolverMatch) ?? Try(_delegationCollectionMatch)
 				?? Try(_resolverMatch) ?? Try(_collectionResolverMatch)
-				?? Try(_fieldMatch);
+				?? Try(_fieldMatch) ?? Try(_constructorMatch);
 		}
 
 		private static InjectionMatch<T> Create<T>(IEnumerable<T> source,

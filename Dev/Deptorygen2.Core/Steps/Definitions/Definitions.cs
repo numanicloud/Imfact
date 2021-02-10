@@ -14,5 +14,5 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 	public record HookDefinition(TypeName HookClass);
 
-	public record ResolutionDefinition(TypeName ResolutionType, string[] ConstructorArguments);
+	public record ResolutionDefinition(string ResolutionCode);
 }

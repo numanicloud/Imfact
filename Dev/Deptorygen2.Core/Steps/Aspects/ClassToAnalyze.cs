@@ -2,6 +2,7 @@
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NacHelpers.Extensions;
 
@@ -11,7 +12,8 @@ namespace Deptorygen2.Core.Steps.Aggregation
 	{
 		public bool IsFactory()
 		{
-			return Syntax.AttributeLists.HasAttribute(new AttributeName("FactoryAttribute"));
+			return Syntax.AttributeLists.HasAttribute(new AttributeName("FactoryAttribute"))
+				&& Syntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
 		}
 
 		public MethodToAnalyze[] GetMethods(IAnalysisContext context)

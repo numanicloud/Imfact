@@ -20,9 +20,14 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			}
 		}
 
-		public static FactorySemantics Build(ClassToAnalyze @class,
+		public static FactorySemantics? Build(ClassToAnalyze @class,
 			Func<Partial, FactorySemantics> completion)
 		{
+			if (!@class.IsFactory())
+			{
+				return null;
+			}
+
 			var partial = new Partial(@class.Symbol);
 			return completion(partial);
 		}

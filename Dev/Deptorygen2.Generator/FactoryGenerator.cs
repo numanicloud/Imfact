@@ -35,7 +35,7 @@ namespace Deptorygen2.Generator
 
 				if (definition is not null)
 				{
-					var sourceFile = facade.ConvertToSourceCode(definition);
+					var sourceFile = facade.SourceCodeStep(definition);
 					var sourceText = SourceText.From(sourceFile.Contents, Encoding.UTF8);
 					context.AddSource(sourceFile.FileName, sourceText);
 				}

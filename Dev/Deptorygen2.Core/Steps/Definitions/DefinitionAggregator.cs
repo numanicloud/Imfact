@@ -17,26 +17,28 @@ namespace Deptorygen2.Core.Steps.Definitions
 			var factory = FactoryDefinition.Build(semantics, name =>
 			{
 				var fields = AggregateDependencies(semantics);
-				var argumentResolver = new ArgumentResolver(semantics, fields);
+				var argumentResolver = new InstantiationResolver(semantics, fields);
 
 				var resolvers = AggregateResolvers(semantics, argumentResolver);
 				var collectionResolvers = AggregateCollectionResolvers(semantics, argumentResolver);
 				var delegations = semantics.Delegations.Select(BuildDelegation).ToArray();
 
+				var constructor = FactoryConstructorDefinition.Build(fields, delegations);
+
 				return new FactoryDefinition(name, resolvers, collectionResolvers, delegations,
-					fields);
+					fields, constructor);
 			});
 
 			return new SourceCodeDefinition(usings, ns, factory);
 		}
 
-		private static CollectionResolverDefinition[] AggregateCollectionResolvers(FactorySemantics semantics, ArgumentResolver argumentResolver)
+		private static CollectionResolverDefinition[] AggregateCollectionResolvers(FactorySemantics semantics, InstantiationResolver instantiationResolver)
 		{
 			return CollectionResolverDefinition.Build(semantics, (resolver, data) =>
 			{
 				var parameters = BuildParameters(resolver.Parameters);
 				var resolutions = resolver.Resolutions
-					.Select(r => BuildResolution(r, argumentResolver, parameters))
+					.Select(r => BuildResolution(r, instantiationResolver, parameters))
 					.ToArray();
 
 				HookDefinition[] hooks = new HookDefinition[0]; // TODO: 未実装
@@ -45,13 +47,13 @@ namespace Deptorygen2.Core.Steps.Definitions
 			}).ToArray();
 		}
 
-		private static ResolverDefinition[] AggregateResolvers(FactorySemantics semantics, ArgumentResolver argumentResolver)
+		private static ResolverDefinition[] AggregateResolvers(FactorySemantics semantics, InstantiationResolver instantiationResolver)
 		{
 			return ResolverDefinition.Build(semantics, (resolver, data) =>
 			{
 				var primalResolution = resolver.ReturnTypeResolution ?? resolver.Resolutions[0];
 				var parameters = BuildParameters(resolver.Parameters);
-				var resolution = BuildResolution(primalResolution, argumentResolver, parameters);
+				var resolution = BuildResolution(primalResolution, instantiationResolver, parameters);
 
 				HookDefinition[] hooks = new HookDefinition[0]; // TODO: 未実装
 
@@ -72,13 +74,11 @@ namespace Deptorygen2.Core.Steps.Definitions
 		}
 
 		private static ResolutionDefinition BuildResolution(ResolutionSemantics resolution,
-			ArgumentResolver argumentResolver,
+			InstantiationResolver instantiationResolver,
 			ResolverParameterDefinition[] parameters)
 		{
-			var type = resolution.TypeName;
-			var arguments = argumentResolver.GetArgumentCodes(resolution.Dependencies, parameters);
-
-			return new ResolutionDefinition(type, arguments);
+			var code = instantiationResolver.GetInjectionUsingParameter(resolution.TypeName, parameters);
+			return new ResolutionDefinition(code);
 		}
 
 		private static DependencyDefinition[] AggregateDependencies(FactorySemantics semantics)
