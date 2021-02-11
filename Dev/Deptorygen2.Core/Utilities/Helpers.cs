@@ -1,16 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Utilities
 {
 	public static class Helpers
 	{
-		public static string Join(this IEnumerable<string> source, string delimiter)
-		{
-			return string.Join(delimiter, source);
-		}
-
 		public static string GetFullNameSpace(this ITypeSymbol typeSymbol)
 		{
 			static IEnumerable<string> GetFullNameSpace(INamespaceSymbol nss)
@@ -108,13 +104,6 @@ namespace Deptorygen2.Core.Utilities
 				yield return (prevItem, true);
 			}
 		}
-
-		public static string Indent(this string source, int level)
-		{
-			var indent = Enumerable.Repeat("\t", level).Join("");
-			return source.Split('\n')
-				.Select(x => indent + x)
-				.Join("\n");
-		}
+		
 	}
 }

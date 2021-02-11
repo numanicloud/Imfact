@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Utilities
 {
@@ -29,7 +29,7 @@ namespace Deptorygen2.Core.Utilities
 			return $"{FullNamespace}.{Name} ({Accessibility})";
 		}
 
-		public bool Equals(TypeName other)
+		public bool Equals(TypeName? other)
 		{
 			if (other is null) return false;
 			if (ReferenceEquals(this, other)) return true;
@@ -37,7 +37,7 @@ namespace Deptorygen2.Core.Utilities
 				&& TypeArguments.SequenceEqual(other.TypeArguments);
 		}
 
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			if (obj is null) return false;
 			if (ReferenceEquals(this, obj)) return true;
@@ -49,13 +49,8 @@ namespace Deptorygen2.Core.Utilities
 		{
 			unchecked
 			{
-				return ((FullNamespace != null ? FullNamespace.GetHashCode() : 0) * 397) ^ (Name != null ? Name.GetHashCode() : 0);
+				return (FullNamespace.GetHashCode() * 397) ^ Name.GetHashCode();
 			}
-		}
-
-		public IEnumerable<string> GetRequiredNamespaces()
-		{
-			yield return FullNamespace;
 		}
 
 		public static TypeName FromSymbol(ITypeSymbol symbol)

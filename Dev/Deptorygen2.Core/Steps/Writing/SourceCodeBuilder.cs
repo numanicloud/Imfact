@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 using Deptorygen2.Core.Steps.Definitions;
-using Deptorygen2.Core.Utilities;
+using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Writing
 {
@@ -117,8 +117,7 @@ namespace Deptorygen2.Core.Steps.Writing
 		{
 			return $"private readonly {definition.FieldType.Name} {definition.FieldName};";
 		}
-
-		// TODO: コンストラクタではなく、コンストラクタの引数に与えるような値を直接返すパターンも欲しい
+		
 		public string RenderResolution(ResolutionDefinition resolution)
 		{
 			return resolution.ResolutionCode;
