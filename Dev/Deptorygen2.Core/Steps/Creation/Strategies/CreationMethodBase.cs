@@ -8,7 +8,7 @@ using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 {
-	internal abstract class CreationMethodBase<T> : IInstantiationCoder
+	internal abstract class CreationMethodBase<T> : ICreationStrategy
 	{
 		private readonly Dictionary<TypeName, T> _resolutionSource;
 		private BooleanDisposable _requestingDisposable;
@@ -23,20 +23,20 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 			_requestingDisposable.Dispose();
 		}
 
-		public string? GetCode(InstantiationRequest request, IInstantiationResolver resolver)
+		public string? GetCode(CreationRequest request, ICreationAggregator aggregator)
 		{
 			if (!_requestingDisposable.IsDisposed
-				|| _resolutionSource.GetValueOrDefault(request.TypeToResolve) is not {} resolution)
+				|| _resolutionSource.GetValueOrDefault(request.TypeToResolve) is not { } resolution)
 			{
 				return null;
 			}
 
-			return GetCreationCode(resolution, request.GivenParameters, resolver);
+			return GetCreationCode(resolution, request.GivenParameters, aggregator);
 		}
 
 		protected abstract string GetCreationCode(T resolution,
 			GivenParameter[] given,
-			IInstantiationResolver resolver);
+			ICreationAggregator aggregator);
 
 		protected abstract IEnumerable<T> GetSource(GenerationSemantics semantics);
 
@@ -44,23 +44,22 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 
 		protected string MethodInvocation(IResolverSemantics resolver,
 			GivenParameter[] given,
-			IInstantiationResolver injector)
+			ICreationAggregator injector)
 		{
-			var request = new MultipleInstantiationRequest(
+			var request = new MultipleCreationRequest(
 				resolver.Parameters.Select(x => x.TypeName).ToArray(), given);
 
-				return $"{resolver.MethodName}({GetArgList(request, injector)})";
-			
+			return $"{resolver.MethodName}({GetArgList(request, injector)})";
 		}
 
-		protected string GetArgList(MultipleInstantiationRequest request,
-			IInstantiationResolver resolver)
+		protected string GetArgList(MultipleCreationRequest request,
+			ICreationAggregator aggregator)
 		{
 			// GetInjectionsの途中でこのCreation自身に戻ってくることがあるが、
 			// それは無限ループを起こすのでBooleanDisposableを使って弾く
 			using (_requestingDisposable = new BooleanDisposable())
 			{
-				return resolver.GetInjections(request).Join(", ");
+				return aggregator.GetInjections(request).Join(", ");
 			}
 		}
 	}

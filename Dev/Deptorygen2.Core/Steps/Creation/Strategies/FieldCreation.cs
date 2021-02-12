@@ -11,7 +11,7 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 		}
 
 		protected override string GetCreationCode(DependencySemantics resolution, GivenParameter[] given,
-			IInstantiationResolver resolver)
+			ICreationAggregator aggregator)
 		{
 			return resolution.FieldName;
 		}

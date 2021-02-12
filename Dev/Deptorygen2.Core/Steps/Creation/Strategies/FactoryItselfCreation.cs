@@ -13,7 +13,7 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 
 		protected override string GetCreationCode(FactorySemantics resolution,
 			GivenParameter[] given,
-			IInstantiationResolver resolver)
+			ICreationAggregator aggregator)
 		{
 			return "this";
 		}

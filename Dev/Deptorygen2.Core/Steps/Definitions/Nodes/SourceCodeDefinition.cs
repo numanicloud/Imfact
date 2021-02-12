@@ -7,10 +7,10 @@ namespace Deptorygen2.Core.Steps.Definitions
 		public string[] Usings { get; }
 		public string Ns { get; }
 		public FactoryDefinition Factory { get; }
-		public IInstantiationResolver Creation { get; }
+		public ICreationAggregator Creation { get; }
 
 		public SourceCodeDefinition(string[] usings, string @namespace,
-			FactoryDefinition factory, IInstantiationResolver creation)
+			FactoryDefinition factory, ICreationAggregator creation)
 		{
 			Usings = usings;
 			Ns = @namespace;

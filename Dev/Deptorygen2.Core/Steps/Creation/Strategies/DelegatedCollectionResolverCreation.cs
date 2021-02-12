@@ -14,9 +14,9 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 		}
 
 		protected override string GetCreationCode(Source resolution,
-			GivenParameter[] given, IInstantiationResolver resolver)
+			GivenParameter[] given, ICreationAggregator aggregator)
 		{
-			var invocation = MethodInvocation(resolution.Item2, given, resolver);
+			var invocation = MethodInvocation(resolution.Item2, given, aggregator);
 			return $"{resolution.Item1.PropertyName}.{invocation}";
 		}
 

@@ -10,7 +10,7 @@ namespace Deptorygen2.Core.Steps.Writing
 	public class SourceCodeBuilder
 	{
 		private readonly SourceCodeDefinition _sourceCode;
-		private readonly IInstantiationResolver _injection;
+		private readonly ICreationAggregator _injection;
 
 		internal SourceCodeBuilder(SourceCodeDefinition sourceCode)
 		{
@@ -132,7 +132,7 @@ namespace Deptorygen2.Core.Steps.Writing
 			ResolverParameterDefinition[] given)
 		{
 			var ps = given.Select(x => new GivenParameter(x.Type, x.Name)).ToArray();
-			var request = new InstantiationRequest(resolution.TypeToResolve, ps);
+			var request = new CreationRequest(resolution.TypeToResolve, ps);
 			return _injection.GetInjection(request) ?? "<Error>";
 		}
 	}

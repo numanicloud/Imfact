@@ -13,11 +13,11 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 		}
 
 		protected override string GetCreationCode(Source resolution, GivenParameter[] given,
-			IInstantiationResolver resolver)
+			ICreationAggregator aggregator)
 		{
-			var request = new MultipleInstantiationRequest(
+			var request = new MultipleCreationRequest(
 				resolution.Dependencies, given);
-			return $"new {resolution.TypeName.Name}({GetArgList(request, resolver)})";
+			return $"new {resolution.TypeName.Name}({GetArgList(request, aggregator)})";
 		}
 
 		protected override IEnumerable<Source> GetSource(GenerationSemantics semantics)

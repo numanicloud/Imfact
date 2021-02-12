@@ -11,9 +11,9 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 		}
 
 		protected override string GetCreationCode(CollectionResolverSemantics resolution, GivenParameter[] given,
-			IInstantiationResolver resolver)
+			ICreationAggregator aggregator)
 		{
-			return MethodInvocation(resolution, given, resolver);
+			return MethodInvocation(resolution, given, aggregator);
 		}
 
 		protected override IEnumerable<CollectionResolverSemantics> GetSource(GenerationSemantics semantics)

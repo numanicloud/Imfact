@@ -13,9 +13,9 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 
 		protected override string GetCreationCode((DelegationSemantics, ResolverSemantics) resolution,
 			GivenParameter[] given,
-			IInstantiationResolver resolver)
+			ICreationAggregator aggregator)
 		{
-			var invocation = MethodInvocation(resolution.Item2, given, resolver);
+			var invocation = MethodInvocation(resolution.Item2, given, aggregator);
 			return $"{resolution.Item1.PropertyName}.{invocation}";
 		}
 
