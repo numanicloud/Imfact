@@ -20,7 +20,8 @@ namespace Deptorygen2.Core.Steps.Creation
 		{
 			var multiple = new MultipleCreationRequest(
 				request.TypeToResolve.WrapByArray(),
-				request.GivenParameters);
+				request.GivenParameters,
+				request.IsRootRequest);
 			return GetInjections(multiple).FirstOrDefault();
 		}
 
@@ -47,6 +48,16 @@ namespace Deptorygen2.Core.Steps.Creation
 		private string? GetInjectionWithoutParameter(CreationRequest request)
 		{
 			return _instantiationCoders
+				.Where(x =>
+				{
+					if (request.IsRootRequest)
+					{
+						return x is not ResolverCreation
+							and not CollectionResolverCreation;
+					}
+
+					return true;
+				})
 				.Select(x => x.GetCode(request, this))
 				.FirstOrDefault(x => x is not null);
 		}

@@ -2,12 +2,10 @@
 using System.Linq;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Utilities;
-using Source = System.ValueTuple<Deptorygen2.Core.Steps.Semanticses.DelegationSemantics,
-	Deptorygen2.Core.Steps.Semanticses.CollectionResolverSemantics>;
 
 namespace Deptorygen2.Core.Steps.Creation.Strategies
 {
-	internal class DelegatedCollectionResolverCreation : CreationMethodBase<Source>
+	internal class DelegatedCollectionResolverCreation : CreationMethodBase<DelegatedCollectionResolverCreation.Source>
 	{
 		public DelegatedCollectionResolverCreation(GenerationSemantics semantics) : base(semantics)
 		{
@@ -16,19 +14,22 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 		protected override string GetCreationCode(Source resolution,
 			GivenParameter[] given, ICreationAggregator aggregator)
 		{
-			var invocation = MethodInvocation(resolution.Item2, given, aggregator);
-			return $"{resolution.Item1.PropertyName}.{invocation}";
+			var invocation = MethodInvocation(resolution.CollectionResolver, given, aggregator);
+			return $"{resolution.Delegation.PropertyName}.{invocation}";
 		}
 
 		protected override IEnumerable<Source> GetSource(GenerationSemantics semantics)
 		{
-			return semantics.Factory.Delegations
-				.SelectMany(x => x.CollectionResolvers.Select(y => (x, y)));
+			return semantics.Factory.Delegations.SelectMany(
+				x => x.CollectionResolvers.Select(y => new Source(x, y)));
 		}
 
 		protected override TypeName GetTypeInfo(Source source)
 		{
-			return source.Item2.CollectionType;
+			return source.CollectionResolver.CollectionType;
 		}
+
+		public record Source(DelegationSemantics Delegation,
+			CollectionResolverSemantics CollectionResolver);
 	}
 }

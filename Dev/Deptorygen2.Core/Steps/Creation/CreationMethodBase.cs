@@ -9,24 +9,20 @@ using NacHelpers.Extensions;
 namespace Deptorygen2.Core.Steps.Creation.Strategies
 {
 	internal abstract class CreationMethodBase<T> : ICreationStrategy
+		where T : notnull
 	{
 		private readonly Dictionary<TypeName, T> _resolutionSource;
-		private BooleanDisposable _requestingDisposable;
 
 		protected CreationMethodBase(GenerationSemantics semantics)
 		{
 			_resolutionSource = GetSource(semantics)
 				.Select(x => (type: GetTypeInfo(x), source: x))
 				.ToDictionary(x => x.type, x => x.source);
-
-			_requestingDisposable = new BooleanDisposable();
-			_requestingDisposable.Dispose();
 		}
 
 		public string? GetCode(CreationRequest request, ICreationAggregator aggregator)
 		{
-			if (!_requestingDisposable.IsDisposed
-				|| _resolutionSource.GetValueOrDefault(request.TypeToResolve) is not { } resolution)
+			if (_resolutionSource.GetValueOrDefault(request.TypeToResolve) is not { } resolution)
 			{
 				return null;
 			}
@@ -47,7 +43,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 			ICreationAggregator injector)
 		{
 			var request = new MultipleCreationRequest(
-				resolver.Parameters.Select(x => x.TypeName).ToArray(), given);
+				resolver.Parameters.Select(x => x.TypeName).ToArray(), given, false);
 
 			return $"{resolver.MethodName}({GetArgList(request, injector)})";
 		}
@@ -55,12 +51,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 		protected string GetArgList(MultipleCreationRequest request,
 			ICreationAggregator aggregator)
 		{
-			// GetInjectionsの途中でこのCreation自身に戻ってくることがあるが、
-			// それは無限ループを起こすのでBooleanDisposableを使って弾く
-			using (_requestingDisposable = new BooleanDisposable())
-			{
-				return aggregator.GetInjections(request).Join(", ");
-			}
+			return aggregator.GetInjections(request).Join(", ");
 		}
 	}
 }

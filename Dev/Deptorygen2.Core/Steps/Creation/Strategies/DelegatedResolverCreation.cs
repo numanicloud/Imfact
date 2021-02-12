@@ -5,29 +5,31 @@ using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Creation.Strategies
 {
-	internal class DelegatedResolverCreation : CreationMethodBase<(DelegationSemantics, ResolverSemantics)>
+	internal class DelegatedResolverCreation : CreationMethodBase<DelegatedResolverCreation.Source>
 	{
 		public DelegatedResolverCreation(GenerationSemantics semantics) : base(semantics)
 		{
 		}
 
-		protected override string GetCreationCode((DelegationSemantics, ResolverSemantics) resolution,
+		protected override string GetCreationCode(Source resolution,
 			GivenParameter[] given,
 			ICreationAggregator aggregator)
 		{
-			var invocation = MethodInvocation(resolution.Item2, given, aggregator);
-			return $"{resolution.Item1.PropertyName}.{invocation}";
+			var invocation = MethodInvocation(resolution.Resolver, given, aggregator);
+			return $"{resolution.Delegation.PropertyName}.{invocation}";
 		}
 
-		protected override IEnumerable<(DelegationSemantics, ResolverSemantics)> GetSource(GenerationSemantics semantics)
+		protected override IEnumerable<Source> GetSource(GenerationSemantics semantics)
 		{
-			return semantics.Factory.Delegations
-				.SelectMany(x => x.Resolvers.Select(y => (x, y)));
+			return semantics.Factory.Delegations.SelectMany(
+				x => x.Resolvers.Select(y => new Source(x, y)));
 		}
 
-		protected override TypeName GetTypeInfo((DelegationSemantics, ResolverSemantics) source)
+		protected override TypeName GetTypeInfo(Source source)
 		{
-			return source.Item2.ReturnTypeName;
+			return source.Resolver.ReturnTypeName;
 		}
+
+		public record Source(DelegationSemantics Delegation, ResolverSemantics Resolver);
 	}
 }
