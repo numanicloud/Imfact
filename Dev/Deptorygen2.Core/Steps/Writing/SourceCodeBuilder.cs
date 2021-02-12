@@ -132,8 +132,7 @@ namespace Deptorygen2.Core.Steps.Writing
 			ResolverParameterDefinition[] given)
 		{
 			var ps = given.Select(x => new GivenParameter(x.Type, x.Name)).ToArray();
-			var request = new InstantiationRequest(resolution.TypeToResolve,
-				ps, InstantiationMethod.None);
+			var request = new InstantiationRequest(resolution.TypeToResolve, ps);
 			return _injection.GetInjection(request) ?? "<Error>";
 		}
 	}

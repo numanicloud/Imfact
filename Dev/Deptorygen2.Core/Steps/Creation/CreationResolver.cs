@@ -3,33 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Steps.Semanticses;
 using NacHelpers.Extensions;
-using static Deptorygen2.Core.Steps.Instantiation.InstantiationMethod;
 using static Deptorygen2.Core.Steps.Instantiation.InstantiationRuleFactory;
 
 namespace Deptorygen2.Core.Steps.Instantiation
 {
-	internal interface IInstantiationResolver
-	{
-		string? GetInjection(InstantiationRequest request);
-		IEnumerable<string> GetInjections(MultipleInstantiationRequest request);
-	}
-
-	internal class InstantiationResolver : IInstantiationResolver
+	internal class CreationResolver : IInstantiationResolver
 	{
 		private readonly IInstantiationCoder[] _instantiationCoders;
 
-		public InstantiationResolver(GenerationSemantics semantics)
+		public CreationResolver(GenerationSemantics semantics)
 		{
-			_instantiationCoders = GetCreations(semantics)
-				.OrderBy(x => (int)x.Method).ToArray();
+			_instantiationCoders = GetCreations(semantics).ToArray();
 		}
 
 		public string? GetInjection(InstantiationRequest request)
 		{
 			var multiple = new MultipleInstantiationRequest(
 				request.TypeToResolve.WrapByArray(),
-				request.GivenParameters,
-				request.Exclude);
+				request.GivenParameters);
 			return GetInjections(multiple).FirstOrDefault();
 		}
 
@@ -55,7 +46,7 @@ namespace Deptorygen2.Core.Steps.Instantiation
 		
 		private string? GetInjectionWithoutParameter(InstantiationRequest request)
 		{
-			return _instantiationCoders.Where(x => (x.Method & request.Exclude) == None)
+			return _instantiationCoders
 				.Select(x => x.GetCode(request, this))
 				.FirstOrDefault(x => x is not null);
 		}

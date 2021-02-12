@@ -13,13 +13,10 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 		{
 		}
 
-		public override InstantiationMethod Method =>
-			InstantiationMethod.DelegatedCollectionResolver;
-
 		protected override string GetCreationCode(Source resolution,
 			GivenParameter[] given, IInstantiationResolver resolver)
 		{
-			var invocation = MethodInvocation(resolution.Item2, given, Method, resolver);
+			var invocation = MethodInvocation(resolution.Item2, given, resolver);
 			return $"{resolution.Item1.PropertyName}.{invocation}";
 		}
 

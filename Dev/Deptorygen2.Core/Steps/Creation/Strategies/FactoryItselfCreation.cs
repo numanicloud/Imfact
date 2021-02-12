@@ -11,8 +11,6 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 		{
 		}
 
-		public override InstantiationMethod Method => InstantiationMethod.FactoryItself;
-
 		protected override string GetCreationCode(FactorySemantics resolution,
 			GivenParameter[] given,
 			IInstantiationResolver resolver)

@@ -39,7 +39,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 					fields, constructor);
 			});
 
-			var creation = new InstantiationResolver(semantics);
+			var creation = new CreationResolver(semantics);
 			
 			return new SourceCodeDefinition(usings, ns, factory, creation);
 		}

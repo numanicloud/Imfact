@@ -9,13 +9,11 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 		public ResolverCreation(GenerationSemantics semantics) : base(semantics)
 		{
 		}
-
-		public override InstantiationMethod Method => InstantiationMethod.Resolver;
-
+		
 		protected override string GetCreationCode(ResolverSemantics resolution, GivenParameter[] given,
 			IInstantiationResolver resolver)
 		{
-			return MethodInvocation(resolution, given, Method, resolver);
+			return MethodInvocation(resolution, given, resolver);
 		}
 
 		protected override IEnumerable<ResolverSemantics> GetSource(GenerationSemantics semantics)

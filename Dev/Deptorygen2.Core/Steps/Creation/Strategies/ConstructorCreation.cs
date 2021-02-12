@@ -12,13 +12,11 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 		{
 		}
 
-		public override InstantiationMethod Method => InstantiationMethod.Constructor;
-
 		protected override string GetCreationCode(Source resolution, GivenParameter[] given,
 			IInstantiationResolver resolver)
 		{
 			var request = new MultipleInstantiationRequest(
-				resolution.Dependencies, given, Method);
+				resolution.Dependencies, given);
 			return $"new {resolution.TypeName.Name}({GetArgList(request, resolver)})";
 		}
 

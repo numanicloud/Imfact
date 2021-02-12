@@ -10,8 +10,6 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 		{
 		}
 
-		public override InstantiationMethod Method => InstantiationMethod.Field;
-
 		protected override string GetCreationCode(DependencySemantics resolution, GivenParameter[] given,
 			IInstantiationResolver resolver)
 		{
