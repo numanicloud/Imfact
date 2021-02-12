@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Deptorygen2.Core.Steps.Instantiation
+namespace Deptorygen2.Core.Steps.Creation
 {
 	internal interface ICreationAggregator
 	{

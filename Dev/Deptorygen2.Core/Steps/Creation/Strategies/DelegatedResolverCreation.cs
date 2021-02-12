@@ -3,7 +3,7 @@ using System.Linq;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Utilities;
 
-namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
+namespace Deptorygen2.Core.Steps.Creation.Strategies
 {
 	internal class DelegatedResolverCreation : CreationMethodBase<(DelegationSemantics, ResolverSemantics)>
 	{

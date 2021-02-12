@@ -1,6 +1,6 @@
 ﻿using Deptorygen2.Core.Utilities;
 
-namespace Deptorygen2.Core.Steps.Instantiation
+namespace Deptorygen2.Core.Steps.Creation
 {
 	internal record CreationRequest(TypeName TypeToResolve, GivenParameter[] GivenParameters);
 

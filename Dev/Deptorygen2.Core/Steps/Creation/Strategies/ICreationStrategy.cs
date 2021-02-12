@@ -1,4 +1,4 @@
-﻿namespace Deptorygen2.Core.Steps.Instantiation
+﻿namespace Deptorygen2.Core.Steps.Creation.Strategies
 {
 	internal interface ICreationStrategy
 	{

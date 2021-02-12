@@ -6,7 +6,7 @@ using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Utilities;
 using NacHelpers.Extensions;
 
-namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
+namespace Deptorygen2.Core.Steps.Creation.Strategies
 {
 	internal abstract class CreationMethodBase<T> : ICreationStrategy
 	{

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Steps.Instantiation.CreationMethods;
+using Deptorygen2.Core.Steps.Creation.Strategies;
 using Deptorygen2.Core.Steps.Semanticses;
 using NacHelpers.Extensions;
 
-namespace Deptorygen2.Core.Steps.Instantiation
+namespace Deptorygen2.Core.Steps.Creation
 {
 	internal class CreationAggregator : ICreationAggregator
 	{

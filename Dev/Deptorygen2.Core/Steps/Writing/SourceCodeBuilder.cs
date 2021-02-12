@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using Deptorygen2.Core.Steps.Creation;
 using Deptorygen2.Core.Steps.Definitions;
-using Deptorygen2.Core.Steps.Instantiation;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Writing

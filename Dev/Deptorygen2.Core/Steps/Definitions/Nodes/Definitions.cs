@@ -1,5 +1,4 @@
-﻿using Deptorygen2.Core.Steps.Instantiation;
-using Deptorygen2.Core.Utilities;
+﻿using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Definitions
 {

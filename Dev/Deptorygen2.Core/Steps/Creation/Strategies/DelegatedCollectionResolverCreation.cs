@@ -5,7 +5,7 @@ using Deptorygen2.Core.Utilities;
 using Source = System.ValueTuple<Deptorygen2.Core.Steps.Semanticses.DelegationSemantics,
 	Deptorygen2.Core.Steps.Semanticses.CollectionResolverSemantics>;
 
-namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
+namespace Deptorygen2.Core.Steps.Creation.Strategies
 {
 	internal class DelegatedCollectionResolverCreation : CreationMethodBase<Source>
 	{
