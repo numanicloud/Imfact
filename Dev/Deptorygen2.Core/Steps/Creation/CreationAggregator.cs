@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Steps.Creation.Strategies;
 using Deptorygen2.Core.Steps.Semanticses;
+using Deptorygen2.Core.Utilities;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Creation
@@ -40,7 +41,7 @@ namespace Deptorygen2.Core.Steps.Creation
 				}
 				else
 				{
-					yield return GetInjectionWithoutParameter(request.OfType(type)) ?? throw new Exception();
+					yield return GetInjectionWithoutParameter(request.OfType(type)) ?? "__NoResolutionFound__";
 				}
 			}
 		}

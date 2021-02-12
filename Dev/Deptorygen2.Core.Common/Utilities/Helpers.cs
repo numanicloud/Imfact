@@ -104,16 +104,6 @@ namespace Deptorygen2.Core.Utilities
 				yield return (prevItem, true);
 			}
 		}
-
-		public static TValue? GetValueOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dic, TKey key)
-			where TValue : notnull
-		{
-			if (dic.TryGetValue(key, out var value))
-			{
-				return value;
-			}
-
-			return default;
-		}
+		
 	}
 }

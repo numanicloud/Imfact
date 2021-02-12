@@ -1,9 +1,10 @@
 ﻿namespace Deptorygen2.Core.Utilities
 {
-	internal record AttributeName(string NameWithAttributeSuffix)
+	public record AttributeName(string NameWithAttributeSuffix)
 	{
-		public string NameWithoutSuffix => NameWithAttributeSuffix
-			.TrimEnd("Attribute".ToCharArray());
+		private static readonly int TrailLength = "Attribute".Length;
+
+		public string NameWithoutSuffix => NameWithAttributeSuffix[..^TrailLength];
 
 		public bool MatchWithAnyName(string attributeName)
 		{

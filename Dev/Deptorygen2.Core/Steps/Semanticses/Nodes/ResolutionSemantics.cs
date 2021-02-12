@@ -33,6 +33,11 @@ namespace Deptorygen2.Core.Steps.Semanticses
 
 		public static ResolutionSemantics? Build(ReturnTypeToAnalyze returnType, IAnalysisContext context)
 		{
+			if (!returnType.IsResolution())
+			{
+				return null;
+			}
+
 			return BuildInternal(returnType.Syntax, returnType.Symbol, context);
 		}
 

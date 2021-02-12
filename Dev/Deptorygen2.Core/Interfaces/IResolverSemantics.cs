@@ -10,5 +10,6 @@ namespace Deptorygen2.Core.Interfaces
 		string MethodName { get; }
 		ParameterSemantics[] Parameters { get; }
 		Accessibility Accessibility { get; }
+		ResolutionSemantics[] Resolutions { get; }
 	}
 }

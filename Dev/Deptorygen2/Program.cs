@@ -8,7 +8,7 @@ namespace Deptorygen2
 		static void Main(string[] args)
 		{
 			var analyzer = new Analyzer();
-			analyzer.Analyze(SampleSourceCode.Factory1);
+			analyzer.Analyze(SampleSourceCode.Factory2);
 		}
 	}
 }

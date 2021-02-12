@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deptorygen2", "Deptorygen2\Deptorygen2.csproj", "{C7E01680-667E-4CF1-8B39-3D0884532273}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deptorygen2.Console", "Deptorygen2\Deptorygen2.Console.csproj", "{C7E01680-667E-4CF1-8B39-3D0884532273}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{26B7E7DB-A0EC-4DC1-816A-28FCDD1D34AF}"
 	ProjectSection(SolutionItems) = preProject
@@ -16,9 +16,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NacHelpers", "..\Modules\Na
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{A9843142-9F22-47C7-8806-BDF42341BD6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deptorygen2.TestSubject", "Deptorygen2.TestSubject\Deptorygen2.TestSubject.csproj", "{3A92EA0C-92CC-4BF8-A595-B51BA70C2814}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deptorygen2.TestSubject", "Deptorygen2.TestSubject\Deptorygen2.TestSubject.csproj", "{3A92EA0C-92CC-4BF8-A595-B51BA70C2814}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deptorygen2.Generator", "Deptorygen2.Generator\Deptorygen2.Generator.csproj", "{364B6F84-0F5D-4D58-B5E3-2C54D636831B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deptorygen2.Generator", "Deptorygen2.Generator\Deptorygen2.Generator.csproj", "{364B6F84-0F5D-4D58-B5E3-2C54D636831B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deptorygen2.Core.Aspects", "Deptorygen2.Core.Aspects\Deptorygen2.Core.Aspects.csproj", "{57C71579-D356-435A-8458-514624D0C9F3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{7944C2AB-1F69-4E21-918D-97AAA932A36C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deptorygen2.Core.Common", "Deptorygen2.Core.Common\Deptorygen2.Core.Common.csproj", "{E5B7F7E4-BFA4-4F89-BBF8-55ED46E70919}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,12 +74,31 @@ Global
 		{364B6F84-0F5D-4D58-B5E3-2C54D636831B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{364B6F84-0F5D-4D58-B5E3-2C54D636831B}.Release|x64.ActiveCfg = Release|Any CPU
 		{364B6F84-0F5D-4D58-B5E3-2C54D636831B}.Release|x64.Build.0 = Release|Any CPU
+		{57C71579-D356-435A-8458-514624D0C9F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57C71579-D356-435A-8458-514624D0C9F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57C71579-D356-435A-8458-514624D0C9F3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{57C71579-D356-435A-8458-514624D0C9F3}.Debug|x64.Build.0 = Debug|Any CPU
+		{57C71579-D356-435A-8458-514624D0C9F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57C71579-D356-435A-8458-514624D0C9F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57C71579-D356-435A-8458-514624D0C9F3}.Release|x64.ActiveCfg = Release|Any CPU
+		{57C71579-D356-435A-8458-514624D0C9F3}.Release|x64.Build.0 = Release|Any CPU
+		{E5B7F7E4-BFA4-4F89-BBF8-55ED46E70919}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5B7F7E4-BFA4-4F89-BBF8-55ED46E70919}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5B7F7E4-BFA4-4F89-BBF8-55ED46E70919}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E5B7F7E4-BFA4-4F89-BBF8-55ED46E70919}.Debug|x64.Build.0 = Debug|Any CPU
+		{E5B7F7E4-BFA4-4F89-BBF8-55ED46E70919}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5B7F7E4-BFA4-4F89-BBF8-55ED46E70919}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5B7F7E4-BFA4-4F89-BBF8-55ED46E70919}.Release|x64.ActiveCfg = Release|Any CPU
+		{E5B7F7E4-BFA4-4F89-BBF8-55ED46E70919}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{D3A7A013-2881-4167-A104-01F485F84F4C} = {7944C2AB-1F69-4E21-918D-97AAA932A36C}
 		{1794604B-BD31-4AC2-9DE3-AD8230F34FE0} = {A9843142-9F22-47C7-8806-BDF42341BD6F}
+		{57C71579-D356-435A-8458-514624D0C9F3} = {7944C2AB-1F69-4E21-918D-97AAA932A36C}
+		{E5B7F7E4-BFA4-4F89-BBF8-55ED46E70919} = {7944C2AB-1F69-4E21-918D-97AAA932A36C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2B35888E-D7BD-4F06-BB52-E53B4BC7E766}

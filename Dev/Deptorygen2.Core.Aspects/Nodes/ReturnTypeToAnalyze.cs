@@ -5,9 +5,5 @@ namespace Deptorygen2.Core.Steps.Aggregation
 {
 	internal record ReturnTypeToAnalyze(TypeSyntax Syntax, INamedTypeSymbol Symbol)
 	{
-		public bool IsResolution()
-		{
-			return !Symbol.IsAbstract;
-		}
 	}
 }

@@ -53,7 +53,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 					param: x.PropertyName.ToLowerCamelCase()))
 				.ToArray();
 
-			var parameters = fs.Concat(ps).Select(x => BuildParameterNode(x.type, x.name));
+			var parameters = fs.Concat(ps).Select(x => BuildParameterNode(x.type, x.param));
 			var assignments = fs.Concat(ps).Select(x => new AssignmentNode(x.name, x.param));
 
 			return new ConstructorNode(_semantics.Factory.Type.Name,
@@ -65,19 +65,19 @@ namespace Deptorygen2.Core.Steps.Definitions
 		{
 			var rs = _semantics.Factory.Resolvers;
 			var crs = _semantics.Factory.CollectionResolvers;
-			var drs = _semantics.Factory.Delegations.SelectMany(x => x.Resolvers);
-			var dcrs = _semantics.Factory.Delegations.SelectMany(x => x.CollectionResolvers);
 			
-			return rs.Cast<IResolverSemantics>().Concat(crs).Concat(drs).Concat(dcrs)
+			return rs.Cast<IResolverSemantics>().Concat(crs)
 				.Select(x =>
 				{
 					var ps = x.Parameters.Select(p =>
 						BuildParameterNode(p.TypeName, p.ParameterName));
+					var resolution = x.Resolutions.FirstOrDefault()?.TypeName ?? x.ReturnType;
 
 					return new MethodNode(x.Accessibility,
 						new TypeNode(x.ReturnType),
 						x.MethodName,
-						ps.ToArray());
+						ps.ToArray(),
+						resolution);
 				}).ToArray();
 		}
 

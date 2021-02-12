@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aggregation;
+using Microsoft.CodeAnalysis;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Semanticses
@@ -30,8 +31,9 @@ namespace Deptorygen2.Core.Steps.Semanticses
 
 					var delegations = properties.Select(DelegationSemantics.GetBuilder).Build(p =>
 					{
-						var dr = AggregateResolvers(methods);
-						var dcr = AggregateCollectionResolvers(methods);
+						var ms = p.GetMethodToAnalyze();
+						var dr = AggregateResolvers(ms);
+						var dcr = AggregateCollectionResolvers(ms);
 						return (dr, dcr);
 					});
 

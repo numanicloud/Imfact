@@ -53,6 +53,35 @@ namespace Pika
 	}
 }
 ";
+
+		public static readonly string Factory2 = @"
+using System;
+
+namespace Deptorygen2.TestSubject
+{
+	class Client
+	{
+		public Client(Sub.Service service)
+		{
+			
+		}
+	}
+
+	[Factory]
+	public partial class MyFactory
+	{
+		internal partial Client ResolveClient();
+	}
+}
+
+namespace Deptorygen2.TestSubject.Sub
+{
+	class Service
+	{
+		
+	}
+}
+";
 	}
 
 	class Analyzer

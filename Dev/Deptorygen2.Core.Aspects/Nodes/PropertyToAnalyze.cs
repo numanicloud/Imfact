@@ -16,22 +16,5 @@ namespace Deptorygen2.Core.Steps.Aggregation
 				.Select(x => new AttributeName(x.Name))
 				.Any(x => x.NameWithoutSuffix == "Factory");
 		}
-
-		public MethodToAnalyze[] GetMethodToAnalyze()
-		{
-			return Symbol.Type.GetMembers().OfType<IMethodSymbol>()
-				.Select(m =>
-				{
-					var mm = m.DeclaringSyntaxReferences
-						.Select(x => x.GetSyntax())
-						.OfType<MethodDeclarationSyntax>()
-						.FirstOrDefault();
-					return mm is { } syntax
-						? new MethodToAnalyze(syntax, m)
-						: null;
-				})
-				.FilterNull()
-				.ToArray();
-		}
 	}
 }
