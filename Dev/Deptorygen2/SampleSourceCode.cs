@@ -69,7 +69,6 @@ namespace Pika
 		public void Analyze(string code)
 		{
 			var tree = CSharpSyntaxTree.ParseText(code);
-			var root = tree.GetCompilationUnitRoot();
 
 			var compilation = CSharpCompilation.Create("Test")
 				.AddReferences(MetadataReference.CreateFromFile(
@@ -77,9 +76,8 @@ namespace Pika
 				.AddSyntaxTrees(tree);
 
 			var semanticModel = compilation.GetSemanticModel(tree);
-			var analysisContext = new CompilationAnalysisContext(semanticModel);
 
-			var generation = new GenerationFacade(analysisContext);
+			var generation = new GenerationFacade(semanticModel);
 
 			var classes = from ns in tree.GetRoot().ChildNodes().OfType<NamespaceDeclarationSyntax>()
 					from type in ns.ChildNodes().OfType<ClassDeclarationSyntax>()

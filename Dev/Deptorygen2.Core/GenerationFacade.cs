@@ -5,6 +5,8 @@ using Deptorygen2.Core.Steps.Definitions;
 using Deptorygen2.Core.Steps.Definitions.Syntaxes;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Writing;
+using Deptorygen2.Generator;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Deptorygen2.Core
@@ -15,10 +17,10 @@ namespace Deptorygen2.Core
 		private readonly AspectAggregator _aspectAggregator = new();
 		private readonly SemanticsAggregator _semanticsAggregator;
 
-		public GenerationFacade(IAnalysisContext context)
+		public GenerationFacade(SemanticModel semanticModel)
 		{
-			_context = context;
-			_semanticsAggregator = new SemanticsAggregator(context);
+			_context = new CompilationAnalysisContext(semanticModel);
+			_semanticsAggregator = new SemanticsAggregator(_context);
 		}
 
 		public SourceFile? RunGeneration(ClassDeclarationSyntax syntax)
@@ -48,7 +50,7 @@ namespace Deptorygen2.Core
 
 		private SourceFile SourceCodeStep(SourceTreeDefinition definition)
 		{
-			var writer = new SourceCodeBuilder2(definition);
+			var writer = new SourceCodeBuilder(definition);
 			return writer.Write();
 		}
 	}

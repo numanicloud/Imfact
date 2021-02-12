@@ -24,18 +24,12 @@ namespace Deptorygen2.Generator
 			}
 
 			var semanticModel = context.Compilation.GetSemanticModel(receiver.SyntaxTree);
-			var analysis = new CompilationAnalysisContext(semanticModel);
+			var facade = new GenerationFacade(semanticModel);
 
-			var facade = new GenerationFacade(analysis);
 			foreach (var candidateClass in receiver.CandidateClasses)
 			{
-				var definition = facade.AspectStep(candidateClass) is not { } aspect ? null
-					: facade.SemanticsStep(aspect) is not { } semantics ? null
-					: facade.DefinitionStep(semantics);
-
-				if (definition is not null)
+				if (facade.RunGeneration(candidateClass) is {} sourceFile)
 				{
-					var sourceFile = facade.SourceCodeStep(definition);
 					var sourceText = SourceText.From(sourceFile.Contents, Encoding.UTF8);
 					context.AddSource(sourceFile.FileName, sourceText);
 				}

@@ -1,5 +1,4 @@
 ﻿using Deptorygen2.Core.Steps.Aggregation;
-using Deptorygen2.Core.Steps.Definitions;
 using Deptorygen2.Core.Steps.Semanticses;
 
 namespace Deptorygen2.Core.Steps.Api
@@ -21,16 +20,6 @@ namespace Deptorygen2.Core.Steps.Api
 		internal DeptorygenSemantics(GenerationSemantics semantics)
 		{
 			Semantics = semantics;
-		}
-	}
-
-	public class DeptorygenDefinition
-	{
-		internal SourceCodeDefinition Definition { get; }
-
-		internal DeptorygenDefinition(SourceCodeDefinition definition)
-		{
-			Definition = definition;
 		}
 	}
 }
