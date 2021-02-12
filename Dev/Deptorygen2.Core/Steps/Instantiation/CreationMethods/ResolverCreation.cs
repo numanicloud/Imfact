@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Deptorygen2.Core.Steps.Definitions;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Utilities;
 
@@ -7,21 +6,21 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 {
 	internal class ResolverCreation : CreationMethodBase<ResolverSemantics>
 	{
-		public ResolverCreation(SourceCodeDefinition definition) : base(definition)
+		public ResolverCreation(GenerationSemantics semantics) : base(semantics)
 		{
 		}
 
 		public override InstantiationMethod Method => InstantiationMethod.Resolver;
 
-		protected override string GetCreationCode(ResolverSemantics resolution, ResolverParameterDefinition[] given,
+		protected override string GetCreationCode(ResolverSemantics resolution, GivenParameter[] given,
 			IInstantiationResolver resolver)
 		{
 			return MethodInvocation(resolution, given, Method, resolver);
 		}
 
-		protected override IEnumerable<ResolverSemantics> GetSource(SourceCodeDefinition definition)
+		protected override IEnumerable<ResolverSemantics> GetSource(GenerationSemantics semantics)
 		{
-			return factory.Resolvers;
+			return semantics.Factory.Resolvers;
 		}
 
 		protected override TypeName GetTypeInfo(ResolverSemantics source)

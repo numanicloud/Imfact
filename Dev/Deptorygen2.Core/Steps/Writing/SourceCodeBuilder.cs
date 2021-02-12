@@ -10,12 +10,12 @@ namespace Deptorygen2.Core.Steps.Writing
 	public class SourceCodeBuilder
 	{
 		private readonly SourceCodeDefinition _sourceCode;
-		private readonly InstantiationResolver _injection;
+		private readonly IInstantiationResolver _injection;
 
 		internal SourceCodeBuilder(SourceCodeDefinition sourceCode)
 		{
 			_sourceCode = sourceCode;
-			_injection = new InstantiationResolver(_sourceCode);
+			_injection = _sourceCode.Creation;
 		}
 
 		internal SourceFile Build()
@@ -131,9 +131,9 @@ namespace Deptorygen2.Core.Steps.Writing
 		public string RenderResolution(ResolutionDefinition resolution,
 			ResolverParameterDefinition[] given)
 		{
+			var ps = given.Select(x => new GivenParameter(x.Type, x.Name)).ToArray();
 			var request = new InstantiationRequest(resolution.TypeToResolve,
-				given,
-				InstantiationMethod.None);
+				ps, InstantiationMethod.None);
 			return _injection.GetInjection(request) ?? "<Error>";
 		}
 	}

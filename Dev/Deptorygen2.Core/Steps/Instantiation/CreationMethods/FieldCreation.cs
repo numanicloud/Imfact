@@ -1,32 +1,31 @@
 ﻿using System.Collections.Generic;
-using Deptorygen2.Core.Steps.Definitions;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 {
-	internal class FieldCreation : CreationMethodBase<DependencyDefinition>
+	internal class FieldCreation : CreationMethodBase<DependencySemantics>
 	{
-		public FieldCreation(SourceCodeDefinition definition) : base(definition)
+		public FieldCreation(GenerationSemantics semantics) : base(semantics)
 		{
 		}
 
 		public override InstantiationMethod Method => InstantiationMethod.Field;
 
-		protected override string GetCreationCode(DependencyDefinition resolution, ResolverParameterDefinition[] given,
+		protected override string GetCreationCode(DependencySemantics resolution, GivenParameter[] given,
 			IInstantiationResolver resolver)
 		{
 			return resolution.FieldName;
 		}
 
-		protected override IEnumerable<DependencyDefinition> GetSource(SourceCodeDefinition definition)
+		protected override IEnumerable<DependencySemantics> GetSource(GenerationSemantics semantics)
 		{
-			return fields;
+			return semantics.Dependencies;
 		}
 
-		protected override TypeName GetTypeInfo(DependencyDefinition source)
+		protected override TypeName GetTypeInfo(DependencySemantics source)
 		{
-			return source.FieldType;
+			return source.TypeName;
 		}
 	}
 }

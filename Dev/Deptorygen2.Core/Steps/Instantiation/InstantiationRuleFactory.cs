@@ -1,5 +1,4 @@
-﻿using Deptorygen2.Core.Steps.Definitions;
-using Deptorygen2.Core.Steps.Semanticses;
+﻿using Deptorygen2.Core.Steps.Semanticses;
 using System.Collections.Generic;
 using Deptorygen2.Core.Steps.Instantiation.CreationMethods;
 
@@ -29,16 +28,17 @@ namespace Deptorygen2.Core.Steps.Instantiation
 
 	internal class InstantiationRuleFactory
 	{
-		public static IEnumerable<IInstantiationCoder> GetCreations(SourceCodeDefinition definition)
+		public static IEnumerable<IInstantiationCoder> GetCreations(GenerationSemantics semantics)
 		{
-			yield return new FactoryItselfCreation(definition);
-			yield return new DelegationItselfCreation(definition);
-			yield return new DelegatedResolverCreation(definition);
-			yield return new DelegatedCollectionResolverCreation(definition);
-			yield return new ResolverCreation(definition);
-			yield return new CollectionResolverCreation(definition);
-			yield return new FieldCreation(definition);
-			yield return new ConstructorCreation(definition);
+			// この順で評価されて、最初にマッチした解決方法が使われる
+			yield return new FactoryItselfCreation(semantics);
+			yield return new DelegationItselfCreation(semantics);
+			yield return new DelegatedResolverCreation(semantics);
+			yield return new DelegatedCollectionResolverCreation(semantics);
+			yield return new ResolverCreation(semantics);
+			yield return new CollectionResolverCreation(semantics);
+			yield return new FieldCreation(semantics);
+			yield return new ConstructorCreation(semantics);
 		}
 	}
 }

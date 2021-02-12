@@ -18,26 +18,30 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 	internal class DefinitionAggregator
 	{
-		public SourceCodeDefinition Encode(FactorySemantics semantics)
+		public SourceCodeDefinition Encode(GenerationSemantics semantics)
 		{
-			string[] usings = AggregateNamespaces(semantics).ToArray();
-			string ns = semantics.ItselfSymbol.GetFullNameSpace();
+			var factoryS = semantics.Factory;
 
-			var factory = FactoryDefinition.Build(semantics, name =>
+			string[] usings = semantics.RequiredNamespaces;
+			string ns = factoryS.ItselfSymbol.GetFullNameSpace();
+
+			var factory = FactoryDefinition.Build(factoryS, name =>
 			{
-				var fields = AggregateDependencies(semantics);
+				var fields = AggregateDependencies(factoryS);
 
-				var resolvers = AggregateResolvers(semantics);
-				var collectionResolvers = AggregateCollectionResolvers(semantics);
-				var delegations = semantics.Delegations.Select(BuildDelegation).ToArray();
+				var resolvers = AggregateResolvers(factoryS);
+				var collectionResolvers = AggregateCollectionResolvers(factoryS);
+				var delegations = factoryS.Delegations.Select(BuildDelegation).ToArray();
 
 				var constructor = FactoryConstructorDefinition.Build(fields, delegations);
 
 				return new FactoryDefinition(name, resolvers, collectionResolvers, delegations,
 					fields, constructor);
 			});
+
+			var creation = new InstantiationResolver(semantics);
 			
-			return new SourceCodeDefinition(usings, ns, factory);
+			return new SourceCodeDefinition(usings, ns, factory, creation);
 		}
 
 		private static CollectionResolverDefinition[] AggregateCollectionResolvers(

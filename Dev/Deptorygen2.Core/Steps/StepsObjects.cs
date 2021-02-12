@@ -16,9 +16,9 @@ namespace Deptorygen2.Core.Steps.Api
 
 	public class DeptorygenSemantics
 	{
-		internal FactorySemantics Semantics { get; }
+		internal GenerationSemantics Semantics { get; }
 
-		internal DeptorygenSemantics(FactorySemantics semantics)
+		internal DeptorygenSemantics(GenerationSemantics semantics)
 		{
 			Semantics = semantics;
 		}

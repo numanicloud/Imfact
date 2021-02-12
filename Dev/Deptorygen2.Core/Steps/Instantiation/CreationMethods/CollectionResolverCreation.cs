@@ -1,31 +1,31 @@
 ﻿using System.Collections.Generic;
-using Deptorygen2.Core.Steps.Definitions;
+using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 {
-	internal class CollectionResolverCreation : CreationMethodBase<CollectionResolverDefinition>
+	internal class CollectionResolverCreation : CreationMethodBase<CollectionResolverSemantics>
 	{
-		public CollectionResolverCreation(SourceCodeDefinition definition) : base(definition)
+		public CollectionResolverCreation(GenerationSemantics semantics) : base(semantics)
 		{
 		}
 
 		public override InstantiationMethod Method => InstantiationMethod.CollectionResolver;
 
-		protected override string GetCreationCode(CollectionResolverDefinition resolution, ResolverParameterDefinition[] given,
+		protected override string GetCreationCode(CollectionResolverSemantics resolution, GivenParameter[] given,
 			IInstantiationResolver resolver)
 		{
 			return MethodInvocation(resolution, given, Method, resolver);
 		}
 
-		protected override IEnumerable<CollectionResolverDefinition> GetSource(SourceCodeDefinition definition)
+		protected override IEnumerable<CollectionResolverSemantics> GetSource(GenerationSemantics semantics)
 		{
-			return definition.Factory.CollectionResolvers;
+			return semantics.Factory.CollectionResolvers;
 		}
 
-		protected override TypeName GetTypeInfo(CollectionResolverDefinition source)
+		protected override TypeName GetTypeInfo(CollectionResolverSemantics source)
 		{
-			return source.ReturnType;
+			return source.CollectionType;
 		}
 	}
 }

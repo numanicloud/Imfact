@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Deptorygen2.Core.Steps.Definitions;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Utilities;
 using NacHelpers.Extensions;
@@ -8,22 +7,22 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 {
 	internal class FactoryItselfCreation : CreationMethodBase<FactorySemantics>
 	{
-		public FactoryItselfCreation(SourceCodeDefinition definition) : base(factory, fields)
+		public FactoryItselfCreation(GenerationSemantics semantics) : base(semantics)
 		{
 		}
 
 		public override InstantiationMethod Method => InstantiationMethod.FactoryItself;
 
 		protected override string GetCreationCode(FactorySemantics resolution,
-			ResolverParameterDefinition[] given,
+			GivenParameter[] given,
 			IInstantiationResolver resolver)
 		{
 			return "this";
 		}
 
-		protected override IEnumerable<FactorySemantics> GetSource(SourceCodeDefinition definition)
+		protected override IEnumerable<FactorySemantics> GetSource(GenerationSemantics semantics)
 		{
-			return factory.WrapByArray();
+			return semantics.Factory.WrapByArray();
 		}
 
 		protected override TypeName GetTypeInfo(FactorySemantics source)

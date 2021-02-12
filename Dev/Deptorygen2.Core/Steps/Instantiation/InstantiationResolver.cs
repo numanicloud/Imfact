@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Steps.Definitions;
 using Deptorygen2.Core.Steps.Semanticses;
 using NacHelpers.Extensions;
 using static Deptorygen2.Core.Steps.Instantiation.InstantiationMethod;
@@ -11,6 +10,7 @@ namespace Deptorygen2.Core.Steps.Instantiation
 {
 	internal interface IInstantiationResolver
 	{
+		string? GetInjection(InstantiationRequest request);
 		IEnumerable<string> GetInjections(MultipleInstantiationRequest request);
 	}
 
@@ -18,9 +18,9 @@ namespace Deptorygen2.Core.Steps.Instantiation
 	{
 		private readonly IInstantiationCoder[] _instantiationCoders;
 
-		public InstantiationResolver(SourceCodeDefinition definition)
+		public InstantiationResolver(GenerationSemantics semantics)
 		{
-			_instantiationCoders = GetCreations(definition)
+			_instantiationCoders = GetCreations(semantics)
 				.OrderBy(x => (int)x.Method).ToArray();
 		}
 

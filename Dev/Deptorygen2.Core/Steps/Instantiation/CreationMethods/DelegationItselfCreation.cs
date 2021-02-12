@@ -1,32 +1,32 @@
 ﻿using System.Collections.Generic;
-using Deptorygen2.Core.Steps.Definitions;
+using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 {
-	internal class DelegationItselfCreation : CreationMethodBase<DelegationDefinition>
+	internal class DelegationItselfCreation : CreationMethodBase<DelegationSemantics>
 	{
-		public DelegationItselfCreation(SourceCodeDefinition definition) : base(definition)
+		public DelegationItselfCreation(GenerationSemantics semantics) : base(semantics)
 		{
 		}
 
 		public override InstantiationMethod Method => InstantiationMethod.DelegationItself;
 
-		protected override string GetCreationCode(DelegationDefinition resolution,
-			ResolverParameterDefinition[] given,
+		protected override string GetCreationCode(DelegationSemantics resolution,
+			GivenParameter[] given,
 			IInstantiationResolver resolver)
 		{
 			return resolution.PropertyName;
 		}
 
-		protected override IEnumerable<DelegationDefinition> GetSource(SourceCodeDefinition definition)
+		protected override IEnumerable<DelegationSemantics> GetSource(GenerationSemantics semantics)
 		{
-			return definition.Factory.Delegations;
+			return semantics.Factory.Delegations;
 		}
 
-		protected override TypeName GetTypeInfo(DelegationDefinition source)
+		protected override TypeName GetTypeInfo(DelegationSemantics source)
 		{
-			return source.PropertyType;
+			return source.TypeName;
 		}
 	}
 }

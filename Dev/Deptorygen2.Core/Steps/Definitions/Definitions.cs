@@ -6,9 +6,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 	public record DependencyDefinition(TypeName FieldType, string FieldName);
 
 	public record DelegationDefinition(TypeName PropertyType,
-		string PropertyName,
-		ResolverDefinition[] Resolvers,
-		CollectionResolverDefinition[] CollectionResolvers);
+		string PropertyName);
 
 	public record ResolverParameterDefinition(TypeName Type, string Name);
 
