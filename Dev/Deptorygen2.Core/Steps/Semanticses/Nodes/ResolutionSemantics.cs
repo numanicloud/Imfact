@@ -43,23 +43,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			var isDisposable = symbol.IsImplementing(typeof(IDisposable));
 
 			var dependencies = symbol.Constructors.Single().Parameters
-				.Select(x =>
-				{
-					var s = x.Type.DeclaringSyntaxReferences
-						.OfType<ClassDeclarationSyntax>()
-						.FirstOrDefault();
-
-					if (s is {})
-					{
-						var sm = context.GetNamedTypeSymbol(s);
-						if (sm is {})
-						{
-							return Utilities.TypeName.FromSymbol(sm);
-						}
-					}
-
-					return TypeName.FromSymbol(x.Type);
-				})
+				.Select(x => TypeName.FromSymbol(x.Type))
 				.ToArray();
 
 			return new ResolutionSemantics(

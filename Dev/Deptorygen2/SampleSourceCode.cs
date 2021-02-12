@@ -28,6 +28,8 @@ namespace HogeHoge
 ";
 
 		public static readonly string Factory1 = @"
+using Pika;
+
 namespace Fuwa
 {
 	public class Client

@@ -34,6 +34,8 @@ namespace Deptorygen2.Core.Steps.Writing
 				builder.AppendLine($"using {usingNode.Namespace};");
 			}
 
+			builder.AppendLine();
+
 			AppendBlock(builder, $"namespace {_root.Namespace.Name}", inner =>
 			{
 				RenderClass(_root.Namespace.Class, inner);
@@ -44,7 +46,7 @@ namespace Deptorygen2.Core.Steps.Writing
 
 		private void RenderClass(ClassNode @class, StringBuilder builder)
 		{
-			AppendBlock(builder, $"internal partial class {@class.Name}", inner =>
+			AppendBlock(builder, $"partial class {@class.Name}", inner =>
 			{
 				foreach (var field in @class.Fields)
 				{
@@ -80,7 +82,7 @@ namespace Deptorygen2.Core.Steps.Writing
 
 				CreationRequest request = new(method.ReturnType.TypeName, given, true);
 
-				_creation.GetInjection(request);
+				inner.AppendLine(_creation.GetInjection(request));
 			});
 		}
 
