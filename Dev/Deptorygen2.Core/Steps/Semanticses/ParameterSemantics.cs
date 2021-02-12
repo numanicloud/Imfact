@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reactive;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aggregation;
 using Deptorygen2.Core.Utilities;
@@ -13,6 +14,20 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			return symbol.Parameters
 				.Select(x => new ParameterSemantics(TypeName.FromSymbol(x.Type), x.Name))
 				.ToArray();
+		}
+
+		public static Builder<ParameterToAnalyze, Unit, ParameterSemantics>? GetBuilder(
+			ParameterToAnalyze parameter, IAnalysisContext context)
+		{
+			if (parameter.Syntax.Type is null
+			    || context.GeTypeSymbol(parameter.Syntax.Type) is not { } symbol)
+			{
+				return null;
+			}
+
+			return new(parameter, unit => new ParameterSemantics(
+				Utilities.TypeName.FromSymbol(symbol),
+				parameter.Syntax.Identifier.ValueText));
 		}
 
 		public static ParameterSemantics? Build(ParameterToAnalyze parameter, IAnalysisContext context)

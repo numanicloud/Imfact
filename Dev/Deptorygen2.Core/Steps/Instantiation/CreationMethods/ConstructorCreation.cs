@@ -3,18 +3,19 @@ using System.Linq;
 using Deptorygen2.Core.Steps.Definitions;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Utilities;
+using Source = Deptorygen2.Core.Steps.Semanticses.ResolutionSemantics;
 
 namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 {
-	internal class ConstructorCreation : CreationMethodBase<ResolutionSemantics>
+	internal class ConstructorCreation : CreationMethodBase<Source>
 	{
-		public ConstructorCreation(FactorySemantics factory, DependencyDefinition[] fields) : base(factory, fields)
+		public ConstructorCreation(SourceCodeDefinition definition) : base(definition)
 		{
 		}
 
 		public override InstantiationMethod Method => InstantiationMethod.Constructor;
 
-		protected override string GetCreationCode(ResolutionSemantics resolution, ResolverParameterDefinition[] given,
+		protected override string GetCreationCode(Source resolution, ResolverParameterDefinition[] given,
 			IInstantiationResolver resolver)
 		{
 			var request = new MultipleInstantiationRequest(
@@ -22,13 +23,13 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 			return $"new {resolution.TypeName.Name}({GetArgList(request, resolver)})";
 		}
 
-		protected override IEnumerable<ResolutionSemantics> GetSource(FactorySemantics factory, DependencyDefinition[] fields)
+		protected override IEnumerable<Source> GetSource(SourceCodeDefinition definition)
 		{
-			return factory.Resolvers.SelectMany(x => x.Resolutions)
+			return definition.Factory.Methods.SelectMany(x => x.Resolutions)
 				.Concat(factory.CollectionResolvers.SelectMany(x => x.Resolutions));
 		}
 
-		protected override TypeName GetTypeInfo(ResolutionSemantics source)
+		protected override TypeName GetTypeInfo(Source source)
 		{
 			return source.TypeName;
 		}

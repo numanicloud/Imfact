@@ -2,16 +2,26 @@
 using System.Linq;
 using System.Text;
 using Deptorygen2.Core.Steps.Definitions;
+using Deptorygen2.Core.Steps.Instantiation;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Writing
 {
 	public class SourceCodeBuilder
 	{
-		internal SourceFile Build(SourceCodeDefinition sourceCode)
+		private readonly SourceCodeDefinition _sourceCode;
+		private readonly InstantiationResolver _injection;
+
+		internal SourceCodeBuilder(SourceCodeDefinition sourceCode)
 		{
-			var fileName = sourceCode.Factory.Name + ".g.cs";
-			var contents = RenderFactory(sourceCode.Factory);
+			_sourceCode = sourceCode;
+			_injection = new InstantiationResolver(_sourceCode);
+		}
+
+		internal SourceFile Build()
+		{
+			var fileName = _sourceCode.Factory.Name + ".g.cs";
+			var contents = RenderFactory(_sourceCode.Factory);
 			return new SourceFile(fileName, contents);
 		}
 
@@ -82,15 +92,15 @@ namespace Deptorygen2.Core.Steps.Writing
 			var signature = string.Format("{0} partial {1} {2}({3})",
 				method.AccessLevel.ToString().ToLower(),
 				method.ReturnType.Name,
-				method.Name,
+				method.MethodName,
 				parameterList);
 			
 			AppendBlock(builder, signature, innerBuilder =>
 			{
 				var code = RenderAnnotations(
 					method.Hooks.AsSpan(),
-					RenderResolution(method.Resolution),
-					method.Name);
+					RenderResolution(method.Resolution, method.Parameters),
+					method.MethodName);
 
 				innerBuilder.AppendLine($"return {code};");
 			});
@@ -118,9 +128,13 @@ namespace Deptorygen2.Core.Steps.Writing
 			return $"private readonly {definition.FieldType.Name} {definition.FieldName};";
 		}
 		
-		public string RenderResolution(ResolutionDefinition resolution)
+		public string RenderResolution(ResolutionDefinition resolution,
+			ResolverParameterDefinition[] given)
 		{
-			return resolution.ResolutionCode;
+			var request = new InstantiationRequest(resolution.TypeToResolve,
+				given,
+				InstantiationMethod.None);
+			return _injection.GetInjection(request) ?? "<Error>";
 		}
 	}
 }

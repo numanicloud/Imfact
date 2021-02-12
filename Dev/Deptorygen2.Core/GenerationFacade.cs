@@ -14,7 +14,6 @@ namespace Deptorygen2.Core
 		private readonly AspectAggregator _aspectAggregator = new();
 		private readonly SemanticsAggregator _semanticsAggregator;
 		private readonly DefinitionAggregator _syntaxBuilder = new();
-		private readonly SourceCodeBuilder _writer = new();
 
 		public GenerationFacade(IAnalysisContext context)
 		{
@@ -49,7 +48,8 @@ namespace Deptorygen2.Core
 
 		public SourceFile SourceCodeStep(DeptorygenDefinition definition)
 		{
-			return _writer.Build(definition.Definition);
+			var writer = new SourceCodeBuilder(definition.Definition);
+			return writer.Build();
 		}
 	}
 }

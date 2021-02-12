@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Definitions;
-using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Utilities;
 using NacHelpers.Extensions;
 
@@ -14,9 +12,9 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 
 		public abstract InstantiationMethod Method { get; }
 
-		protected CreationMethodBase(FactorySemantics factory, DependencyDefinition[] fields)
+		protected CreationMethodBase(SourceCodeDefinition definition)
 		{
-			_resolutionSource = GetSource(factory, fields)
+			_resolutionSource = GetSource(definition)
 				.Select(x => (type: GetTypeInfo(x), source: x))
 				.ToDictionary(x => x.type, x => x.source);
 		}
@@ -36,17 +34,17 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 			ResolverParameterDefinition[] given,
 			IInstantiationResolver resolver);
 
-		protected abstract IEnumerable<T> GetSource(FactorySemantics factory, DependencyDefinition[] fields);
+		protected abstract IEnumerable<T> GetSource(SourceCodeDefinition definition);
 
 		protected abstract TypeName GetTypeInfo(T source);
 
-		protected static string MethodInvocation(IResolverSemantics resolver,
+		protected static string MethodInvocation(IResolverDefinition resolver,
 			ResolverParameterDefinition[] given,
 			InstantiationMethod exclude,
 			IInstantiationResolver injector)
 		{
 			var request = new MultipleInstantiationRequest(
-				resolver.Parameters.Select(x => x.TypeName).ToArray(), given, exclude);
+				resolver.Parameters.Select(x => x.Type).ToArray(), given, exclude);
 			return $"{resolver.MethodName}({GetArgList(request, injector)})";
 		}
 

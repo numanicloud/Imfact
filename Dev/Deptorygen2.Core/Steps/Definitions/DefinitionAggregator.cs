@@ -8,6 +8,14 @@ using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
 namespace Deptorygen2.Core.Steps.Definitions
 {
+	/* やってること：
+	 *		- 必要な依存関係（フィールド）の集計
+	 *		- 必要な名前空間の集計
+	 *		- （オブジェクト生成方法の決定）
+	 *		- 各種データ型を、コード生成に必要な情報のみを持つものに変換
+	 *
+	 */
+
 	internal class DefinitionAggregator
 	{
 		public SourceCodeDefinition Encode(FactorySemantics semantics)
@@ -18,10 +26,9 @@ namespace Deptorygen2.Core.Steps.Definitions
 			var factory = FactoryDefinition.Build(semantics, name =>
 			{
 				var fields = AggregateDependencies(semantics);
-				var argumentResolver = new InstantiationResolver(semantics, fields);
 
-				var resolvers = AggregateResolvers(semantics, argumentResolver);
-				var collectionResolvers = AggregateCollectionResolvers(semantics, argumentResolver);
+				var resolvers = AggregateResolvers(semantics);
+				var collectionResolvers = AggregateCollectionResolvers(semantics);
 				var delegations = semantics.Delegations.Select(BuildDelegation).ToArray();
 
 				var constructor = FactoryConstructorDefinition.Build(fields, delegations);
@@ -29,17 +36,18 @@ namespace Deptorygen2.Core.Steps.Definitions
 				return new FactoryDefinition(name, resolvers, collectionResolvers, delegations,
 					fields, constructor);
 			});
-
+			
 			return new SourceCodeDefinition(usings, ns, factory);
 		}
 
-		private static CollectionResolverDefinition[] AggregateCollectionResolvers(FactorySemantics semantics, InstantiationResolver instantiationResolver)
+		private static CollectionResolverDefinition[] AggregateCollectionResolvers(
+			FactorySemantics semantics)
 		{
 			return CollectionResolverDefinition.Build(semantics, (resolver, data) =>
 			{
 				var parameters = BuildParameters(resolver.Parameters);
 				var resolutions = resolver.Resolutions
-					.Select(r => BuildResolution(r, instantiationResolver, parameters))
+					.Select(r => BuildResolution(r))
 					.ToArray();
 
 				HookDefinition[] hooks = new HookDefinition[0]; // TODO: 未実装
@@ -48,13 +56,13 @@ namespace Deptorygen2.Core.Steps.Definitions
 			}).ToArray();
 		}
 
-		private static ResolverDefinition[] AggregateResolvers(FactorySemantics semantics, InstantiationResolver instantiationResolver)
+		private static ResolverDefinition[] AggregateResolvers(FactorySemantics semantics)
 		{
 			return ResolverDefinition.Build(semantics, (resolver, data) =>
 			{
 				var primalResolution = resolver.ReturnTypeResolution ?? resolver.Resolutions[0];
 				var parameters = BuildParameters(resolver.Parameters);
-				var resolution = BuildResolution(primalResolution, instantiationResolver, parameters);
+				var resolution = BuildResolution(primalResolution);
 
 				HookDefinition[] hooks = new HookDefinition[0]; // TODO: 未実装
 
@@ -74,12 +82,9 @@ namespace Deptorygen2.Core.Steps.Definitions
 				.ToArray();
 		}
 
-		private static ResolutionDefinition BuildResolution(ResolutionSemantics resolution,
-			InstantiationResolver instantiationResolver,
-			ResolverParameterDefinition[] parameters)
+		private static ResolutionDefinition BuildResolution(ResolutionSemantics resolution)
 		{
-			var code = instantiationResolver.GetInjectionUsingParameter(resolution.TypeName, parameters);
-			return new ResolutionDefinition(code);
+			return new ResolutionDefinition(resolution.TypeName);
 		}
 
 		private static DependencyDefinition[] AggregateDependencies(FactorySemantics semantics)

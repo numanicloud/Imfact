@@ -8,7 +8,7 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 {
 	internal class FactoryItselfCreation : CreationMethodBase<FactorySemantics>
 	{
-		public FactoryItselfCreation(FactorySemantics factory, DependencyDefinition[] fields) : base(factory, fields)
+		public FactoryItselfCreation(SourceCodeDefinition definition) : base(factory, fields)
 		{
 		}
 
@@ -21,7 +21,7 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 			return "this";
 		}
 
-		protected override IEnumerable<FactorySemantics> GetSource(FactorySemantics factory, DependencyDefinition[] fields)
+		protected override IEnumerable<FactorySemantics> GetSource(SourceCodeDefinition definition)
 		{
 			return factory.WrapByArray();
 		}

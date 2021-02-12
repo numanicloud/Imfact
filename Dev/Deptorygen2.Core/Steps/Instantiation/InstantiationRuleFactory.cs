@@ -20,21 +20,25 @@ namespace Deptorygen2.Core.Steps.Instantiation
 	 * そのため、この解決手段だけはこの型レイヤーに含めないほうがすっきりしそう。
 	 * そうなると、この型レイヤーには引数に関する情報を送らなくて良くなる。
 	 * 結果として、InstantiationRequest 型のデータは TypeName だけで構わない。
+	 *
+	 * Semanticsを使うのをやめてDefinitionsを使うようにしたが、どちらかというと
+	 * Semanticsを使う方がよいかもしれない。Definitionsにはコード生成に必要な情報だけが
+	 * あってほしいが、Injectionにはそうでない情報も要るので、
+	 * Definitionステップ内で情報を消費してしまいたい。
 	 */
 
 	internal class InstantiationRuleFactory
 	{
-		public static IEnumerable<IInstantiationCoder> GetCreations(FactorySemantics factory,
-			DependencyDefinition[] fields)
+		public static IEnumerable<IInstantiationCoder> GetCreations(SourceCodeDefinition definition)
 		{
-			yield return new FactoryItselfCreation(factory, fields);
-			yield return new DelegationItselfCreation(factory, fields);
-			yield return new DelegatedResolverCreation(factory, fields);
-			yield return new DelegatedCollectionResolverCreation(factory, fields);
-			yield return new ResolverCreation(factory, fields);
-			yield return new CollectionResolverCreation(factory, fields);
-			yield return new FieldCreation(factory, fields);
-			yield return new ConstructorCreation(factory, fields);
+			yield return new FactoryItselfCreation(definition);
+			yield return new DelegationItselfCreation(definition);
+			yield return new DelegatedResolverCreation(definition);
+			yield return new DelegatedCollectionResolverCreation(definition);
+			yield return new ResolverCreation(definition);
+			yield return new CollectionResolverCreation(definition);
+			yield return new FieldCreation(definition);
+			yield return new ConstructorCreation(definition);
 		}
 	}
 }

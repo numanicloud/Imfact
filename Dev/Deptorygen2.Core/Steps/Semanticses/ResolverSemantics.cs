@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aggregation;
@@ -43,31 +42,23 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			}
 		}
 
-		public static ResolverSemantics? Build(MethodToAnalyze method,
-			Func<Partial, ResolverSemantics> completion)
+		public static Builder<MethodToAnalyze,
+			(ResolutionSemantics?,
+			ResolutionSemantics[],
+			ParameterSemantics[]),
+			ResolverSemantics>? GetBuilder(MethodToAnalyze method)
 		{
 			if (!method.IsSingleResolver())
 			{
 				return null;
 			}
 
-			var partial = new Partial(method.Symbol.DeclaredAccessibility,
+			return new(method, tuple => new ResolverSemantics(method.Symbol.Name,
 				TypeName.FromSymbol(method.Symbol.ReturnType),
-				method.Symbol.Name);
-
-			return completion(partial);
-		}
-
-		public record Partial(Accessibility Accessibility,
-			TypeName ReturnTypeName,
-			string MethodName)
-		{
-			public ResolverSemantics Complete(ResolutionSemantics? returnTypeResolution,
-				ResolutionSemantics[] resolutions, ParameterSemantics[] parameters)
-			{
-				return new ResolverSemantics(MethodName, ReturnTypeName, returnTypeResolution,
-					resolutions, parameters, Accessibility);
-			}
+				tuple.Item1,
+				tuple.Item2,
+				tuple.Item3,
+				method.Symbol.DeclaredAccessibility));
 		}
 	}
 }

@@ -45,6 +45,23 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			}
 		}
 
+		public static Builder<MethodToAnalyze,
+			(ParameterSemantics[], ResolutionSemantics[]),
+			CollectionResolverSemantics>? GetBuilder(MethodToAnalyze method)
+		{
+			if (!method.IsCollectionResolver())
+			{
+				return null;
+			}
+
+			return new(method, tuple => new CollectionResolverSemantics(
+				method.Symbol.Name,
+				TypeName.FromSymbol(method.Symbol.ReturnType),
+				tuple.Item1,
+				tuple.Item2,
+				method.Symbol.DeclaredAccessibility));
+		}
+
 		public static CollectionResolverSemantics? Build(MethodToAnalyze method,
 			Func<Partial, CollectionResolverSemantics> completion)
 		{

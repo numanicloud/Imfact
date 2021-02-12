@@ -7,7 +7,7 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 {
 	internal class ResolverCreation : CreationMethodBase<ResolverSemantics>
 	{
-		public ResolverCreation(FactorySemantics factory, DependencyDefinition[] fields) : base(factory, fields)
+		public ResolverCreation(SourceCodeDefinition definition) : base(definition)
 		{
 		}
 
@@ -19,7 +19,7 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 			return MethodInvocation(resolution, given, Method, resolver);
 		}
 
-		protected override IEnumerable<ResolverSemantics> GetSource(FactorySemantics factory, DependencyDefinition[] fields)
+		protected override IEnumerable<ResolverSemantics> GetSource(SourceCodeDefinition definition)
 		{
 			return factory.Resolvers;
 		}

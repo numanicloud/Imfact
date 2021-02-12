@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aggregation;
@@ -25,29 +24,20 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			yield return TypeName.FullNamespace;
 		}
 
-		public static DelegationSemantics? Build(PropertyToAnalyze property,
-			Func<Partial, DelegationSemantics> completion)
+		public static Builder<PropertyToAnalyze,
+			(ResolverSemantics[], CollectionResolverSemantics[]),
+			DelegationSemantics>? GetBuilder(PropertyToAnalyze property)
 		{
 			if (!property.IsDelegation())
 			{
 				return null;
 			}
-
-			var partial = new Partial(property.Symbol.Name,
-				TypeName.FromSymbol(property.Symbol.Type));
-
-			return completion(partial);
-		}
-
-		public record Partial(string PropertyName,
-			TypeName TypeName)
-		{
-			public DelegationSemantics Complete(ResolverSemantics[] resolvers,
-				CollectionResolverSemantics[] collectionResolvers)
-			{
-				return new DelegationSemantics(PropertyName, TypeName,
-					resolvers, collectionResolvers);
-			}
+			
+			return new(property, tuple => new DelegationSemantics(
+				property.Symbol.Name,
+				Utilities.TypeName.FromSymbol(property.Symbol.Type),
+				tuple.Item1,
+				tuple.Item2));
 		}
 	}
 }

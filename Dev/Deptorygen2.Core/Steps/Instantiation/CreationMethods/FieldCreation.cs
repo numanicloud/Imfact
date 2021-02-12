@@ -7,7 +7,7 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 {
 	internal class FieldCreation : CreationMethodBase<DependencyDefinition>
 	{
-		public FieldCreation(FactorySemantics factory, DependencyDefinition[] fields) : base(factory, fields)
+		public FieldCreation(SourceCodeDefinition definition) : base(definition)
 		{
 		}
 
@@ -19,7 +19,7 @@ namespace Deptorygen2.Core.Steps.Instantiation.CreationMethods
 			return resolution.FieldName;
 		}
 
-		protected override IEnumerable<DependencyDefinition> GetSource(FactorySemantics factory, DependencyDefinition[] fields)
+		protected override IEnumerable<DependencyDefinition> GetSource(SourceCodeDefinition definition)
 		{
 			return fields;
 		}

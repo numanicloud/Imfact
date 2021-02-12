@@ -7,11 +7,11 @@ using Microsoft.CodeAnalysis;
 namespace Deptorygen2.Core.Steps.Definitions
 {
 	public record CollectionResolverDefinition(Accessibility AccessLevel,
-		string Name,
+		string MethodName,
 		TypeName ReturnType,
 		ResolutionDefinition[] Resolutions,
 		ResolverParameterDefinition[] Parameters,
-		HookDefinition[] Hooks)
+		HookDefinition[] Hooks) : IResolverDefinition
 	{
 		internal CollectionResolverDefinition(CollectionResolverNodeData nodeData,
 			ResolutionDefinition[] resolutions,
