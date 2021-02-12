@@ -26,6 +26,8 @@ namespace Deptorygen2.Generator
 				return;
 			}
 
+			context.Compilation.
+
 			var semanticModel = context.Compilation.GetSemanticModel(receiver.SyntaxTree);
 			var facade = new GenerationFacade(semanticModel);
 

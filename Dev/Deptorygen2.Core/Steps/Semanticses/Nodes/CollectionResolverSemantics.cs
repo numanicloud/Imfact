@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aggregation;
+using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
@@ -13,11 +13,9 @@ namespace Deptorygen2.Core.Steps.Semanticses
 		TypeName ReturnType,
 		ParameterSemantics[] Parameters,
 		ResolutionSemantics[] Resolutions,
-		Accessibility Accessibility) : IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
+		Accessibility Accessibility,
+		HookSemantics[] Hooks) : IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
 	{
-		public TypeName ElementType => ReturnType.TypeArguments[0];
-
-
 		public IEnumerable<TypeName> GetRequiredServiceTypes()
 		{
 			return Resolutions.SelectMany(x => x.Dependencies)
@@ -46,7 +44,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 		}
 
 		public static Builder<MethodToAnalyze,
-			(ParameterSemantics[], ResolutionSemantics[]),
+			(ParameterSemantics[], ResolutionSemantics[], HookSemantics[]),
 			CollectionResolverSemantics>? GetBuilder(MethodToAnalyze method)
 		{
 			if (!method.IsCollectionResolver())
@@ -59,34 +57,8 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				TypeName.FromSymbol(method.Symbol.ReturnType),
 				tuple.Item1,
 				tuple.Item2,
-				method.Symbol.DeclaredAccessibility));
-		}
-
-		public static CollectionResolverSemantics? Build(MethodToAnalyze method,
-			Func<Partial, CollectionResolverSemantics> completion)
-		{
-			if (!method.IsCollectionResolver())
-			{
-				return null;
-			}
-
-			var partial = new Partial(method.Symbol.Name,
-				TypeName.FromSymbol(method.Symbol.ReturnType),
-				method.Symbol.DeclaredAccessibility);
-
-			return completion(partial);
-		}
-
-		public record Partial(string MethodName,
-			TypeName CollectionType,
-			Accessibility Accessibility)
-		{
-			public CollectionResolverSemantics Complete(ParameterSemantics[] parameters,
-				ResolutionSemantics[] resolutions)
-			{
-				return new CollectionResolverSemantics(MethodName, CollectionType, parameters,
-					resolutions, Accessibility);
-			}
+				method.Symbol.DeclaredAccessibility,
+				tuple.Item3));
 		}
 	}
 }

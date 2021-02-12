@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Deptorygen2.Core.Steps.Creation;
@@ -11,11 +12,13 @@ namespace Deptorygen2.Core.Steps.Writing
 	{
 		private readonly RootNode _root;
 		private readonly ICreationAggregator _creation;
+		private readonly ResolverWriter _resolverWriter;
 
 		public SourceCodeBuilder(SourceTreeDefinition definition)
 		{
 			_root = definition.Root;
 			_creation = definition.Creation;
+			_resolverWriter = new ResolverWriter();
 		}
 
 		public SourceFile Write()
@@ -62,11 +65,21 @@ namespace Deptorygen2.Core.Steps.Writing
 
 				inner.AppendLine();
 
-				foreach (var method in @class.Methods)
-				{
-					RenderMethod(method, inner);
-				}
+				AppendSequence(@class.Methods, inner, 
+					method => RenderMethod(method, inner));
 			});
+		}
+
+		private void AppendSequence<T>(IEnumerable<T> collection, StringBuilder builder, Action<T> renderer)
+		{
+			foreach (var item in collection.WithIndex())
+			{
+				if (item.index != 0)
+				{
+					builder.AppendLine();
+				}
+				renderer(item.item);
+			}
 		}
 
 		private void RenderMethod(MethodNode method, StringBuilder builder)
@@ -80,13 +93,7 @@ namespace Deptorygen2.Core.Steps.Writing
 
 			AppendBlock(builder, $"{access} partial {ret} {method.Name}({paramList})", inner =>
 			{
-				var given = method.Parameters.Select(x => new GivenParameter(x.Type.TypeName, x.Name))
-					.ToArray();
-				
-				CreationRequest request = new(method.ResolutionType, given, true);
-
-				var creation = _creation.GetInjection(request);
-				inner.AppendLine($"return {creation};");
+				_resolverWriter.RenderImplementation(method, _creation, inner);
 			});
 		}
 
@@ -105,7 +112,7 @@ namespace Deptorygen2.Core.Steps.Writing
 			});
 		}
 
-		private void AppendBlock(StringBuilder builder, string header, Action<StringBuilder> build)
+		public static void AppendBlock(StringBuilder builder, string header, Action<StringBuilder> build)
 		{
 			builder.AppendLine(header);
 			builder.AppendLine("{");

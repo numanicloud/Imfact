@@ -20,7 +20,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			ParameterToAnalyze parameter, IAnalysisContext context)
 		{
 			if (parameter.Syntax.Type is null
-			    || context.GeTypeSymbol(parameter.Syntax.Type) is not { } symbol)
+			    || context.GetTypeSymbol(parameter.Syntax.Type) is not { } symbol)
 			{
 				return null;
 			}
@@ -33,7 +33,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 		public static ParameterSemantics? Build(ParameterToAnalyze parameter, IAnalysisContext context)
 		{
 			if (parameter.Syntax.Type is null
-				|| context.GeTypeSymbol(parameter.Syntax.Type) is not {} symbol)
+				|| context.GetTypeSymbol(parameter.Syntax.Type) is not {} symbol)
 			{
 				return null;
 			}

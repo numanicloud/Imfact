@@ -30,7 +30,7 @@ namespace Deptorygen2.Core.Steps.Definitions.Syntaxes
 		AssignmentNode[] Assignments);
 
 	internal record MethodNode(Accessibility Accessibility, TypeNode ReturnType, string Name,
-		ParameterNode[] Parameters, TypeName ResolutionType);
+		ParameterNode[] Parameters, TypeName ResolutionType, HookNode[] Hooks);
 
 	internal record PropertyNode(TypeNode Type, string Name);
 
@@ -61,4 +61,6 @@ namespace Deptorygen2.Core.Steps.Definitions.Syntaxes
 	}
 
 	internal record AssignmentNode(string Dest, string Src);
+
+	internal record HookNode(TypeNode FieldType, string FieldName);
 }

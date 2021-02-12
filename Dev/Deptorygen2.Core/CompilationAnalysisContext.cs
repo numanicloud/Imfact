@@ -13,7 +13,7 @@ namespace Deptorygen2.Generator
 			_semanticModel = semanticModel;
 		}
 
-		public ITypeSymbol? GeTypeSymbol(TypeSyntax syntax)
+		public ITypeSymbol? GetTypeSymbol(TypeSyntax syntax)
 		{
 			return _semanticModel.GetSymbolInfo(syntax).Symbol is ITypeSymbol type ? type
 				: null;

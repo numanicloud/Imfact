@@ -72,12 +72,15 @@ namespace Deptorygen2.Core.Steps.Definitions
 					var ps = x.Parameters.Select(p =>
 						BuildParameterNode(p.TypeName, p.ParameterName));
 					var resolution = x.Resolutions.FirstOrDefault()?.TypeName ?? x.ReturnType;
+					var hooks = x.Hooks.Select(y => new HookNode(new TypeNode(y.HookType), y.FieldName))
+						.ToArray();
 
 					return new MethodNode(x.Accessibility,
 						new TypeNode(x.ReturnType),
 						x.MethodName,
 						ps.ToArray(),
-						resolution);
+						resolution,
+						hooks);
 				}).ToArray();
 		}
 

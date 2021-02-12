@@ -20,7 +20,7 @@ namespace Deptorygen2.Core.Steps.Aggregation
 
 		public ReturnTypeToAnalyze? GetReturnType(IAnalysisContext context)
 		{
-			if (context.GeTypeSymbol(Syntax.ReturnType) is INamedTypeSymbol symbol)
+			if (context.GetTypeSymbol(Syntax.ReturnType) is INamedTypeSymbol symbol)
 			{
 				return new(Syntax.ReturnType, symbol);
 			}
@@ -30,7 +30,7 @@ namespace Deptorygen2.Core.Steps.Aggregation
 
 		public AttributeToAnalyze[] GetAttributes()
 		{
-			return Syntax.AttributeLists.SelectMany(x => x.Attributes)
+			return Symbol.GetAttributes()
 				.Select(x => new AttributeToAnalyze(x))
 				.ToArray();
 		}

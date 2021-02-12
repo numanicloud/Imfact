@@ -36,9 +36,11 @@ namespace Deptorygen2.TestSubject
 	[Factory]
 	internal partial class CapturedFactory
 	{
+		[Hook(typeof(Cache<Client>))]
 		internal partial Client ResolveClient2();
 	}
 	
+	// Next: BaseType, Hook, CollectionResolver
 	[Factory]
 	internal partial class MyFactory
 	{

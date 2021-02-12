@@ -2,6 +2,7 @@
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aggregation;
+using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
@@ -13,7 +14,8 @@ namespace Deptorygen2.Core.Steps.Semanticses
 		ResolutionSemantics? ReturnTypeResolution,
 		ResolutionSemantics[] Resolutions,
 		ParameterSemantics[] Parameters,
-		Accessibility Accessibility) : IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
+		Accessibility Accessibility,
+		HookSemantics[] Hooks) : IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
 	{
 		public IEnumerable<TypeName> GetRequiredServiceTypes()
 		{
@@ -45,7 +47,8 @@ namespace Deptorygen2.Core.Steps.Semanticses
 		public static Builder<MethodToAnalyze,
 			(ResolutionSemantics?,
 			ResolutionSemantics[],
-			ParameterSemantics[]),
+			ParameterSemantics[],
+			HookSemantics[]),
 			ResolverSemantics>? GetBuilder(MethodToAnalyze method)
 		{
 			if (!method.IsSingleResolver())
@@ -58,7 +61,8 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				tuple.Item1,
 				tuple.Item2,
 				tuple.Item3,
-				method.Symbol.DeclaredAccessibility));
+				method.Symbol.DeclaredAccessibility,
+				tuple.Item4));
 		}
 	}
 }

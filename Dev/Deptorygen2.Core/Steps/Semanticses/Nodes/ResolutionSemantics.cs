@@ -20,10 +20,16 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				return null;
 			}
 
-			var argument1 = attribute.Syntax.ArgumentList?.Arguments[0];
+			var syntaxNode = attribute.Data.ApplicationSyntaxReference?.GetSyntax();
+			if (syntaxNode is not AttributeSyntax syntax)
+			{
+				return null;
+			}
+
+			var argument1 = syntax.ArgumentList?.Arguments[0];
 
 			if (argument1?.Expression is TypeOfExpressionSyntax toes
-				&& context.GeTypeSymbol(toes.Type) is INamedTypeSymbol symbol)
+				&& context.GetTypeSymbol(toes.Type) is INamedTypeSymbol symbol)
 			{
 				return BuildInternal(toes.Type, symbol, context);
 			}

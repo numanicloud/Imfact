@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aggregation;
+using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Microsoft.CodeAnalysis;
 using NacHelpers.Extensions;
 
@@ -56,27 +57,30 @@ namespace Deptorygen2.Core.Steps.Semanticses
 		{
 			return methods.Select(ResolverSemantics.GetBuilder).Build(m =>
 			{
+				var attr = m.GetAttributes();
+
 				var ret = m.GetReturnType(_context) is { } t
 					? ResolutionSemantics.Build(t, _context)
 					: null;
-				var (parameters, resolutions) = LoadMethodFeature(m.GetParameters(), m.GetAttributes());
+				var (parameters, resolutions, hooks) = LoadMethodFeature(m.GetParameters(), attr, m.Symbol.Name);
 
-				return (ret, resolutions, parameters);
+				return (ret, resolutions, parameters, hooks);
 			});
 		}
 
 		private CollectionResolverSemantics[] AggregateCollectionResolvers(MethodToAnalyze[] methods)
 		{
 			return methods.Select(CollectionResolverSemantics.GetBuilder).Build(
-				m => LoadMethodFeature(m.GetParameters(), m.GetAttributes()));
+				m => LoadMethodFeature(m.GetParameters(), m.GetAttributes(), m.Symbol.Name));
 		}
 
-		private (ParameterSemantics[], ResolutionSemantics[]) LoadMethodFeature(
-			ParameterToAnalyze[] parameters, AttributeToAnalyze[] attributes)
+		private (ParameterSemantics[], ResolutionSemantics[], HookSemantics[]) LoadMethodFeature(
+			ParameterToAnalyze[] parameters, AttributeToAnalyze[] attributes, string methodName)
 		{
 			var ps = Build(parameters, p => ParameterSemantics.Build(p, _context));
 			var rs = Build(attributes, a => ResolutionSemantics.Build(a, _context));
-			return (ps, rs);
+			var hs = Build(attributes, a => HookSemantics.Build(a, _context, methodName));
+			return (ps, rs, hs);
 		}
 
 		private TResult[] Build<T, TResult>(IEnumerable<T> source, Func<T, TResult?> selector)

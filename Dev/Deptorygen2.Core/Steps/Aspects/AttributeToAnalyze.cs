@@ -1,16 +1,24 @@
 ﻿using Deptorygen2.Core.Utilities;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Steps.Aggregation
 {
-	internal record AttributeToAnalyze(AttributeSyntax Syntax)
+	internal record AttributeToAnalyze(AttributeData Data)
 	{
 		public bool IsResolution()
 		{
 			var name = new AttributeName("ResolutionAttribute");
-			return name.MatchWithAnyName(Syntax.Name.ToString())
-			       && Syntax.ArgumentList?.Arguments.Count == 1
-			       && Syntax.ArgumentList?.Arguments[0].Expression is TypeOfExpressionSyntax;
+			return name.MatchWithAnyName(Data.AttributeClass?.Name ?? "")
+			       && Data.ConstructorArguments.Length == 1
+			       && Data.ConstructorArguments[0].Kind == TypedConstantKind.Type;
+		}
+
+		public bool IsHook()
+		{
+			var name = new AttributeName("HookAttribute");
+			return name.MatchWithAnyName(Data.AttributeClass?.Name ?? "")
+			       && Data.ConstructorArguments.Length == 1
+			       && Data.ConstructorArguments[0].Kind == TypedConstantKind.Type;
 		}
 	}
 }
