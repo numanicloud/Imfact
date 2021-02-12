@@ -2,6 +2,7 @@
 using Deptorygen2.Core.Steps.Aggregation;
 using Deptorygen2.Core.Steps.Api;
 using Deptorygen2.Core.Steps.Definitions;
+using Deptorygen2.Core.Steps.Definitions.Syntaxes;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Writing;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -13,7 +14,6 @@ namespace Deptorygen2.Core
 		private readonly IAnalysisContext _context;
 		private readonly AspectAggregator _aspectAggregator = new();
 		private readonly SemanticsAggregator _semanticsAggregator;
-		private readonly DefinitionAggregator _syntaxBuilder = new();
 
 		public GenerationFacade(IAnalysisContext context)
 		{
@@ -28,28 +28,28 @@ namespace Deptorygen2.Core
 				: SourceCodeStep(DefinitionStep(semantics));
 		}
 
-		public SyntaxOnAspect? AspectStep(ClassDeclarationSyntax syntax)
+		private SyntaxOnAspect? AspectStep(ClassDeclarationSyntax syntax)
 		{
 			return _aspectAggregator.Aggregate(syntax, _context) is { } aspect
 				? new SyntaxOnAspect(aspect) : null;
 		}
 
-		public DeptorygenSemantics? SemanticsStep(SyntaxOnAspect aspect)
+		private DeptorygenSemantics? SemanticsStep(SyntaxOnAspect aspect)
 		{
 			return _semanticsAggregator.Aggregate(aspect.Class, _context) is { } semantics
 				? new DeptorygenSemantics(semantics) : null;
 		}
 
-		public DeptorygenDefinition DefinitionStep(DeptorygenSemantics semantics)
+		private SourceTreeDefinition DefinitionStep(DeptorygenSemantics semantics)
 		{
-			var definition = _syntaxBuilder.Encode(semantics.Semantics);
-			return new DeptorygenDefinition(definition);
+			var builder = new DefinitionTreeBuilder(semantics.Semantics);
+			return builder.Build();
 		}
 
-		public SourceFile SourceCodeStep(DeptorygenDefinition definition)
+		private SourceFile SourceCodeStep(SourceTreeDefinition definition)
 		{
-			var writer = new SourceCodeBuilder(definition.Definition);
-			return writer.Build();
+			var writer = new SourceCodeBuilder2(definition);
+			return writer.Write();
 		}
 	}
 }

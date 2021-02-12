@@ -32,7 +32,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 		internal static FactoryDefinition Build(FactorySemantics semantics, ChildrenBuilder childrenBuilder)
 		{
-			return childrenBuilder(semantics.ItselfSymbol.Name);
+			return childrenBuilder(semantics.Type.Name);
 		}
 
 		internal delegate FactoryDefinition ChildrenBuilder(string className);

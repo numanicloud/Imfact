@@ -1,18 +1,17 @@
 ﻿using System.Collections.Generic;
 using Deptorygen2.Core.Steps.Aggregation;
 using Deptorygen2.Core.Utilities;
-using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Steps.Semanticses
 {
-	internal record FactorySemantics(INamedTypeSymbol ItselfSymbol,
+	internal record FactorySemantics(TypeName Type,
 		ResolverSemantics[] Resolvers,
 		CollectionResolverSemantics[] CollectionResolvers,
 		DelegationSemantics[] Delegations) : Interfaces.IServiceProvider
 	{
 		public IEnumerable<TypeName> GetCapableServiceTypes()
 		{
-			yield return TypeName.FromSymbol(ItselfSymbol);
+			yield return Type;
 			foreach (var delegation in Delegations)
 			{
 				yield return delegation.TypeName;
@@ -30,8 +29,10 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				return null;
 			}
 
+			var t = TypeName.FromSymbol(@class.Symbol);
+
 			return new(@class, tuple => new FactorySemantics(
-				@class.Symbol, tuple.Item1, tuple.Item2, tuple.Item3));
+				t, tuple.Item1, tuple.Item2, tuple.Item3));
 		}
 	}
 }

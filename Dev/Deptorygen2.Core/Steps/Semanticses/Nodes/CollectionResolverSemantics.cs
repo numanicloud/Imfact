@@ -10,12 +10,12 @@ using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 namespace Deptorygen2.Core.Steps.Semanticses
 {
 	internal record CollectionResolverSemantics(string MethodName,
-		TypeName CollectionType,
+		TypeName ReturnType,
 		ParameterSemantics[] Parameters,
 		ResolutionSemantics[] Resolutions,
 		Accessibility Accessibility) : IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
 	{
-		public TypeName ElementType => CollectionType.TypeArguments[0];
+		public TypeName ElementType => ReturnType.TypeArguments[0];
 
 
 		public IEnumerable<TypeName> GetRequiredServiceTypes()
@@ -26,13 +26,13 @@ namespace Deptorygen2.Core.Steps.Semanticses
 
 		public IEnumerable<TypeName> GetCapableServiceTypes()
 		{
-			yield return CollectionType;
+			yield return ReturnType;
 		}
 
 		public IEnumerable<string> GetRequiredNamespaces()
 		{
 			yield return "System.Collections.Generic";
-			yield return CollectionType.TypeArguments[0].FullNamespace;
+			yield return ReturnType.TypeArguments[0].FullNamespace;
 
 			foreach (var parameter in Parameters)
 			{

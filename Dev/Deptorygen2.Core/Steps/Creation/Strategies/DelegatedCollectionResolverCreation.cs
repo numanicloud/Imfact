@@ -26,7 +26,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 
 		protected override TypeName GetTypeInfo(Source source)
 		{
-			return source.CollectionResolver.CollectionType;
+			return source.CollectionResolver.ReturnType;
 		}
 
 		public record Source(DelegationSemantics Delegation,

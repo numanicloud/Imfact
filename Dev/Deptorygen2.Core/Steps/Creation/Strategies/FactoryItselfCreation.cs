@@ -25,7 +25,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 
 		protected override TypeName GetTypeInfo(FactorySemantics source)
 		{
-			return TypeName.FromSymbol(source.ItselfSymbol);
+			return source.Type;
 		}
 	}
 }

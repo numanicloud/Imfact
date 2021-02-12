@@ -23,7 +23,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 			var factoryS = semantics.Factory;
 
 			string[] usings = semantics.RequiredNamespaces;
-			string ns = factoryS.ItselfSymbol.GetFullNameSpace();
+			string ns = factoryS.Type.FullNamespace;
 
 			var factory = FactoryDefinition.Build(factoryS, name =>
 			{

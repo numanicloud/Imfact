@@ -31,7 +31,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 			{
 				var data = new ResolverNodeData(resolver.Accessibility,
 					resolver.MethodName,
-					resolver.ReturnTypeName);
+					resolver.ReturnType);
 				return childrenBuilder.Invoke(resolver, data);
 			});
 		}

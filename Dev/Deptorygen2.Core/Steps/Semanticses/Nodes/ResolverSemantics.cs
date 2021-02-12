@@ -9,7 +9,7 @@ using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 namespace Deptorygen2.Core.Steps.Semanticses
 {
 	internal record ResolverSemantics(string MethodName,
-		TypeName ReturnTypeName,
+		TypeName ReturnType,
 		ResolutionSemantics? ReturnTypeResolution,
 		ResolutionSemantics[] Resolutions,
 		ParameterSemantics[] Parameters,
@@ -25,12 +25,12 @@ namespace Deptorygen2.Core.Steps.Semanticses
 
 		public IEnumerable<TypeName> GetCapableServiceTypes()
 		{
-			yield return ReturnTypeName;
+			yield return ReturnType;
 		}
 
 		public IEnumerable<string> GetRequiredNamespaces()
 		{
-			yield return ReturnTypeName.FullNamespace;
+			yield return ReturnType.FullNamespace;
 			foreach (var parameter in Parameters)
 			{
 				yield return parameter.TypeName.FullNamespace;

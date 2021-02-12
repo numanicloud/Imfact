@@ -24,7 +24,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 
 		protected override TypeName GetTypeInfo(ResolverSemantics source)
 		{
-			return source.ReturnTypeName;
+			return source.ReturnType;
 		}
 	}
 }

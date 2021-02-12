@@ -23,7 +23,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 
 		protected override TypeName GetTypeInfo(CollectionResolverSemantics source)
 		{
-			return source.CollectionType;
+			return source.ReturnType;
 		}
 	}
 }

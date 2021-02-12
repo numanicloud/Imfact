@@ -1,10 +1,11 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Semanticses
 {
-	internal record DependencySemantics(TypeName TypeName, string FieldName)
+	internal record DependencySemantics(TypeName TypeName, string FieldName) : INamespaceClaimer
 	{
 		public static DependencySemantics[] FromFactory(FactorySemantics semantics)
 		{
@@ -22,6 +23,11 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			return consumers.Except(providers)
 				.Select(t => new DependencySemantics(t, "_" + t.Name.ToLowerCamelCase()))
 				.ToArray();
+		}
+
+		public IEnumerable<string> GetRequiredNamespaces()
+		{
+			yield return TypeName.FullNamespace;
 		}
 	}
 }

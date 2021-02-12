@@ -29,7 +29,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 			return factory.CollectionResolvers.Select(resolver =>
 			{
 				var nodeData = new CollectionResolverNodeData(
-					resolver.Accessibility, resolver.MethodName, resolver.CollectionType);
+					resolver.Accessibility, resolver.MethodName, resolver.ReturnType);
 				return childrenBuilder.Invoke(resolver, nodeData);
 			});
 		}

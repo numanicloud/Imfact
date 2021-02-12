@@ -44,7 +44,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				}
 
 				var dependencies = DependencySemantics.FromFactory(factory);
-				var namespaces = AggregateNamespaces(factory).ToArray();
+				var namespaces = AggregateNamespaces(factory, dependencies).ToArray();
 
 				return (namespaces, factory, dependencies);
 			});
@@ -55,7 +55,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			return methods.Select(ResolverSemantics.GetBuilder).Build(m =>
 			{
 				var ret = m.GetReturnType(_context) is { } t
-					? ResolutionSemantics.Build(t)
+					? ResolutionSemantics.Build(t, _context)
 					: null;
 				var (parameters, resolutions) = LoadMethodFeature(m.GetParameters(), m.GetAttributes());
 
@@ -85,12 +85,15 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				.ToArray();
 		}
 
-		private static IEnumerable<string> AggregateNamespaces(FactorySemantics semantics)
+		private static IEnumerable<string> AggregateNamespaces(FactorySemantics semantics,
+			DependencySemantics[] dependencies)
 		{
 			return semantics.Resolvers.Cast<INamespaceClaimer>()
 				.Concat(semantics.CollectionResolvers)
 				.Concat(semantics.Delegations)
+				.Concat(dependencies)
 				.SelectMany(x => x.GetRequiredNamespaces())
+				.Except(semantics.Type.FullNamespace.WrapByArray())
 				.Distinct();
 		}
 	}
