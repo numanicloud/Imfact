@@ -4,9 +4,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NacHelpers.Extensions;
 
-namespace Deptorygen2.Core.Steps.Aggregation
+namespace Deptorygen2.Core.Steps.Aspects.Nodes
 {
-	internal record PropertyToAnalyze(PropertyDeclarationSyntax Syntax, IPropertySymbol Symbol)
+	internal record Property(PropertyDeclarationSyntax Syntax, IPropertySymbol Symbol)
 	{
 		public bool IsDelegation()
 		{
@@ -17,7 +17,7 @@ namespace Deptorygen2.Core.Steps.Aggregation
 				.Any(x => x.NameWithoutSuffix == "Factory");
 		}
 
-		public MethodToAnalyze[] GetMethodToAnalyze()
+		public Method[] GetMethodToAnalyze()
 		{
 			return Symbol.Type.GetMembers().OfType<IMethodSymbol>()
 				.Select(m =>
@@ -27,7 +27,7 @@ namespace Deptorygen2.Core.Steps.Aggregation
 						.OfType<MethodDeclarationSyntax>()
 						.FirstOrDefault();
 					return mm is { } syntax
-						? new MethodToAnalyze(syntax, m)
+						? new Method(syntax, m)
 						: null;
 				})
 				.FilterNull()

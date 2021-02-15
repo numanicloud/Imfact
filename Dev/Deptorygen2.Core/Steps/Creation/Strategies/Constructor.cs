@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Steps.Semanticses;
+using Deptorygen2.Core.Steps.Creation.Abstraction;
+using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 using NacHelpers.Extensions;
-using Source = Deptorygen2.Core.Steps.Semanticses.ResolutionSemantics;
 
 namespace Deptorygen2.Core.Steps.Creation.Strategies
 {
-	internal class ConstructorCreation : CreationMethodBase<Source>
+	internal class Constructor : CreationMethodBase<Resolution>
 	{
-		public ConstructorCreation(GenerationSemantics semantics) : base(semantics)
+		public Constructor(Generation semantics) : base(semantics)
 		{
 		}
 
-		protected override string GetCreationCode(Source resolution, GivenParameter[] given,
+		protected override string GetCreationCode(Resolution resolution, GivenParameter[] given,
 			ICreationAggregator aggregator)
 		{
 			var request = new MultipleCreationRequest(
@@ -21,7 +21,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 			return $"new {resolution.TypeName.Name}({GetArgList(request, aggregator)})";
 		}
 
-		protected override IEnumerable<Source> GetSource(GenerationSemantics semantics)
+		protected override IEnumerable<Resolution> GetSource(Generation semantics)
 		{
 			var rr = semantics.Factory.Resolvers.Select(x => x.ReturnTypeResolution).FilterNull();
 			var rs = semantics.Factory.Resolvers.SelectMany(x => x.Resolutions);
@@ -29,7 +29,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 			return rr.Concat(rs).Concat(crs);
 		}
 
-		protected override TypeName GetTypeInfo(Source source)
+		protected override TypeName GetTypeInfo(Resolution source)
 		{
 			return source.TypeName;
 		}

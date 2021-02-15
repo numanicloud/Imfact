@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Steps.Semanticses;
+using Deptorygen2.Core.Steps.Creation.Abstraction;
+using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Creation.Strategies
 {
-	internal class DelegatedResolverCreation : CreationMethodBase<DelegatedResolverCreation.Source>
+	internal class DelegatedResolver : CreationMethodBase<DelegatedResolver.Source>
 	{
-		public DelegatedResolverCreation(GenerationSemantics semantics) : base(semantics)
+		public DelegatedResolver(Generation semantics) : base(semantics)
 		{
 		}
 
@@ -19,7 +20,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 			return $"{resolution.Delegation.PropertyName}.{invocation}";
 		}
 
-		protected override IEnumerable<Source> GetSource(GenerationSemantics semantics)
+		protected override IEnumerable<Source> GetSource(Generation semantics)
 		{
 			return semantics.Factory.Delegations.SelectMany(
 				x => x.Resolvers.Select(y => new Source(x, y)));
@@ -30,6 +31,6 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 			return source.Resolver.ReturnType;
 		}
 
-		public record Source(DelegationSemantics Delegation, ResolverSemantics Resolver);
+		public record Source(Delegation Delegation, Semanticses.Nodes.Resolver Resolver);
 	}
 }

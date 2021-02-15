@@ -1,23 +1,22 @@
 ﻿using System.Linq;
 using System.Reactive;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Aggregation;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Steps.Semanticses
+namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record ParameterSemantics(TypeName TypeName, string ParameterName)
+	internal record Parameter(TypeName TypeName, string ParameterName)
 	{
-		public static ParameterSemantics[] FromResolver(IMethodSymbol symbol)
+		public static Parameter[] FromResolver(IMethodSymbol symbol)
 		{
 			return symbol.Parameters
-				.Select(x => new ParameterSemantics(TypeName.FromSymbol(x.Type), x.Name))
+				.Select(x => new Parameter(TypeName.FromSymbol(x.Type), x.Name))
 				.ToArray();
 		}
 
-		public static Builder<ParameterToAnalyze, Unit, ParameterSemantics>? GetBuilder(
-			ParameterToAnalyze parameter, IAnalysisContext context)
+		public static Builder<Aspects.Nodes.Parameter, Unit, Parameter>? GetBuilder(
+			Aspects.Nodes.Parameter parameter, IAnalysisContext context)
 		{
 			if (parameter.Syntax.Type is null
 			    || context.GetTypeSymbol(parameter.Syntax.Type) is not { } symbol)
@@ -25,12 +24,12 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				return null;
 			}
 
-			return new(parameter, unit => new ParameterSemantics(
+			return new(parameter, unit => new Parameter(
 				Utilities.TypeName.FromSymbol(symbol),
 				parameter.Syntax.Identifier.ValueText));
 		}
 
-		public static ParameterSemantics? Build(ParameterToAnalyze parameter, IAnalysisContext context)
+		public static Parameter? Build(Aspects.Nodes.Parameter parameter, IAnalysisContext context)
 		{
 			if (parameter.Syntax.Type is null
 				|| context.GetTypeSymbol(parameter.Syntax.Type) is not {} symbol)
@@ -38,7 +37,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				return null;
 			}
 
-			return new ParameterSemantics(
+			return new Parameter(
 				TypeName.FromSymbol(symbol),
 				parameter.Syntax.Identifier.ValueText);
 		}

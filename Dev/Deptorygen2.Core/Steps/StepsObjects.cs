@@ -1,13 +1,13 @@
-﻿using Deptorygen2.Core.Steps.Aggregation;
-using Deptorygen2.Core.Steps.Semanticses;
+﻿using Deptorygen2.Core.Steps.Aspects.Nodes;
+using Deptorygen2.Core.Steps.Semanticses.Nodes;
 
-namespace Deptorygen2.Core.Steps.Api
+namespace Deptorygen2.Core.Steps
 {
 	public class SyntaxOnAspect
 	{
-		internal ClassToAnalyze Class { get; }
+		internal Class Class { get; }
 
-		internal SyntaxOnAspect(ClassToAnalyze @class)
+		internal SyntaxOnAspect(Class @class)
 		{
 			Class = @class;
 		}
@@ -15,9 +15,9 @@ namespace Deptorygen2.Core.Steps.Api
 
 	public class DeptorygenSemantics
 	{
-		internal GenerationSemantics Semantics { get; }
+		internal Generation Semantics { get; }
 
-		internal DeptorygenSemantics(GenerationSemantics semantics)
+		internal DeptorygenSemantics(Generation semantics)
 		{
 			Semantics = semantics;
 		}

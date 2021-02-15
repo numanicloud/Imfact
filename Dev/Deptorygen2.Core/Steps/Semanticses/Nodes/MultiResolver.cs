@@ -1,20 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Aggregation;
-using Deptorygen2.Core.Steps.Semanticses.Nodes;
+using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
-namespace Deptorygen2.Core.Steps.Semanticses
+namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record CollectionResolverSemantics(string MethodName,
+	internal record MultiResolver(string MethodName,
 		TypeName ReturnType,
-		ParameterSemantics[] Parameters,
-		ResolutionSemantics[] Resolutions,
+		Parameter[] Parameters,
+		Resolution[] Resolutions,
 		Accessibility Accessibility,
-		HookSemantics[] Hooks) : IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
+		Hook[] Hooks) : IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
 	{
 		public IEnumerable<TypeName> GetRequiredServiceTypes()
 		{
@@ -43,16 +42,16 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			}
 		}
 
-		public static Builder<MethodToAnalyze,
-			(ParameterSemantics[], ResolutionSemantics[], HookSemantics[]),
-			CollectionResolverSemantics>? GetBuilder(MethodToAnalyze method)
+		public static Builder<Method,
+			(Parameter[], Resolution[], Hook[]),
+			MultiResolver>? GetBuilder(Method method)
 		{
 			if (!method.IsCollectionResolver())
 			{
 				return null;
 			}
 
-			return new(method, tuple => new CollectionResolverSemantics(
+			return new(method, tuple => new MultiResolver(
 				method.Symbol.Name,
 				TypeName.FromSymbol(method.Symbol.ReturnType),
 				tuple.Item1,

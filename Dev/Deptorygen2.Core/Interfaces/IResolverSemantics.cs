@@ -9,9 +9,9 @@ namespace Deptorygen2.Core.Interfaces
 	{
 		TypeName ReturnType { get; }
 		string MethodName { get; }
-		ParameterSemantics[] Parameters { get; }
+		Parameter[] Parameters { get; }
 		Accessibility Accessibility { get; }
-		ResolutionSemantics[] Resolutions { get; }
-		HookSemantics[] Hooks { get; }
+		Resolution[] Resolutions { get; }
+		Hook[] Hooks { get; }
 	}
 }

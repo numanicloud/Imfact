@@ -4,9 +4,9 @@ using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Deptorygen2.Core.Steps.Aggregation
+namespace Deptorygen2.Core.Steps.Aspects.Nodes
 {
-	internal record MethodToAnalyze(MethodDeclarationSyntax Syntax, IMethodSymbol Symbol)
+	internal record Method(MethodDeclarationSyntax Syntax, IMethodSymbol Symbol)
 	{
 		public bool IsSingleResolver()
 		{
@@ -18,7 +18,7 @@ namespace Deptorygen2.Core.Steps.Aggregation
 			return TypeName.FromSymbol(Symbol.ReturnType).IsCollectionType();
 		}
 
-		public ReturnTypeToAnalyze? GetReturnType(IAnalysisContext context)
+		public ReturnType? GetReturnType(IAnalysisContext context)
 		{
 			if (context.GetTypeSymbol(Syntax.ReturnType) is INamedTypeSymbol symbol)
 			{
@@ -28,17 +28,17 @@ namespace Deptorygen2.Core.Steps.Aggregation
 			return null;
 		}
 
-		public AttributeToAnalyze[] GetAttributes()
+		public Attribute[] GetAttributes()
 		{
 			return Symbol.GetAttributes()
-				.Select(x => new AttributeToAnalyze(x))
+				.Select(x => new Attribute(x))
 				.ToArray();
 		}
 
-		public ParameterToAnalyze[] GetParameters()
+		public Parameter[] GetParameters()
 		{
 			return Syntax.ParameterList.Parameters
-				.Select(x => new ParameterToAnalyze(x))
+				.Select(x => new Parameter(x))
 				.ToArray();
 		}
 	}

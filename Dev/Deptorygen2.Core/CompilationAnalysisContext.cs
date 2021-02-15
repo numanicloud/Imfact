@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Deptorygen2.Generator
+namespace Deptorygen2.Core
 {
 	internal class CompilationAnalysisContext : IAnalysisContext
 	{

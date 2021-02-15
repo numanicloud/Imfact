@@ -5,16 +5,16 @@ using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record EntryResolverSemantics(string MethodName,
+	internal record EntryResolver(string MethodName,
 		TypeName ReturnType,
-		ParameterSemantics[] Parameters,
+		Parameter[] Parameters,
 		Accessibility Accessibility)
 	{
 		private static readonly TypeName CtxType = TypeName.FromType(typeof(ResolutionContext));
 
-		public static EntryResolverSemantics FromResolver(ResolverSemantics resolver)
+		public static EntryResolver FromResolver(Resolver resolver)
 		{
-			return new EntryResolverSemantics(
+			return new EntryResolver(
 				resolver.MethodName.TrimStart("__".ToCharArray()),
 				resolver.ReturnType,
 				resolver.Parameters.Where(x => x.TypeName != CtxType).ToArray(),

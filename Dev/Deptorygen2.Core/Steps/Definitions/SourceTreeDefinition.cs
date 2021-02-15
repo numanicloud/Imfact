@@ -1,15 +1,15 @@
-﻿using Deptorygen2.Core.Steps.Creation;
+﻿using Deptorygen2.Core.Steps.Creation.Abstraction;
 
-namespace Deptorygen2.Core.Steps.Definitions.Syntaxes
+namespace Deptorygen2.Core.Steps.Definitions
 {
 	internal class SourceTreeDefinition
 	{
-		public RootNode Root { get; }
+		public DefinitionRoot DefinitionRoot { get; }
 		public ICreationAggregator Creation { get; }
 
-		public SourceTreeDefinition(RootNode root, ICreationAggregator creation)
+		public SourceTreeDefinition(DefinitionRoot definitionRoot, ICreationAggregator creation)
 		{
-			Root = root;
+			DefinitionRoot = definitionRoot;
 			Creation = creation;
 		}
 	}

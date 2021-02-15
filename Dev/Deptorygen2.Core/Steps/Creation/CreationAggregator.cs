@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Deptorygen2.Core.Steps.Creation.Abstraction;
 using Deptorygen2.Core.Steps.Creation.Strategies;
 using Deptorygen2.Core.Steps.Semanticses;
+using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 using NacHelpers.Extensions;
+using MultiResolver = Deptorygen2.Core.Steps.Creation.Strategies.MultiResolver;
+using Resolver = Deptorygen2.Core.Steps.Creation.Strategies.Resolver;
 
 namespace Deptorygen2.Core.Steps.Creation
 {
@@ -12,7 +16,7 @@ namespace Deptorygen2.Core.Steps.Creation
 	{
 		private readonly ICreationStrategy[] _instantiationCoders;
 
-		public CreationAggregator(GenerationSemantics semantics)
+		public CreationAggregator(Generation semantics)
 		{
 			_instantiationCoders = GetCreations(semantics).ToArray();
 		}
@@ -53,8 +57,8 @@ namespace Deptorygen2.Core.Steps.Creation
 				{
 					if (request.IsRootRequest)
 					{
-						return x is not ResolverCreation
-							and not CollectionResolverCreation;
+						return x is not Resolver
+							and not MultiResolver;
 					}
 
 					return true;
@@ -63,17 +67,17 @@ namespace Deptorygen2.Core.Steps.Creation
 				.FirstOrDefault(x => x is not null);
 		}
 
-		public static IEnumerable<ICreationStrategy> GetCreations(GenerationSemantics semantics)
+		public static IEnumerable<ICreationStrategy> GetCreations(Generation semantics)
 		{
 			// この順で評価されて、最初にマッチした解決方法が使われる
-			yield return new FactoryItselfCreation(semantics);
-			yield return new DelegationItselfCreation(semantics);
-			yield return new DelegatedResolverCreation(semantics);
-			yield return new DelegatedCollectionResolverCreation(semantics);
-			yield return new ResolverCreation(semantics);
-			yield return new CollectionResolverCreation(semantics);
-			yield return new FieldCreation(semantics);
-			yield return new ConstructorCreation(semantics);
+			yield return new FactoryItself(semantics);
+			yield return new DelegationItself(semantics);
+			yield return new DelegatedResolver(semantics);
+			yield return new DelegatedMultiResolver(semantics);
+			yield return new Resolver(semantics);
+			yield return new MultiResolver(semantics);
+			yield return new Field(semantics);
+			yield return new Constructor(semantics);
 		}
 	}
 }

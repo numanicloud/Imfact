@@ -1,9 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Deptorygen2.Core.Steps.Aggregation
+namespace Deptorygen2.Core.Steps.Aspects.Nodes
 {
-	internal record ReturnTypeToAnalyze(TypeSyntax Syntax, INamedTypeSymbol Symbol)
+	internal record ReturnType(TypeSyntax Syntax, INamedTypeSymbol Symbol)
 	{
 		public bool IsResolution()
 		{

@@ -2,20 +2,21 @@
 using System.Linq;
 using System.Text;
 using Deptorygen2.Core.Steps.Creation;
-using Deptorygen2.Core.Steps.Definitions.Syntaxes;
+using Deptorygen2.Core.Steps.Creation.Abstraction;
+using Deptorygen2.Core.Steps.Definitions;
 using static Deptorygen2.Core.Steps.Writing.SourceCodeBuilder;
 
 namespace Deptorygen2.Core.Steps.Writing
 {
 	internal class ResolverWriter
 	{
-		public void RenderImplementation(MethodNode method, ICreationAggregator creation, StringBuilder builder)
+		public void RenderImplementation(Method method, ICreationAggregator creation, StringBuilder builder)
 		{
 			var writers = GetHookWriters(method, creation).ToArray();
 			writers[0].Write(builder, writers.Skip(1).ToArray());
 		}
 
-		private IEnumerable<IHookWriter> GetHookWriters(MethodNode method, ICreationAggregator creation)
+		private IEnumerable<IHookWriter> GetHookWriters(Method method, ICreationAggregator creation)
 		{
 			yield return new RootWriter(method);
 			foreach (var hook in method.Hooks)
@@ -39,7 +40,7 @@ namespace Deptorygen2.Core.Steps.Writing
 			void Write(StringBuilder builder, IHookWriter[] rest);
 		}
 
-		private record RootWriter(MethodNode Method) : IHookWriter
+		private record RootWriter(Method Method) : IHookWriter
 		{
 			public void Write(StringBuilder builder, IHookWriter[] rest)
 			{
@@ -53,7 +54,7 @@ namespace Deptorygen2.Core.Steps.Writing
 			}
 		}
 
-		private record HookWriter(HookNode Hook) : IHookWriter
+		private record HookWriter(Hook Hook) : IHookWriter
 		{
 			public void Write(StringBuilder builder, IHookWriter[] rest)
 			{

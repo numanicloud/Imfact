@@ -6,9 +6,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NacHelpers.Extensions;
 
-namespace Deptorygen2.Core.Steps.Aggregation
+namespace Deptorygen2.Core.Steps.Aspects.Nodes
 {
-	internal record ClassToAnalyze(ClassDeclarationSyntax Syntax, INamedTypeSymbol Symbol)
+	internal record Class(ClassDeclarationSyntax Syntax, INamedTypeSymbol Symbol)
 	{
 		public bool IsFactory()
 		{
@@ -16,23 +16,23 @@ namespace Deptorygen2.Core.Steps.Aggregation
 				&& Syntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
 		}
 
-		public MethodToAnalyze[] GetMethods(IAnalysisContext context)
+		public Method[] GetMethods(IAnalysisContext context)
 		{
 			return Syntax.Members
 				.OfType<MethodDeclarationSyntax>()
 				.Select(m => context.GetMethodSymbol(m) is { } symbol
-					? new MethodToAnalyze(m, symbol)
+					? new Method(m, symbol)
 					: null)
 				.FilterNull()
 				.ToArray();
 		}
 
-		public PropertyToAnalyze[] GetProperties(IAnalysisContext context)
+		public Property[] GetProperties(IAnalysisContext context)
 		{
 			return Syntax.Members
 				.OfType<PropertyDeclarationSyntax>()
 				.Select(m => context.GetPropertySymbol(m) is { } symbol
-					? new PropertyToAnalyze(m, symbol)
+					? new Property(m, symbol)
 					: null)
 				.FilterNull()
 				.ToArray();

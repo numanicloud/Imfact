@@ -3,11 +3,11 @@ using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Utilities;
 
-namespace Deptorygen2.Core.Steps.Semanticses
+namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record DependencySemantics(TypeName TypeName, string FieldName) : INamespaceClaimer
+	internal record Dependency(TypeName TypeName, string FieldName) : INamespaceClaimer
 	{
-		public static DependencySemantics[] FromFactory(FactorySemantics semantics)
+		public static Dependency[] FromFactory(Factory semantics)
 		{
 			var consumers = semantics.Resolvers.Cast<IServiceConsumer>()
 				.Concat(semantics.CollectionResolvers)
@@ -21,7 +21,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				.Distinct();
 
 			return consumers.Except(providers)
-				.Select(t => new DependencySemantics(t, "_" + t.Name.ToLowerCamelCase()))
+				.Select(t => new Dependency(t, "_" + t.Name.ToLowerCamelCase()))
 				.ToArray();
 		}
 

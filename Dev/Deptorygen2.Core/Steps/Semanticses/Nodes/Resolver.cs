@@ -2,21 +2,20 @@
 using System.Linq;
 using Deptorygen2.Annotations;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Aggregation;
-using Deptorygen2.Core.Steps.Semanticses.Nodes;
+using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
-namespace Deptorygen2.Core.Steps.Semanticses
+namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record ResolverSemantics(string MethodName,
+	internal record Resolver(string MethodName,
 		TypeName ReturnType,
-		ResolutionSemantics? ReturnTypeResolution,
-		ResolutionSemantics[] Resolutions,
-		ParameterSemantics[] Parameters,
+		Resolution? ReturnTypeResolution,
+		Resolution[] Resolutions,
+		Parameter[] Parameters,
 		Accessibility Accessibility,
-		HookSemantics[] Hooks) : IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
+		Hook[] Hooks) : IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
 	{
 		public IEnumerable<TypeName> GetRequiredServiceTypes()
 		{
@@ -45,21 +44,21 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			}
 		}
 
-		public static Builder<MethodToAnalyze,
-			(ResolutionSemantics?,
-			ResolutionSemantics[],
-			ParameterSemantics[],
-			HookSemantics[]),
-			ResolverSemantics>? GetBuilder(MethodToAnalyze method)
+		public static Builder<Method,
+			(Resolution?,
+			Resolution[],
+			Parameter[],
+			Hook[]),
+			Resolver>? GetBuilder(Method method)
 		{
 			if (!method.IsSingleResolver())
 			{
 				return null;
 			}
 			
-			var ctxType = new ParameterSemantics(TypeName.FromType(typeof(ResolutionContext)), "context");
+			var ctxType = new Parameter(TypeName.FromType(typeof(ResolutionContext)), "context");
 
-			return new(method, tuple => new ResolverSemantics(
+			return new(method, tuple => new Resolver(
 				"__" + method.Symbol.Name,
 				TypeName.FromSymbol(method.Symbol.ReturnType),
 				tuple.Item1,

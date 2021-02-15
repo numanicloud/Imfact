@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.PlatformServices;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Aggregation;
+using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using NacHelpers.Extensions;
+using Attribute = Deptorygen2.Core.Steps.Aspects.Nodes.Attribute;
+using Parameter = Deptorygen2.Core.Steps.Semanticses.Nodes.Parameter;
 
 namespace Deptorygen2.Core.Steps.Semanticses
 {
@@ -18,19 +20,19 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			_context = context;
 		}
 
-		public GenerationSemantics? Aggregate(ClassToAnalyze @class, IAnalysisContext context)
+		public Generation? Aggregate(Class @class, IAnalysisContext context)
 		{
 			var methods = @class.GetMethods(context);
 			var properties = @class.GetProperties(context);
 
-			return GenerationSemantics.GetBuilder(@class).Build(_ =>
+			return Generation.GetBuilder(@class).Build(_ =>
 			{
-				var factory = FactorySemantics.GetBuilder(@class)?.Build(_ =>
+				var factory = Factory.GetBuilder(@class)?.Build(_ =>
 				{
 					var resolvers = AggregateResolvers(methods);
 					var collectionResolvers = AggregateCollectionResolvers(methods);
 
-					var delegations = properties.Select(DelegationSemantics.GetBuilder).Build(p =>
+					var delegations = properties.Select(Delegation.GetBuilder).Build(p =>
 					{
 						var ms = p.GetMethodToAnalyze();
 						var dr = AggregateResolvers(ms);
@@ -38,31 +40,31 @@ namespace Deptorygen2.Core.Steps.Semanticses
 						return (dr, dcr);
 					});
 
-					var entries = resolvers.Select(EntryResolverSemantics.FromResolver).ToArray();
+					var entries = resolvers.Select(EntryResolver.FromResolver).ToArray();
 
 					return (resolvers, collectionResolvers, delegations, entries);
 				});
 
 				if (factory is null)
 				{
-					return (new string[0], null, new DependencySemantics[0]);
+					return (new string[0], null, new Dependency[0]);
 				}
 
-				var dependencies = DependencySemantics.FromFactory(factory);
+				var dependencies = Dependency.FromFactory(factory);
 				var namespaces = AggregateNamespaces(factory, dependencies).ToArray();
 
 				return (namespaces, factory, dependencies);
 			});
 		}
 
-		private ResolverSemantics[] AggregateResolvers(MethodToAnalyze[] methods)
+		private Resolver[] AggregateResolvers(Method[] methods)
 		{
-			return methods.Select(ResolverSemantics.GetBuilder).Build(m =>
+			return methods.Select(Resolver.GetBuilder).Build(m =>
 			{
 				var attr = m.GetAttributes();
 
 				var ret = m.GetReturnType(_context) is { } t
-					? ResolutionSemantics.Build(t, _context)
+					? Resolution.Build(t, _context)
 					: null;
 				var (parameters, resolutions, hooks) = LoadMethodFeature(m.GetParameters(), attr, m.Symbol.Name);
 
@@ -70,18 +72,18 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			});
 		}
 
-		private CollectionResolverSemantics[] AggregateCollectionResolvers(MethodToAnalyze[] methods)
+		private MultiResolver[] AggregateCollectionResolvers(Method[] methods)
 		{
-			return methods.Select(CollectionResolverSemantics.GetBuilder).Build(
+			return methods.Select(MultiResolver.GetBuilder).Build(
 				m => LoadMethodFeature(m.GetParameters(), m.GetAttributes(), m.Symbol.Name));
 		}
 
-		private (ParameterSemantics[], ResolutionSemantics[], HookSemantics[]) LoadMethodFeature(
-			ParameterToAnalyze[] parameters, AttributeToAnalyze[] attributes, string methodName)
+		private (Parameter[], Resolution[], Hook[]) LoadMethodFeature(
+			Aspects.Nodes.Parameter[] parameters, Attribute[] attributes, string methodName)
 		{
-			var ps = Build(parameters, p => ParameterSemantics.Build(p, _context));
-			var rs = Build(attributes, a => ResolutionSemantics.Build(a, _context));
-			var hs = Build(attributes, a => HookSemantics.Build(a, _context, methodName));
+			var ps = Build(parameters, p => Parameter.Build(p, _context));
+			var rs = Build(attributes, a => Resolution.Build(a, _context));
+			var hs = Build(attributes, a => Hook.Build(a, _context, methodName));
 			return (ps, rs, hs);
 		}
 
@@ -93,8 +95,8 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				.ToArray();
 		}
 
-		private static IEnumerable<string> AggregateNamespaces(FactorySemantics semantics,
-			DependencySemantics[] dependencies)
+		private static IEnumerable<string> AggregateNamespaces(Factory semantics,
+			Dependency[] dependencies)
 		{
 			return semantics.Resolvers.Cast<INamespaceClaimer>()
 				.Concat(semantics.CollectionResolvers)

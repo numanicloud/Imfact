@@ -1,4 +1,4 @@
-﻿namespace Deptorygen2.Core.Steps.Creation.Strategies
+﻿namespace Deptorygen2.Core.Steps.Creation.Abstraction
 {
 	internal interface ICreationStrategy
 	{

@@ -1,18 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Semanticses;
+using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 using NacHelpers.Extensions;
 
-namespace Deptorygen2.Core.Steps.Creation.Strategies
+namespace Deptorygen2.Core.Steps.Creation.Abstraction
 {
 	internal abstract class CreationMethodBase<T> : ICreationStrategy
 		where T : notnull
 	{
 		private readonly Dictionary<TypeName, T> _resolutionSource;
 
-		protected CreationMethodBase(GenerationSemantics semantics)
+		protected CreationMethodBase(Generation semantics)
 		{
 			_resolutionSource = GetSource(semantics)
 				.Select(x => (type: GetTypeInfo(x), source: x))
@@ -33,7 +33,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 			GivenParameter[] given,
 			ICreationAggregator aggregator);
 
-		protected abstract IEnumerable<T> GetSource(GenerationSemantics semantics);
+		protected abstract IEnumerable<T> GetSource(Generation semantics);
 
 		protected abstract TypeName GetTypeInfo(T source);
 

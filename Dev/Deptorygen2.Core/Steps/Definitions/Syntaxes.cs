@@ -1,37 +1,36 @@
-﻿using System;
-using Deptorygen2.Core.Utilities;
+﻿using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Steps.Definitions.Syntaxes
+namespace Deptorygen2.Core.Steps.Definitions
 {
-	internal record RootNode(UsingNode[] Usings, NamespaceNode Namespace);
+	internal record DefinitionRoot(Using[] Usings, Namespace Namespace);
 
-	internal record UsingNode(string Namespace);
+	internal record Using(string Namespace);
 
-	internal record NamespaceNode(string Name, ClassNode Class);
+	internal record Namespace(string Name, Class Class);
 
-	internal record ClassNode(string Name, ConstructorNode Constructor,
-		MethodNode[] Methods, PropertyNode[] Properties, FieldNode[] Fields,
-		EntryMethodNode[] EntryMethods);
+	internal record Class(string Name, Constructor Constructor,
+		Method[] Methods, Property[] Properties, Field[] Fields,
+		EntryMethod[] EntryMethods);
 
-	internal record ConstructorNode(string Name, ParameterNode[] Parameters,
-		AssignmentNode[] Assignments);
+	internal record Constructor(string Name, Parameter[] Parameters,
+		Assignment[] Assignments);
 
 	// ユーザーからは触らない想定。実際の解決を行う実装が入っているメソッド
-	internal record MethodNode(Accessibility Accessibility, TypeNode ReturnType, string Name,
-		ParameterNode[] Parameters, TypeName ResolutionType, HookNode[] Hooks);
+	internal record Method(Accessibility Accessibility, Type ReturnType, string Name,
+		Parameter[] Parameters, TypeName ResolutionType, Hook[] Hooks);
 
 	// MethodNodeのほうのメソッドを呼び出すメソッド。ユーザーが直接使う
-	internal record EntryMethodNode(Accessibility Accessibility, TypeNode ReturnType,
-		string Name, ParameterNode[] Parameters);
+	internal record EntryMethod(Accessibility Accessibility, Type ReturnType,
+		string Name, Parameter[] Parameters);
 
-	internal record PropertyNode(TypeNode Type, string Name);
+	internal record Property(Type Type, string Name);
 
-	internal record FieldNode(TypeNode Type, string Name);
+	internal record Field(Type Type, string Name);
 
-	internal record ParameterNode(TypeNode Type, string Name);
+	internal record Parameter(Type Type, string Name);
 
-	internal record TypeNode(TypeName TypeName)
+	internal record Type(TypeName TypeName)
 	{
 		public string Text => $"{TypeName.FullNamespace}.{TypeName.Name}" switch
 		{
@@ -53,7 +52,7 @@ namespace Deptorygen2.Core.Steps.Definitions.Syntaxes
 		};
 	}
 
-	internal record AssignmentNode(string Dest, string Src);
+	internal record Assignment(string Dest, string Src);
 
-	internal record HookNode(TypeNode FieldType, string FieldName);
+	internal record Hook(Type FieldType, string FieldName);
 }

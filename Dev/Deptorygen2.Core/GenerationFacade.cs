@@ -1,11 +1,9 @@
 ﻿using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Aggregation;
-using Deptorygen2.Core.Steps.Api;
+using Deptorygen2.Core.Steps;
+using Deptorygen2.Core.Steps.Aspects;
 using Deptorygen2.Core.Steps.Definitions;
-using Deptorygen2.Core.Steps.Definitions.Syntaxes;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Writing;
-using Deptorygen2.Generator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 

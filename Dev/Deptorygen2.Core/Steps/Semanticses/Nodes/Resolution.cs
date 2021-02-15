@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Aggregation;
+using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Attribute = Deptorygen2.Core.Steps.Aspects.Nodes.Attribute;
 
-namespace Deptorygen2.Core.Steps.Semanticses
+namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record ResolutionSemantics(TypeName TypeName,
+	internal record Resolution(TypeName TypeName,
 		TypeName[] Dependencies,
 		bool IsDisposable)
 	{
-		public static ResolutionSemantics? Build(AttributeToAnalyze attribute,
+		public static Resolution? Build(Attribute attribute,
 			IAnalysisContext context)
 		{
 			if (!attribute.IsResolution())
@@ -37,7 +38,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			return null;
 		}
 
-		public static ResolutionSemantics? Build(ReturnTypeToAnalyze returnType, IAnalysisContext context)
+		public static Resolution? Build(ReturnType returnType, IAnalysisContext context)
 		{
 			if (!returnType.IsResolution())
 			{
@@ -47,7 +48,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			return BuildInternal(returnType.Syntax, returnType.Symbol, context);
 		}
 
-		private static ResolutionSemantics? BuildInternal(TypeSyntax syntax,
+		private static Resolution? BuildInternal(TypeSyntax syntax,
 			INamedTypeSymbol symbol,
 			IAnalysisContext context)
 		{
@@ -57,7 +58,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				.Select(x => TypeName.FromSymbol(x.Type))
 				.ToArray();
 
-			return new ResolutionSemantics(
+			return new Resolution(
 				TypeName.FromSymbol(symbol),
 				dependencies,
 				isDisposable);
