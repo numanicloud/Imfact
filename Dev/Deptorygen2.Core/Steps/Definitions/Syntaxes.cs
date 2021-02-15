@@ -11,7 +11,8 @@ namespace Deptorygen2.Core.Steps.Definitions.Syntaxes
 	internal record NamespaceNode(string Name, ClassNode Class);
 
 	internal record ClassNode(string Name, ConstructorNode Constructor,
-		MethodNode[] Methods, PropertyNode[] Properties, FieldNode[] Fields);
+		MethodNode[] Methods, PropertyNode[] Properties, FieldNode[] Fields,
+		EntryMethodNode[] EntryMethods);
 
 	internal record ConstructorNode(string Name, ParameterNode[] Parameters,
 		AssignmentNode[] Assignments);

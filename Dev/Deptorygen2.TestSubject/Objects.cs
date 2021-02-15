@@ -50,6 +50,7 @@ namespace Deptorygen2.TestSubject
 		internal partial Client ResolveClient();
 		public partial ServiceGold ResolveServiceGold();
 		[Resolution(typeof(Hoge))]
+		[Hook(typeof(CachePerResolution<Hoge>))]
 		private partial IHoge ResolveHoge();
 	}
 }

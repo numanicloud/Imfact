@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Deptorygen2.Annotations;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Creation;
 using Deptorygen2.Core.Steps.Definitions.Syntaxes;
@@ -10,10 +11,12 @@ namespace Deptorygen2.Core.Steps.Definitions
 	internal class DefinitionTreeBuilder
 	{
 		private readonly GenerationSemantics _semantics;
+		private readonly TypeName _resolutionCtxType;
 
 		public DefinitionTreeBuilder(GenerationSemantics semantics)
 		{
 			_semantics = semantics;
+			_resolutionCtxType = TypeName.FromType(typeof(ResolutionContext));
 		}
 
 		public SourceTreeDefinition Build()
@@ -37,7 +40,8 @@ namespace Deptorygen2.Core.Steps.Definitions
 				BuildConstructorNode(),
 				BuildMethodNode(),
 				BuildPropertyNodes(),
-				BuildFieldNode());
+				BuildFieldNode(),
+				BuildEntryMethodNodes());
 		}
 
 		private ConstructorNode BuildConstructorNode()
@@ -71,8 +75,9 @@ namespace Deptorygen2.Core.Steps.Definitions
 			return rs.Cast<IResolverSemantics>().Concat(crs)
 				.Select(x =>
 				{
-					var ps = x.Parameters.Select(p =>
-						BuildParameterNode(p.TypeName, p.ParameterName));
+					var ps = x.Parameters.Select(
+						p => BuildParameterNode(p.TypeName, p.ParameterName));
+
 					var resolution = x.Resolutions.FirstOrDefault()?.TypeName ?? x.ReturnType;
 					var hooks = x.Hooks.Select(y => new HookNode(new TypeNode(y.HookType), y.FieldName))
 						.ToArray();
@@ -84,6 +89,22 @@ namespace Deptorygen2.Core.Steps.Definitions
 						resolution,
 						hooks);
 				}).ToArray();
+		}
+
+		private EntryMethodNode[] BuildEntryMethodNodes()
+		{
+			var rs = _semantics.Factory.EntryResolvers;
+
+			return rs.Select(x =>
+			{
+				var ps = x.Parameters.Select(p =>
+					BuildParameterNode(p.TypeName, p.ParameterName));
+
+				return new EntryMethodNode(x.Accessibility,
+					new TypeNode(x.ReturnType),
+					x.MethodName,
+					ps.ToArray());
+			}).ToArray();
 		}
 
 		private ParameterNode BuildParameterNode(TypeName type, string name)

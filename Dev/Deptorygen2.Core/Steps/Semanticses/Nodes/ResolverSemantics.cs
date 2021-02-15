@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Deptorygen2.Annotations;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aggregation;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
@@ -55,12 +56,15 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			{
 				return null;
 			}
+			
+			var ctxType = new ParameterSemantics(TypeName.FromType(typeof(ResolutionContext)), "context");
 
-			return new(method, tuple => new ResolverSemantics(method.Symbol.Name,
+			return new(method, tuple => new ResolverSemantics(
+				"__" + method.Symbol.Name,
 				TypeName.FromSymbol(method.Symbol.ReturnType),
 				tuple.Item1,
 				tuple.Item2,
-				tuple.Item3,
+				tuple.Item3.Append(ctxType).ToArray(),
 				method.Symbol.DeclaredAccessibility,
 				tuple.Item4));
 		}

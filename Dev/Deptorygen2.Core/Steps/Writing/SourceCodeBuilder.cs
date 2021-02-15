@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using Deptorygen2.Core.Steps.Creation;
@@ -61,28 +62,17 @@ namespace Deptorygen2.Core.Steps.Writing
 
 				inner.AppendLine();
 
-				inner.AppendLine("private int _resolutionDepth = 0;");
+				RenderConstructor(@class.Constructor, inner);
 
 				inner.AppendLine();
 
-				RenderConstructor(@class.Constructor, inner);
+				AppendSequence(@class.EntryMethods, inner,
+					method => RenderEntryMethod(method, inner));
 
 				inner.AppendLine();
 
 				AppendSequence(@class.Methods, inner, 
 					method => RenderMethod(method, inner));
-
-				inner.AppendLine();
-
-				AppendBlock(inner, "private void OnResolutionEnd()", inner2 =>
-				{
-					var hooks = @class.Methods.SelectMany(x => x.Hooks)
-						.Select(x => $"{x.FieldName}.OnResolutionEnd();");
-					foreach (var h in hooks)
-					{
-						inner2.AppendLine(h);
-					}
-				});
 			});
 		}
 
@@ -103,11 +93,11 @@ namespace Deptorygen2.Core.Steps.Writing
 			var paramList = method.Parameters
 				.Select(x => $"{x.Type.Text} {x.Name}")
 				.Join(", ");
-
-			var access = method.Accessibility.ToString().ToLower();
+			
 			var ret = method.ReturnType.Text;
 
-			AppendBlock(builder, $"{access} partial {ret} {method.Name}({paramList})", inner =>
+			builder.AppendLine("[EditorBrowsable(EditorBrowsableState.Never)]");
+			AppendBlock(builder, $"internal {ret} {method.Name}({paramList})", inner =>
 			{
 				_resolverWriter.RenderImplementation(method, _creation, inner);
 			});
@@ -125,6 +115,27 @@ namespace Deptorygen2.Core.Steps.Writing
 				{
 					inner.AppendLine($"{assignment.Dest} = {assignment.Src};");
 				}
+			});
+		}
+
+		private void RenderEntryMethod(EntryMethodNode method, StringBuilder builder)
+		{
+			var paramList = method.Parameters
+				.Select(x => $"{x.Type.Text} {x.Name}")
+				.Join(", ");
+
+			var access = method.Accessibility.ToString().ToLower();
+			var ret = method.ReturnType.Text;
+
+			AppendBlock(builder, $"{access} partial {ret} {method.Name}({paramList})", inner =>
+			{
+				var argList = method.Parameters
+					.Select(x => x.Name)
+					.Append("context")
+					.Join(", ");
+
+				inner.AppendLine("var context = new ResolutionContext();");
+				inner.AppendLine($"return __{method.Name}({argList});");
 			});
 		}
 

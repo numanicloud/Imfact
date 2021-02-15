@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.PlatformServices;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aggregation;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
@@ -37,7 +38,9 @@ namespace Deptorygen2.Core.Steps.Semanticses
 						return (dr, dcr);
 					});
 
-					return (resolvers, collectionResolvers, delegations);
+					var entries = resolvers.Select(EntryResolverSemantics.FromResolver).ToArray();
+
+					return (resolvers, collectionResolvers, delegations, entries);
 				});
 
 				if (factory is null)
@@ -100,6 +103,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				.Concat(dependencies)
 				.SelectMany(x => x.GetRequiredNamespaces())
 				.Except(semantics.Type.FullNamespace.WrapByArray())
+				.Append("System.ComponentModel")
 				.Distinct();
 		}
 	}

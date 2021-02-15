@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Deptorygen2.Core.Steps.Aggregation;
+using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Semanticses
@@ -7,7 +8,8 @@ namespace Deptorygen2.Core.Steps.Semanticses
 	internal record FactorySemantics(TypeName Type,
 		ResolverSemantics[] Resolvers,
 		CollectionResolverSemantics[] CollectionResolvers,
-		DelegationSemantics[] Delegations) : Interfaces.IServiceProvider
+		DelegationSemantics[] Delegations,
+		EntryResolverSemantics[] EntryResolvers) : Interfaces.IServiceProvider
 	{
 		public IEnumerable<TypeName> GetCapableServiceTypes()
 		{
@@ -21,7 +23,8 @@ namespace Deptorygen2.Core.Steps.Semanticses
 		public static Builder<ClassToAnalyze,
 			(ResolverSemantics[],
 			CollectionResolverSemantics[],
-			DelegationSemantics[]),
+			DelegationSemantics[],
+			EntryResolverSemantics[]),
 			FactorySemantics>? GetBuilder(ClassToAnalyze @class)
 		{
 			if (!@class.IsFactory())
@@ -32,7 +35,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			var t = TypeName.FromSymbol(@class.Symbol);
 
 			return new(@class, tuple => new FactorySemantics(
-				t, tuple.Item1, tuple.Item2, tuple.Item3));
+				t, tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4));
 		}
 	}
 }
