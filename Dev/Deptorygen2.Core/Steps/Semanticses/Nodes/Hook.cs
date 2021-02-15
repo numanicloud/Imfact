@@ -4,6 +4,7 @@ using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
+using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
@@ -11,26 +12,76 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 	{
 		public static Hook? Build(Attribute attribute,
 			IAnalysisContext context,
-			string methodName)
+			Method method)
 		{
-			if (!attribute.IsHook())
+			string methodName = method.Symbol.Name;
+
+			if (FromHookAttribute() is {} hook)
 			{
-				return null;
+				return hook;
 			}
 
-			var arg = attribute.Data.ConstructorArguments[0].Value;
-			if (arg is not INamedTypeSymbol symbol)
+			if (FromPresetAttribute() is {} hook2)
 			{
-				return null;
+				return hook2;
 			}
 			
-			if (!symbol.ConstructedFrom.IsImplementing(typeof(IHook<>)))
+			return null;
+
+			Hook? FromHookAttribute()
 			{
-				return null;
+				if (!attribute.IsHook())
+				{
+					return null;
+				}
+
+				var arg = attribute.Data.ConstructorArguments[0].Value;
+				if (arg is not INamedTypeSymbol symbol)
+				{
+					return null;
+				}
+
+				// symbol.IsUnboundGenericType == true だとしても、
+				// Constructメソッドは「別の構築済みの型から、型を構築することができません」の例外を投げる。なぜ？
+
+				if (!symbol.ConstructedFrom.IsImplementing(typeof(IHook<>)))
+				{
+					return null;
+				}
+
+				if (symbol.IsUnboundGenericType)
+				{
+					symbol = symbol.ConstructedFrom.Construct(method.Symbol.ReturnType);
+				}
+
+				var name = $"_{methodName}_{symbol.Name}";
+				return new Hook(TypeName.FromSymbol(symbol), name);
 			}
 
-			var name = $"_{methodName}_{symbol.Name}";
-			return new Hook(TypeName.FromSymbol(symbol), name);
+			Hook? FromPresetAttribute()
+			{
+				if (attribute.IsCacheHook())
+				{
+					var type = typeof(Cache<>);
+					var arg = TypeName.FromSymbol(method.Symbol.ReturnType);
+					var typeName = TypeName.FromType(type, arg.WrapByArray());
+
+					var name = $"_{methodName}_Cache";
+					return new Hook(typeName, name);
+				}
+
+				if (attribute.IsCachePerResolutionHook())
+				{
+					var type = typeof(CachePerResolution<>);
+					var arg = TypeName.FromSymbol(method.Symbol.ReturnType);
+					var typeName = TypeName.FromType(type, arg.WrapByArray());
+
+					var name = $"_{methodName}_CachePerResolution";
+					return new Hook(typeName, name);
+				}
+
+				return null;
+			}
 		}
 
 		public IEnumerable<string> GetRequiredNamespaces()

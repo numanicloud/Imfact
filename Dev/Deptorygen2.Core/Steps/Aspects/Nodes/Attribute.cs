@@ -21,5 +21,17 @@ namespace Deptorygen2.Core.Steps.Aspects.Nodes
 			       && Data.ConstructorArguments.Length == 1
 			       && Data.ConstructorArguments[0].Kind == TypedConstantKind.Type;
 		}
+
+		public bool IsCacheHook()
+		{
+			var name1 = new AttributeName(nameof(CacheAttribute));
+			return name1.MatchWithAnyName(Data.AttributeClass?.Name ?? "");
+		}
+
+		public bool IsCachePerResolutionHook()
+		{
+			var name2 = new AttributeName(nameof(CachePerResolutionAttribute));
+			return name2.MatchWithAnyName(Data.AttributeClass?.Name ?? "");
+		}
 	}
 }

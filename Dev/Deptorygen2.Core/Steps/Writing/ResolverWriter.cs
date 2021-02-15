@@ -44,7 +44,7 @@ namespace Deptorygen2.Core.Steps.Writing
 		{
 			public void Write(StringBuilder builder, IHookWriter[] rest)
 			{
-				builder.AppendLine($"{Method.ResolutionType.Name}? result;");
+				builder.AppendLine($"{Method.ReturnType.Text}? result;");
 				builder.AppendLine();
 
 				rest[0].Write(builder, rest.Skip(1).ToArray());

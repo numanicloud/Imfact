@@ -37,7 +37,7 @@ namespace Deptorygen2.TestSubject
 	[Factory]
 	internal partial class CapturedFactory
 	{
-		[Hook(typeof(Cache<Client>))]
+		[Hook(typeof(Cache<>))]
 		internal partial Client ResolveClient2();
 	}
 	
@@ -47,10 +47,14 @@ namespace Deptorygen2.TestSubject
 	{
 		private CapturedFactory Captured { get; }
 
+		[Hook(typeof(Cache<Client>))]
 		internal partial Client ResolveClient();
+
 		public partial ServiceGold ResolveServiceGold();
+
 		[Resolution(typeof(Hoge))]
-		[Hook(typeof(CachePerResolution<Hoge>))]
+		[CachePerResolution]
+		[Cache]
 		private partial IHoge ResolveHoge();
 	}
 }

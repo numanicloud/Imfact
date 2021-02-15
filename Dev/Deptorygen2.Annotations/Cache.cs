@@ -42,4 +42,9 @@ namespace Deptorygen2.Annotations
 	public class CachePerResolutionAttribute : Attribute
 	{
 	}
+
+	[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
+	public sealed class TransientAttribute : Attribute
+	{
+	}
 }

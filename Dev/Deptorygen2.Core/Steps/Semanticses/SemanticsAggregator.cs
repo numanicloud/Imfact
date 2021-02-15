@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.PlatformServices;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
@@ -66,7 +65,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				var ret = m.GetReturnType(_context) is { } t
 					? Resolution.Build(t, _context)
 					: null;
-				var (parameters, resolutions, hooks) = LoadMethodFeature(m.GetParameters(), attr, m.Symbol.Name);
+				var (parameters, resolutions, hooks) = LoadMethodFeature(m.GetParameters(), attr, m);
 
 				return (ret, resolutions, parameters, hooks);
 			});
@@ -75,15 +74,17 @@ namespace Deptorygen2.Core.Steps.Semanticses
 		private MultiResolver[] AggregateCollectionResolvers(Method[] methods)
 		{
 			return methods.Select(MultiResolver.GetBuilder).Build(
-				m => LoadMethodFeature(m.GetParameters(), m.GetAttributes(), m.Symbol.Name));
+				m => LoadMethodFeature(m.GetParameters(), m.GetAttributes(), m));
 		}
 
 		private (Parameter[], Resolution[], Hook[]) LoadMethodFeature(
-			Aspects.Nodes.Parameter[] parameters, Attribute[] attributes, string methodName)
+			Aspects.Nodes.Parameter[] parameters,
+			Attribute[] attributes,
+			Method method)
 		{
 			var ps = Build(parameters, p => Parameter.Build(p, _context));
 			var rs = Build(attributes, a => Resolution.Build(a, _context));
-			var hs = Build(attributes, a => Hook.Build(a, _context, methodName));
+			var hs = Build(attributes, a => Hook.Build(a, _context, method));
 			return (ps, rs, hs);
 		}
 
