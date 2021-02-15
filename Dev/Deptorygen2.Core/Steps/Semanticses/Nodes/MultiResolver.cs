@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Deptorygen2.Annotations;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Utilities;
@@ -15,6 +16,8 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		Accessibility Accessibility,
 		Hook[] Hooks) : IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
 	{
+		public TypeName ElementType => ReturnType.TypeArguments[0];
+
 		public IEnumerable<TypeName> GetRequiredServiceTypes()
 		{
 			return Resolutions.SelectMany(x => x.Dependencies)
@@ -51,10 +54,12 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 				return null;
 			}
 
+			var ctxType = new Parameter(TypeName.FromType(typeof(ResolutionContext)), "context");
+
 			return new(method, tuple => new MultiResolver(
-				method.Symbol.Name,
+				"__" + method.Symbol.Name,
 				TypeName.FromSymbol(method.Symbol.ReturnType),
-				tuple.Item1,
+				tuple.Item1.Append(ctxType).ToArray(),
 				tuple.Item2,
 				method.Symbol.DeclaredAccessibility,
 				tuple.Item3));

@@ -14,8 +14,9 @@ namespace Deptorygen2.Core.Steps.Creation.Abstraction
 
 		protected CreationMethodBase(Generation semantics)
 		{
-			_resolutionSource = GetSource(semantics)
-				.Select(x => (type: GetTypeInfo(x), source: x))
+			var xx = GetSource(semantics)
+				.Select(x => (type: GetTypeInfo(x), source: x));
+			_resolutionSource = xx
 				.ToDictionary(x => x.type, x => x.source);
 		}
 

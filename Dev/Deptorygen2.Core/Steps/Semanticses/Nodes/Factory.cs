@@ -6,7 +6,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
 	internal record Factory(TypeName Type,
 		Resolver[] Resolvers,
-		MultiResolver[] CollectionResolvers,
+		MultiResolver[] MultiResolvers,
 		Delegation[] Delegations,
 		EntryResolver[] EntryResolvers) : Interfaces.IServiceProvider
 	{

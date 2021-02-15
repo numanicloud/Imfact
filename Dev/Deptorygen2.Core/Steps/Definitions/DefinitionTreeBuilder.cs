@@ -2,7 +2,6 @@
 using Deptorygen2.Annotations;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Creation;
-using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 
@@ -39,6 +38,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 			return new Class(_semantics.Factory.Type.Name,
 				BuildConstructorNode(),
 				BuildMethodNode(),
+				BuildEnumerableMethods(),
 				BuildPropertyNodes(),
 				BuildFieldNode(),
 				BuildEntryMethodNodes());
@@ -59,7 +59,9 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 			var parameters = fs.Concat(ps).Select(x => BuildParameterNode(x.type, x.param));
 			var assignments = fs.Concat(ps).Select(x => new Assignment(x.name, x.param));
-			var hooks = _semantics.Factory.Resolvers.SelectMany(x => x.Hooks)
+			var hooks = _semantics.Factory.Resolvers.Cast<IResolverSemantics>()
+				.Concat(_semantics.Factory.MultiResolvers)
+				.SelectMany(x => x.Hooks)
 				.Select(x => new Assignment(x.FieldName, $"new {x.HookType.Name}()"));
 
 			return new Constructor(_semantics.Factory.Type.Name,
@@ -69,10 +71,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 		private Method[] BuildMethodNode()
 		{
-			var rs = _semantics.Factory.Resolvers;
-			var crs = _semantics.Factory.CollectionResolvers;
-			
-			return rs.Cast<IResolverSemantics>().Concat(crs)
+			return _semantics.Factory.Resolvers
 				.Select(x =>
 				{
 					var ps = x.Parameters.Select(
@@ -87,6 +86,25 @@ namespace Deptorygen2.Core.Steps.Definitions
 						x.MethodName,
 						ps.ToArray(),
 						resolution,
+						hooks);
+				}).ToArray();
+		}
+
+		private EnumMethod[] BuildEnumerableMethods()
+		{
+			return _semantics.Factory.MultiResolvers
+				.Select(x =>
+				{
+					var ps = x.Parameters.Select(
+						p => BuildParameterNode(p.TypeName, p.ParameterName));
+					var hooks = x.Hooks.Select(y => new Hook(new Type(y.HookType), y.FieldName))
+						.ToArray();
+
+					return new EnumMethod(x.Accessibility,
+						new Type(x.ElementType),
+						x.MethodName,
+						ps.ToArray(),
+						x.Resolutions.Select(x => x.TypeName).ToArray(),
 						hooks);
 				}).ToArray();
 		}
@@ -128,7 +146,11 @@ namespace Deptorygen2.Core.Steps.Definitions
 				.SelectMany(x => x.Hooks)
 				.Select(x => new Field(new Type(x.HookType), x.FieldName));
 
-			return deps.Concat(hooks).ToArray();
+			var hooks2 = _semantics.Factory.MultiResolvers
+				.SelectMany(x => x.Hooks)
+				.Select(x => new Field(new Type(x.HookType), x.FieldName));
+
+			return deps.Concat(hooks).Concat(hooks2).ToArray();
 		}
 	}
 }

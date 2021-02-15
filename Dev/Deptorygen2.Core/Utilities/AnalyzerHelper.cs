@@ -43,8 +43,8 @@ namespace Deptorygen2.Core.Utilities
 		{
 			var enumerableType = TypeName.FromType(typeof(IEnumerable<>));
 
-			return type.NameWithoutArguments != enumerableType.NameWithoutArguments
-			       && type.TypeArguments.Length != enumerableType.TypeArguments.Length;
+			return type.NameWithoutArguments == enumerableType.NameWithoutArguments
+			       && type.TypeArguments.Length == 1;
 		}
 	}
 }

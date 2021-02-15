@@ -10,7 +10,8 @@ namespace Deptorygen2.Core.Steps.Definitions
 	internal record Namespace(string Name, Class Class);
 
 	internal record Class(string Name, Constructor Constructor,
-		Method[] Methods, Property[] Properties, Field[] Fields,
+		Method[] Methods, EnumMethod[] EnumMethods, Property[] Properties,
+		Field[] Fields,
 		EntryMethod[] EntryMethods);
 
 	internal record Constructor(string Name, Parameter[] Parameters,
@@ -19,6 +20,9 @@ namespace Deptorygen2.Core.Steps.Definitions
 	// ユーザーからは触らない想定。実際の解決を行う実装が入っているメソッド
 	internal record Method(Accessibility Accessibility, Type ReturnType, string Name,
 		Parameter[] Parameters, TypeName ResolutionType, Hook[] Hooks);
+
+	internal record EnumMethod(Accessibility Accessibility, Type ElementType, string Name,
+		Parameter[] Parameters, TypeName[] ResolutionTypes, Hook[] Hooks);
 
 	// MethodNodeのほうのメソッドを呼び出すメソッド。ユーザーが直接使う
 	internal record EntryMethod(Accessibility Accessibility, Type ReturnType,

@@ -29,19 +29,21 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				var factory = Factory.GetBuilder(@class)?.Build(_ =>
 				{
 					var resolvers = AggregateResolvers(methods);
-					var collectionResolvers = AggregateCollectionResolvers(methods);
+					var multiResolvers = AggregateMultiResolvers(methods);
 
 					var delegations = properties.Select(Delegation.GetBuilder).Build(p =>
 					{
 						var ms = p.GetMethodToAnalyze();
 						var dr = AggregateResolvers(ms);
-						var dcr = AggregateCollectionResolvers(ms);
+						var dcr = AggregateMultiResolvers(ms);
 						return (dr, dcr);
 					});
 
-					var entries = resolvers.Select(EntryResolver.FromResolver).ToArray();
+					var entries = resolvers.Cast<IResolverSemantics>()
+						.Concat(multiResolvers)
+						.Select(EntryResolver.FromResolver).ToArray();
 
-					return (resolvers, collectionResolvers, delegations, entries);
+					return (resolvers, multiResolvers, delegations, entries);
 				});
 
 				if (factory is null)
@@ -71,7 +73,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			});
 		}
 
-		private MultiResolver[] AggregateCollectionResolvers(Method[] methods)
+		private MultiResolver[] AggregateMultiResolvers(Method[] methods)
 		{
 			return methods.Select(MultiResolver.GetBuilder).Build(
 				m => LoadMethodFeature(m.GetParameters(), m.GetAttributes(), m));
@@ -100,7 +102,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			Dependency[] dependencies)
 		{
 			return semantics.Resolvers.Cast<INamespaceClaimer>()
-				.Concat(semantics.CollectionResolvers)
+				.Concat(semantics.MultiResolvers)
 				.Concat(semantics.Delegations)
 				.Concat(semantics.Resolvers.SelectMany(x => x.Hooks))
 				.Concat(dependencies)

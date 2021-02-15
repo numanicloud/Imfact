@@ -3,6 +3,7 @@ using System.Linq;
 using Deptorygen2.Core.Steps.Creation.Abstraction;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Creation.Strategies
@@ -25,8 +26,10 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 		{
 			var rr = semantics.Factory.Resolvers.Select(x => x.ReturnTypeResolution).FilterNull();
 			var rs = semantics.Factory.Resolvers.SelectMany(x => x.Resolutions);
-			var crs = semantics.Factory.CollectionResolvers.SelectMany(x => x.Resolutions);
-			return rr.Concat(rs).Concat(crs);
+			var crs = semantics.Factory.MultiResolvers.SelectMany(x => x.Resolutions);
+			return rr.Concat(rs).Concat(crs)
+				.GroupBy(x => x.TypeName)
+				.Select(x => x.First());
 		}
 
 		protected override TypeName GetTypeInfo(Resolution source)

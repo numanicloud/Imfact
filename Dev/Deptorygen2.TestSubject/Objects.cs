@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Deptorygen;
 using Deptorygen2.Annotations;
 
@@ -34,6 +35,11 @@ namespace Deptorygen2.TestSubject
 	{
 	}
 
+	class Hoge2 : IHoge
+	{
+		
+	}
+
 	[Factory]
 	internal partial class CapturedFactory
 	{
@@ -56,6 +62,11 @@ namespace Deptorygen2.TestSubject
 		[CachePerResolution]
 		[Cache]
 		private partial IHoge ResolveHoge();
+
+		[Cache]
+		[Resolution(typeof(Hoge))]
+		[Resolution(typeof(Hoge2))]
+		public partial IEnumerable<IHoge> ResolveMultiHoge();
 	}
 }
 

@@ -10,12 +10,12 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		public static Dependency[] FromFactory(Factory semantics)
 		{
 			var consumers = semantics.Resolvers.Cast<IServiceConsumer>()
-				.Concat(semantics.CollectionResolvers)
+				.Concat(semantics.MultiResolvers)
 				.SelectMany(x => x.GetRequiredServiceTypes())
 				.Distinct();
 
 			var providers = semantics.Resolvers.Cast<IServiceProvider>()
-				.Concat(semantics.CollectionResolvers)
+				.Concat(semantics.MultiResolvers)
 				.Concat(semantics.Delegations)
 				.SelectMany(x => x.GetCapableServiceTypes())
 				.Distinct();

@@ -20,7 +20,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 
 		protected override IEnumerable<Semanticses.Nodes.MultiResolver> GetSource(Generation semantics)
 		{
-			return semantics.Factory.CollectionResolvers;
+			return semantics.Factory.MultiResolvers;
 		}
 
 		protected override TypeName GetTypeInfo(Semanticses.Nodes.MultiResolver source)

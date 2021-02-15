@@ -72,6 +72,11 @@ namespace Deptorygen2.Core.Steps.Writing
 
 				AppendSequence(@class.Methods, inner, 
 					method => RenderMethod(method, inner));
+
+				inner.AppendLine();
+
+				AppendSequence(@class.EnumMethods, inner,
+					method => RenderEnumerableMethod(method, inner));
 			});
 		}
 
@@ -94,6 +99,21 @@ namespace Deptorygen2.Core.Steps.Writing
 				.Join(", ");
 			
 			var ret = method.ReturnType.Text;
+
+			builder.AppendLine("[EditorBrowsable(EditorBrowsableState.Never)]");
+			AppendBlock(builder, $"internal {ret} {method.Name}({paramList})", inner =>
+			{
+				_resolverWriter.RenderImplementation(method, _creation, inner);
+			});
+		}
+
+		private void RenderEnumerableMethod(EnumMethod method, StringBuilder builder)
+		{
+			var paramList = method.Parameters
+				.Select(x => $"{x.Type.Text} {x.Name}")
+				.Join(", ");
+
+			var ret = $"IEnumerable<{method.ElementType.Text}>";
 
 			builder.AppendLine("[EditorBrowsable(EditorBrowsableState.Never)]");
 			AppendBlock(builder, $"internal {ret} {method.Name}({paramList})", inner =>
