@@ -1,22 +1,9 @@
 ﻿using System;
-using Deptorygen2.Core.Steps.Creation;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Steps.Definitions.Syntaxes
 {
-	internal class SourceTreeDefinition
-	{
-		public RootNode Root { get; }
-		public ICreationAggregator Creation { get; }
-
-		public SourceTreeDefinition(RootNode root, ICreationAggregator creation)
-		{
-			Root = root;
-			Creation = creation;
-		}
-	}
-
 	internal record RootNode(UsingNode[] Usings, NamespaceNode Namespace);
 
 	internal record UsingNode(string Namespace);
@@ -29,8 +16,13 @@ namespace Deptorygen2.Core.Steps.Definitions.Syntaxes
 	internal record ConstructorNode(string Name, ParameterNode[] Parameters,
 		AssignmentNode[] Assignments);
 
+	// ユーザーからは触らない想定。実際の解決を行う実装が入っているメソッド
 	internal record MethodNode(Accessibility Accessibility, TypeNode ReturnType, string Name,
 		ParameterNode[] Parameters, TypeName ResolutionType, HookNode[] Hooks);
+
+	// MethodNodeのほうのメソッドを呼び出すメソッド。ユーザーが直接使う
+	internal record EntryMethodNode(Accessibility Accessibility, TypeNode ReturnType,
+		string Name, ParameterNode[] Parameters);
 
 	internal record PropertyNode(TypeNode Type, string Name);
 

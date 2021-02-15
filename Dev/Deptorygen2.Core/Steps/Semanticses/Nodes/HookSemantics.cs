@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Diagnostics.SymbolStore;
+using Deptorygen2.Annotations;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aggregation;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record HookSemantics(TypeName HookType, string FieldName)
+	internal record HookSemantics(TypeName HookType, string FieldName) : INamespaceClaimer
 	{
 		public static HookSemantics? Build(AttributeToAnalyze attribute,
 			IAnalysisContext context,
@@ -23,22 +20,23 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 			}
 
 			var arg = attribute.Data.ConstructorArguments[0].Value;
-			if (arg is not Type t)
+			if (arg is not INamedTypeSymbol symbol)
+			{
+				return null;
+			}
+			
+			if (!symbol.ConstructedFrom.IsImplementing(typeof(IHook<>)))
 			{
 				return null;
 			}
 
-			var isHook = t.GetInterfaces().Any(
-				x => x.IsGenericType && x.GetGenericTypeDefinition().Name == "IHook`1");
-			if (!isHook)
-			{
-				return null;
-			}
+			var name = $"_{methodName}_{symbol.Name}";
+			return new HookSemantics(TypeName.FromSymbol(symbol), name);
+		}
 
-			// IHook<T> _Method_HookType = new HookType<T>();
-
-			var name = $"_{methodName}_{t.Name}";
-			return new HookSemantics(TypeName.FromType(t), name);
+		public IEnumerable<string> GetRequiredNamespaces()
+		{
+			yield return HookType.FullNamespace;
 		}
 	}
 }

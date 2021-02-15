@@ -4,7 +4,6 @@ using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aggregation;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
-using Microsoft.CodeAnalysis;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Semanticses
@@ -97,6 +96,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			return semantics.Resolvers.Cast<INamespaceClaimer>()
 				.Concat(semantics.CollectionResolvers)
 				.Concat(semantics.Delegations)
+				.Concat(semantics.Resolvers.SelectMany(x => x.Hooks))
 				.Concat(dependencies)
 				.SelectMany(x => x.GetRequiredNamespaces())
 				.Except(semantics.Type.FullNamespace.WrapByArray())

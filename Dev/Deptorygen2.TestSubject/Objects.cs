@@ -1,5 +1,6 @@
 ﻿using System;
 using Deptorygen;
+using Deptorygen2.Annotations;
 
 namespace Deptorygen
 {

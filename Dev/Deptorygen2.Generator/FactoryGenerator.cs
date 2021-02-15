@@ -18,15 +18,13 @@ namespace Deptorygen2.Generator
 		public void Execute(GeneratorExecutionContext context)
 		{
 			System.Diagnostics.Debugger.Launch();
-			AnnotationGenerator.AddSource(in context);
+			//AnnotationGenerator.AddSource(in context);
 
 			if (context.SyntaxReceiver is not FactorySyntaxReceiver receiver
 				|| receiver.SyntaxTree is null)
 			{
 				return;
 			}
-
-			context.Compilation.
 
 			var semanticModel = context.Compilation.GetSemanticModel(receiver.SyntaxTree);
 			var facade = new GenerationFacade(semanticModel);

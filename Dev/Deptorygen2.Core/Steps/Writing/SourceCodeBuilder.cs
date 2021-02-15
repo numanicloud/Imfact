@@ -61,12 +61,28 @@ namespace Deptorygen2.Core.Steps.Writing
 
 				inner.AppendLine();
 
+				inner.AppendLine("private int _resolutionDepth = 0;");
+
+				inner.AppendLine();
+
 				RenderConstructor(@class.Constructor, inner);
 
 				inner.AppendLine();
 
 				AppendSequence(@class.Methods, inner, 
 					method => RenderMethod(method, inner));
+
+				inner.AppendLine();
+
+				AppendBlock(inner, "private void OnResolutionEnd()", inner2 =>
+				{
+					var hooks = @class.Methods.SelectMany(x => x.Hooks)
+						.Select(x => $"{x.FieldName}.OnResolutionEnd();");
+					foreach (var h in hooks)
+					{
+						inner2.AppendLine(h);
+					}
+				});
 			});
 		}
 

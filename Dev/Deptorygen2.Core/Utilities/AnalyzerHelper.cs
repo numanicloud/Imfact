@@ -13,7 +13,7 @@ namespace Deptorygen2.Core.Utilities
 		{
 			var typeName = TypeName.FromType(@interface);
 			return symbol.AllInterfaces
-				.Any(x => x.Name == typeName.Name
+				.Any(x => x.MetadataName == typeName.NameWithoutArguments
 						  && x.GetFullNameSpace() == typeName.FullNamespace);
 		}
 

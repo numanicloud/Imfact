@@ -55,10 +55,12 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 			var parameters = fs.Concat(ps).Select(x => BuildParameterNode(x.type, x.param));
 			var assignments = fs.Concat(ps).Select(x => new AssignmentNode(x.name, x.param));
+			var hooks = _semantics.Factory.Resolvers.SelectMany(x => x.Hooks)
+				.Select(x => new AssignmentNode(x.FieldName, $"new {x.HookType.Name}()"));
 
 			return new ConstructorNode(_semantics.Factory.Type.Name,
 				parameters.ToArray(),
-				assignments.ToArray());
+				assignments.Concat(hooks).ToArray());
 		}
 
 		private MethodNode[] BuildMethodNode()
@@ -98,9 +100,14 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 		private FieldNode[] BuildFieldNode()
 		{
-			return _semantics.Dependencies
-				.Select(x => new FieldNode(new TypeNode(x.TypeName), x.FieldName))
-				.ToArray();
+			var deps = _semantics.Dependencies
+				.Select(x => new FieldNode(new TypeNode(x.TypeName), x.FieldName));
+
+			var hooks = _semantics.Factory.Resolvers
+				.SelectMany(x => x.Hooks)
+				.Select(x => new FieldNode(new TypeNode(x.HookType), x.FieldName));
+
+			return deps.Concat(hooks).ToArray();
 		}
 	}
 }

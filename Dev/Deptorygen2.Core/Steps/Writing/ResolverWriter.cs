@@ -44,9 +44,17 @@ namespace Deptorygen2.Core.Steps.Writing
 			public void Write(StringBuilder builder, IHookWriter[] rest)
 			{
 				builder.AppendLine($"{Method.ResolutionType.Name}? result;");
+				builder.AppendLine("_resolutionDepth++;");
+				builder.AppendLine();
 
 				rest[0].Write(builder, rest.Skip(1).ToArray());
 
+				builder.AppendLine();
+				builder.AppendLine("_resolutionDepth--;");
+				AppendBlock(builder, "if(_resolutionDepth == 0)", inner =>
+				{
+					inner.AppendLine("OnResolutionEnd();");
+				});
 				builder.AppendLine("return result;");
 			}
 		}
@@ -56,11 +64,10 @@ namespace Deptorygen2.Core.Steps.Writing
 			public void Write(StringBuilder builder, IHookWriter[] rest)
 			{
 				builder.AppendLine($"result = {Hook.FieldName}.Before();");
-				AppendBlock(builder, "if(result is null)\n{", inner =>
+				AppendBlock(builder, "if(result is null)", inner =>
 				{
 					rest[0].Write(inner, rest.Skip(1).ToArray());
 				});
-				builder.AppendLine("}");
 				builder.AppendLine($"result = {Hook.FieldName}.After(result);");
 			}
 		}

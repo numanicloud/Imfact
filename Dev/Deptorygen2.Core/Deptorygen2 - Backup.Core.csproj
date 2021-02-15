@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Deptorygen2.Annotations\Deptorygen2.Annotations.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Steps\Aspects\Nodes\" />
+  </ItemGroup>
+
 </Project>

@@ -6,9 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Deptorygen2.Generator\Deptorygen2.Generator.csproj"
-                      OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Deptorygen2.Annotations\Deptorygen2.Annotations.csproj" />
+    <ProjectReference Include="..\Deptorygen2.Generator\Deptorygen2.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

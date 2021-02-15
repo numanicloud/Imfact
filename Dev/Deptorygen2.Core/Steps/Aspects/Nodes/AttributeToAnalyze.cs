@@ -1,4 +1,5 @@
-﻿using Deptorygen2.Core.Utilities;
+﻿using Deptorygen2.Annotations;
+using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Steps.Aggregation
@@ -7,7 +8,7 @@ namespace Deptorygen2.Core.Steps.Aggregation
 	{
 		public bool IsResolution()
 		{
-			var name = new AttributeName("ResolutionAttribute");
+			var name = new AttributeName(nameof(ResolutionAttribute));
 			return name.MatchWithAnyName(Data.AttributeClass?.Name ?? "")
 			       && Data.ConstructorArguments.Length == 1
 			       && Data.ConstructorArguments[0].Kind == TypedConstantKind.Type;
@@ -15,7 +16,7 @@ namespace Deptorygen2.Core.Steps.Aggregation
 
 		public bool IsHook()
 		{
-			var name = new AttributeName("HookAttribute");
+			var name = new AttributeName(nameof(HookAttribute));
 			return name.MatchWithAnyName(Data.AttributeClass?.Name ?? "")
 			       && Data.ConstructorArguments.Length == 1
 			       && Data.ConstructorArguments[0].Kind == TypedConstantKind.Type;
