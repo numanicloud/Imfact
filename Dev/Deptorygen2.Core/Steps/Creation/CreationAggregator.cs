@@ -30,12 +30,12 @@ namespace Deptorygen2.Core.Steps.Creation
 
 		public IEnumerable<string> GetInjections(MultipleCreationRequest request)
 		{
-			var table = request.GivenParameters.GroupBy(x => x.Type)
+			var table = request.GivenParameters.GroupBy(x => x.Type.Record)
 				.ToDictionary(x => x.Key, x => x.ToList());
 
 			foreach (var type in request.TypeToResolve)
 			{
-				if (table.GetValueOrDefault(type) is { } onType)
+				if (table.GetValueOrDefault(type.Record) is { } onType)
 				{
 					var result = onType[0].Name;
 					onType.RemoveAt(0);
@@ -53,6 +53,7 @@ namespace Deptorygen2.Core.Steps.Creation
 			return _instantiationCoders
 				.Where(x =>
 				{
+					// 自分自身を呼び出さないように
 					if (request.IsRootRequest)
 					{
 						return x is not Resolver

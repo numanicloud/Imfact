@@ -17,7 +17,7 @@ namespace Deptorygen2.Generator
 
 		public void Execute(GeneratorExecutionContext context)
 		{
-			//System.Diagnostics.Debugger.Launch();
+			System.Diagnostics.Debugger.Launch();
 			//AnnotationGenerator.AddSource(in context);
 
 			if (context.SyntaxReceiver is not FactorySyntaxReceiver receiver

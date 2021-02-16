@@ -1,4 +1,5 @@
-﻿using Deptorygen2.Core.Steps.Semanticses;
+﻿using Deptorygen2.Core.Steps.Definitions.Methods;
+using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
@@ -11,23 +12,8 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 	internal record Namespace(string Name, Class Class);
 
-	internal record Class(string Name, Constructor Constructor,
-		Method[] Methods, EnumMethod[] EnumMethods, Property[] Properties,
-		Field[] Fields, EntryMethod[] EntryMethods, DisposableInfo DisposableInfo);
-
-	internal record Constructor(Accessibility Accessibility, string Name, Parameter[] Parameters,
-		Assignment[] Assignments);
-
-	// ユーザーからは触らない想定。実際の解決を行う実装が入っているメソッド
-	internal record Method(Accessibility Accessibility, Type ReturnType, string Name,
-		Parameter[] Parameters, TypeNode ResolutionType, Hook[] Hooks);
-
-	internal record EnumMethod(Accessibility Accessibility, Type ElementType, string Name,
-		Parameter[] Parameters, TypeNode[] ResolutionTypes, Hook[] Hooks);
-
-	// MethodNodeのほうのメソッドを呼び出すメソッド。ユーザーが直接使う
-	internal record EntryMethod(Accessibility Accessibility, Type ReturnType,
-		string Name, Parameter[] Parameters);
+	internal record Class(string Name, MethodInfo[] Methods, Property[] Properties,
+		Field[] Fields, DisposableInfo DisposableInfo);
 
 	internal record Property(Type Type, string Name);
 
@@ -53,7 +39,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 			nameof(System.Char) => "char",
 			nameof(System.String) => "string",
 			"System.Void" => "void",
-			_ => TypeName.Name
+			_ => TypeName.FullBoundName
 		};
 	}
 

@@ -7,16 +7,11 @@ using Microsoft.CodeAnalysis;
 namespace Deptorygen2.Core.Entities
 {
 	// 等値性判定にはこちらを使う。追加の情報はTypeNodeに持たせる
-	internal record TypeRecord(
-		string FullNamespace, string Name, TypeRecord[] TypeArguments)
+	internal record TypeRecord(string FullNamespace, string Name)
 	{
 		public static TypeRecord FromSymbol(INamedTypeSymbol symbol)
 		{
-			var typeArguments = symbol.TypeArguments
-				.Select(FromSymbol)
-				.ToArray();
-
-			return new (symbol.GetFullNameSpace(), symbol.Name, typeArguments);
+			return new (symbol.GetFullNameSpace(), symbol.Name);
 		}
 
 		public static TypeRecord FromSymbol(ITypeSymbol symbol)
@@ -30,8 +25,7 @@ namespace Deptorygen2.Core.Entities
 		{
 			return new(
 				type.Namespace ?? "",
-				Regex.Replace(type.Name, @"`\d+$", ""),
-				typeArguments ?? new TypeRecord[0]);
+				Regex.Replace(type.Name, @"`\d+$", ""));
 		}
 	}
 }

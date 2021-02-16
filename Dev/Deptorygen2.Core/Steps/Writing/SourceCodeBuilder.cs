@@ -2,6 +2,7 @@
 using System.Linq;
 using Deptorygen2.Core.Steps.Creation.Abstraction;
 using Deptorygen2.Core.Steps.Definitions;
+using Deptorygen2.Core.Steps.Definitions.Methods;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Writing
@@ -52,12 +53,6 @@ namespace Deptorygen2.Core.Steps.Writing
 		private void RenderClass(Class @class, ICodeBuilder builder)
 		{
 			builder.Append($"partial class {@class.Name}");
-			var disposables = GetInterfaces(@class).ToArray();
-			if (disposables.Any())
-			{
-				builder.Append(" : " + disposables.Join(", "));
-			}
-			builder.AppendLine();
 
 			builder.EnterBlock(block =>
 			{
@@ -71,16 +66,10 @@ namespace Deptorygen2.Core.Steps.Writing
 						}
 					});
 
-					seqOuter.EnterChunk(chunk => RenderConstructor(@class.Constructor, chunk));
-
-					seqOuter.EnterSequenceChunk(@class.EntryMethods, (method, inner) =>
-						RenderEntryMethod(method, inner));
-
-					seqOuter.EnterSequenceChunk(@class.Methods, (method, inner) =>
-						RenderMethod(method, inner));
-
-					seqOuter.EnterSequenceChunk(@class.EnumMethods, (method, inner) =>
-						RenderEnumerableMethod(method, inner));
+					foreach (var method in @class.Methods)
+					{
+						RenderMethod(method, seqOuter);
+					}
 				});
 			});
 		}
@@ -100,84 +89,18 @@ namespace Deptorygen2.Core.Steps.Writing
 			}
 		}
 
-		private void RenderMethod(Method method, ICodeBuilder builder)
+		private void RenderMethod(MethodInfo method, ICodeBuilder builder)
 		{
-			var paramList = method.Parameters
-				.Select(x => $"{x.Type.Text} {x.Name}")
-				.Join(", ");
-			
-			var ret = method.ReturnType.Text;
-
 			builder.EnterChunk(chunk =>
 			{
-				chunk.AppendLine("[EditorBrowsable(EditorBrowsableState.Never)]");
-				chunk.AppendLine($"internal {ret} {method.Name}({paramList})");
+				foreach (var attribute in method.Attributes)
+				{
+					chunk.AppendLine(attribute.Text);
+				}
+				chunk.AppendLine(method.Signature.GetSignatureString());
 				chunk.EnterBlock(block =>
 				{
-					_resolverWriter.RenderImplementation(method, _creation, block);
-				});
-			});
-		}
-
-		private void RenderEnumerableMethod(EnumMethod method, ICodeBuilder builder)
-		{
-			var paramList = method.Parameters
-				.Select(x => $"{x.Type.Text} {x.Name}")
-				.Join(", ");
-
-			var ret = $"IEnumerable<{method.ElementType.Text}>";
-
-			builder.EnterChunk(chunk =>
-			{
-				chunk.AppendLine("[EditorBrowsable(EditorBrowsableState.Never)]");
-				chunk.AppendLine($"internal {ret} {method.Name}({paramList})");
-				chunk.EnterBlock(inner =>
-				{
-					_resolverWriter.RenderImplementation(method, _creation, inner);
-				});
-			});
-		}
-
-		private void RenderConstructor(Constructor ctor, ICodeBuilder builder)
-		{
-			var paramList = ctor.Parameters
-				.Select(x => $"{x.Type.Text} {x.Name}")
-				.Join(", ");
-			var access = ctor.Accessibility.ToString().ToLower();
-
-			builder.EnterChunk(chunk =>
-			{
-				chunk.AppendLine($"{access} {ctor.Name}({paramList})");
-				chunk.EnterBlock(block =>
-				{
-					foreach (var assignment in ctor.Assignments)
-					{
-						block.AppendLine($"{assignment.Dest} = {assignment.Src};");
-					}
-				});
-			});
-		}
-
-		private void RenderEntryMethod(EntryMethod method, ICodeBuilder builder)
-		{
-			var paramList = method.Parameters
-				.Select(x => $"{x.Type.Text} {x.Name}")
-				.Join(", ");
-			var argList = method.Parameters
-				.Select(x => x.Name)
-				.Append("context")
-				.Join(", ");
-
-			var access = method.Accessibility.ToString().ToLower();
-			var ret = method.ReturnType.Text;
-
-			builder.EnterChunk(chunk =>
-			{
-				chunk.AppendLine($"{access} partial {ret} {method.Name}({paramList})");
-				chunk.EnterBlock(block =>
-				{
-					block.AppendLine("var context = new ResolutionContext();");
-					block.AppendLine($"return __{method.Name}({argList});");
+					method.Implementation.Render(block, _creation, _resolverWriter);
 				});
 			});
 		}

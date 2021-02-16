@@ -12,13 +12,15 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		{
 			var consumers = semantics.TraverseDeep().OfType<IServiceConsumer>()
 				.SelectMany(x => x.GetRequiredServiceTypes())
-				.Distinct();
+				.GroupBy(x => x.Record)
+				.Select(x => x.First());
 
 			var providers = semantics.TraverseDeep().OfType<IServiceProvider>()
 				.SelectMany(x => x.GetCapableServiceTypes())
-				.Distinct();
+				.GroupBy(x => x.Record)
+				.Select(x => x.First());
 
-			return consumers.Except(providers)
+			return consumers.Where(x => providers.All(y => !y.Record.Equals(x.Record)))
 				.Select(t => new Dependency(t, "_" + t.Name.ToLowerCamelCase()))
 				.ToArray();
 		}

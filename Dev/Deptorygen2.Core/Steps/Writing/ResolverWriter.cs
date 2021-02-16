@@ -1,44 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Deptorygen2.Core.Steps.Creation;
-using Deptorygen2.Core.Steps.Creation.Abstraction;
 using Deptorygen2.Core.Steps.Definitions;
-using NacHelpers.Extensions;
-using static Deptorygen2.Core.Steps.Writing.SourceCodeBuilder;
 
 namespace Deptorygen2.Core.Steps.Writing
 {
 	internal class ResolverWriter
 	{
-		public void RenderImplementation(Method method, ICreationAggregator creation, ICodeBuilder builder)
+		public void Render(string returnTypeName, Hook[] hooks, string expression, ICodeBuilder builder)
 		{
-			var given = method.Parameters
-				.Select(x => new GivenParameter(x.Type.TypeName, x.Name))
-				.ToArray();
-			var request = new CreationRequest(method.ResolutionType, given, true);
-			var expression = creation.GetInjection(request) ?? "__NoResolutionFound__";
-
-			var writers = GetHookWriters(method.ReturnType.Text, method.Hooks, expression).ToArray();
-			writers[0].Write(builder, writers.Skip(1).ToArray());
-		}
-
-		public void RenderImplementation(EnumMethod method, ICreationAggregator creation, ICodeBuilder builder)
-		{
-			var given = method.Parameters
-				.Select(x => new GivenParameter(x.Type.TypeName, x.Name))
-				.ToArray();
-			var request = new MultipleCreationRequest(method.ResolutionTypes, given, true);
-
-			var expBuilder = CodeHelper.GetBuilder();
-			expBuilder.AppendLine($"new {method.ElementType.Text}[]");
-			expBuilder.EnterBlock(inner =>
-			{
-				inner.AppendLine(creation.GetInjections(request).Join(",\n"));
-			});
-
-			var returnType = $"IEnumerable<{method.ElementType.Text}>";
-			var writers = GetHookWriters(returnType, method.Hooks, expBuilder.GetText()).ToArray();
+			var writers = GetHookWriters(returnTypeName, hooks, expression).ToArray();
 			writers[0].Write(builder, writers.Skip(1).ToArray());
 		}
 
