@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Utilities;
 

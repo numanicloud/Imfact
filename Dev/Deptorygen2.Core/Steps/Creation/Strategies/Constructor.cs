@@ -3,7 +3,6 @@ using System.Linq;
 using Deptorygen2.Core.Steps.Creation.Abstraction;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Creation.Strategies
