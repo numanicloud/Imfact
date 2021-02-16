@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
+using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,7 +13,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
 	internal record Resolution(TypeName TypeName,
 		TypeName[] Dependencies,
-		bool IsDisposable)
+		bool IsDisposable) : ISemanticsNode, IServiceConsumer, INamespaceClaimer
 	{
 		public static Resolution? Build(Attribute attribute,
 			IAnalysisContext context)
@@ -62,6 +64,21 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 				TypeName.FromSymbol(symbol),
 				dependencies,
 				isDisposable);
+		}
+
+		public IEnumerable<ISemanticsNode> Traverse()
+		{
+			yield return this;
+		}
+
+		public IEnumerable<string> GetRequiredNamespaces()
+		{
+			yield return TypeName.FullNamespace;
+		}
+
+		public IEnumerable<TypeName> GetRequiredServiceTypes()
+		{
+			yield break;
 		}
 	}
 }

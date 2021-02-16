@@ -1,16 +1,15 @@
-﻿using Deptorygen2.Annotations;
-using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Aspects.Nodes;
+﻿using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
+using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
 	internal record Resolver(ResolverCommon Common, Resolution? ReturnTypeResolution)
-		: IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
+		: IServiceConsumer, IServiceProvider, IResolverSemantics
 	{
 		public TypeName ReturnType => Common.ReturnType;
 		public string MethodName => Common.MethodName;
@@ -32,35 +31,14 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 			yield return ReturnType;
 		}
 
-		public IEnumerable<string> GetRequiredNamespaces()
+		public IEnumerable<ISemanticsNode> Traverse()
 		{
-			yield return ReturnType.FullNamespace;
-			foreach (var parameter in Parameters)
+			yield return this;
+			yield return Common;
+			if (ReturnTypeResolution is not null)
 			{
-				yield return parameter.TypeName.FullNamespace;
+				yield return ReturnTypeResolution;
 			}
-
-			if (Resolutions.Any())
-			{
-				yield return Resolutions[0].TypeName.FullNamespace;
-			}
-		}
-
-		public static Builder<Method,
-			(Resolution?,
-			Resolution[],
-			Parameter[],
-			Hook[]),
-			Resolver>? GetBuilder(Method method)
-		{
-			if (!method.IsSingleResolver())
-			{
-				return null;
-			}
-
-			var ctxType = new Parameter(TypeName.FromType(typeof(ResolutionContext)), "context");
-
-			return null;
 		}
 	}
 }

@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Deptorygen2.Annotations;
 using Deptorygen2.Core.Interfaces;
+using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
@@ -9,7 +11,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 	internal record EntryResolver(string MethodName,
 		TypeName ReturnType,
 		Parameter[] Parameters,
-		Accessibility Accessibility)
+		Accessibility Accessibility) : ISemanticsNode
 	{
 		private static readonly TypeName CtxType = TypeName.FromType(typeof(ResolutionContext));
 
@@ -20,6 +22,16 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 				resolver.ReturnType,
 				resolver.Parameters.Where(x => x.TypeName != CtxType).ToArray(),
 				resolver.Accessibility);
+		}
+
+		public IEnumerable<ISemanticsNode> Traverse()
+		{
+			yield return this;
+
+			foreach (var parameter in Parameters)
+			{
+				yield return parameter;
+			}
 		}
 	}
 }
