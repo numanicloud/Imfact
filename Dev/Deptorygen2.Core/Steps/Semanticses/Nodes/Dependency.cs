@@ -6,7 +6,7 @@ using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record Dependency(TypeName TypeName, string FieldName) : INamespaceClaimer
+	internal record Dependency(TypeName TypeName, string FieldName, DisposableType Disposable) : INamespaceClaimer
 	{
 		public static Dependency[] FromFactory(Factory semantics)
 		{

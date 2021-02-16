@@ -30,7 +30,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 	internal record Property(Type Type, string Name);
 
-	internal record Field(Type Type, string Name);
+	internal record Field(Type Type, string Name, DisposableType Disposable);
 
 	internal record Parameter(Type Type, string Name);
 
