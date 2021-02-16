@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Entities
 {
+	// 等値性判定にはこちらを使う。追加の情報はTypeNodeに持たせる
 	internal record TypeRecord(
 		string FullNamespace, string Name, TypeRecord[] TypeArguments)
 	{

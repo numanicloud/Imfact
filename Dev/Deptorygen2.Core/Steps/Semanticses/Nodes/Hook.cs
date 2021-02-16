@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Deptorygen2.Annotations;
+using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
@@ -9,7 +10,7 @@ using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record Hook(TypeName HookType, string FieldName) : INamespaceClaimer
+	internal record Hook(TypeNode HookType, string FieldName) : INamespaceClaimer
 	{
 		public static Hook? Build(Attribute attribute,
 			IAnalysisContext context,
@@ -56,7 +57,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 				}
 
 				var name = $"_{methodName}_{symbol.Name}";
-				return new Hook(TypeName.FromSymbol(symbol), name);
+				return new Hook(TypeNode.FromSymbol(symbol), name);
 			}
 
 			Hook? FromPresetAttribute()
@@ -64,8 +65,8 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 				if (attribute.IsCacheHook())
 				{
 					var type = typeof(Cache<>);
-					var arg = TypeName.FromSymbol(method.Symbol.ReturnType);
-					var typeName = TypeName.FromType(type, arg.WrapByArray());
+					var arg = TypeNode.FromSymbol(method.Symbol.ReturnType);
+					var typeName = TypeNode.FromRuntime(type, arg.WrapByArray());
 
 					var name = $"_{methodName}_Cache";
 					return new Hook(typeName, name);
@@ -74,8 +75,8 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 				if (attribute.IsCachePerResolutionHook())
 				{
 					var type = typeof(CachePerResolution<>);
-					var arg = TypeName.FromSymbol(method.Symbol.ReturnType);
-					var typeName = TypeName.FromType(type, arg.WrapByArray());
+					var arg = TypeNode.FromSymbol(method.Symbol.ReturnType);
+					var typeName = TypeNode.FromRuntime(type, arg.WrapByArray());
 
 					var name = $"_{methodName}_CachePerResolution";
 					return new Hook(typeName, name);

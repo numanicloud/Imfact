@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Deptorygen2.Core.Steps.Creation.Abstraction;
 using Deptorygen2.Core.Steps.Definitions;
 using NacHelpers.Extensions;
@@ -50,7 +51,14 @@ namespace Deptorygen2.Core.Steps.Writing
 
 		private void RenderClass(Class @class, ICodeBuilder builder)
 		{
-			builder.AppendLine($"partial class {@class.Name}");
+			builder.Append($"partial class {@class.Name}");
+			var disposables = GetInterfaces(@class).ToArray();
+			if (disposables.Any())
+			{
+				builder.Append(" : " + disposables.Join(", "));
+			}
+			builder.AppendLine();
+
 			builder.EnterBlock(block =>
 			{
 				block.EnterSequence(seqOuter =>
@@ -75,6 +83,21 @@ namespace Deptorygen2.Core.Steps.Writing
 						RenderEnumerableMethod(method, inner));
 				});
 			});
+		}
+
+
+
+		private IEnumerable<string> GetInterfaces(Class @class)
+		{
+			if (@class.DisposableInfo.HasDisposable)
+			{
+				yield return "IDisposable";
+			}
+
+			if (@class.DisposableInfo.HasAsyncDisposable)
+			{
+				yield return "IAsyncDisposable";
+			}
 		}
 
 		private void RenderMethod(Method method, ICodeBuilder builder)

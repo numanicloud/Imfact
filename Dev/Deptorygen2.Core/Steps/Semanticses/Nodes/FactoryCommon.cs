@@ -6,12 +6,14 @@ using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record FactoryCommon(TypeName Type,
+	internal record FactoryCommon(TypeNode Type,
 		Resolver[] Resolvers,
 		MultiResolver[] MultiResolvers) : IFactorySemantics, INamespaceClaimer, IServiceProvider
 	{
 		public IEnumerable<ISemanticsNode> Traverse()
 		{
+			yield return Type;
+
 			foreach (var resolver in Resolvers)
 			{
 				yield return resolver;
@@ -23,7 +25,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 			}
 		}
 
-		public IEnumerable<TypeName> GetCapableServiceTypes()
+		public IEnumerable<TypeNode> GetCapableServiceTypes()
 		{
 			yield return Type;
 		}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
@@ -13,6 +14,10 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		Accessibility Accessibility,
 		DisposableType DisposableType) : INamespaceClaimer
 	{
+		public string FullNamespace => Record.FullNamespace;
+		public string Name => Record.Name;
+		public TypeNode[] TypeArguments { get; init; } = new TypeNode[0];
+
 		public IEnumerable<ISemanticsNode> Traverse()
 		{
 			yield break;
@@ -35,15 +40,27 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 				dispose);
 		}
 
-		public static TypeNode FromRuntime(Type type, TypeRecord[]? typeArguments = null)
+		public static TypeNode FromSymbol(ITypeSymbol symbol)
+		{
+			return symbol is INamedTypeSymbol nts
+				? FromSymbol(nts)
+				: throw new ArgumentException(nameof(symbol));
+		}
+
+		public static TypeNode FromRuntime(Type type, TypeNode[]? typeArguments = null)
 		{
 			var dispose = type.GetInterface(nameof(IAsyncDisposable)) is not null ? AsyncDisposable
 				: type.GetInterface(nameof(IDisposable)) is not null ? Disposable
 				: NonDisposable;
 
-			return new TypeNode(TypeRecord.FromRuntime(type, typeArguments),
+			var args = typeArguments?.Select(x => x.Record).ToArray();
+
+			return new TypeNode(TypeRecord.FromRuntime(type, args),
 				type.IsPublic ? Accessibility.Public : Accessibility.Internal,
-				dispose);
+				dispose)
+			{
+				TypeArguments = typeArguments ?? new TypeNode[0]
+			};
 		}
 	}
 }

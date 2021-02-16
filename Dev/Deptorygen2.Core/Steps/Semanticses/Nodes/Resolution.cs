@@ -11,8 +11,8 @@ using Attribute = Deptorygen2.Core.Steps.Aspects.Nodes.Attribute;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record Resolution(TypeName TypeName,
-		TypeName[] Dependencies,
+	internal record Resolution(TypeNode TypeName,
+		TypeNode[] Dependencies,
 		bool IsDisposable) : INamespaceClaimer
 	{
 		public static Resolution? Build(Attribute attribute,
@@ -57,11 +57,11 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 			var isDisposable = symbol.IsImplementing(typeof(IDisposable));
 
 			var dependencies = symbol.Constructors.Single().Parameters
-				.Select(x => TypeName.FromSymbol(x.Type))
+				.Select(x => TypeNode.FromSymbol(x.Type))
 				.ToArray();
 
 			return new Resolution(
-				TypeName.FromSymbol(symbol),
+				TypeNode.FromSymbol(symbol),
 				dependencies,
 				isDisposable);
 		}

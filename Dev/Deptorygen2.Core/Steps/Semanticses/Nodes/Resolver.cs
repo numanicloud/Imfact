@@ -11,22 +11,22 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 	internal record Resolver(ResolverCommon Common, Resolution? ReturnTypeResolution)
 		: IServiceConsumer, IServiceProvider, IResolverSemantics
 	{
-		public TypeName ReturnType => Common.ReturnType;
+		public TypeNode ReturnType => Common.ReturnType;
 		public string MethodName => Common.MethodName;
 		public Parameter[] Parameters => Common.Parameters;
 		public Accessibility Accessibility => Common.Accessibility;
 		public Resolution[] Resolutions => Common.Resolutions;
 		public Hook[] Hooks => Common.Hooks;
 
-		public IEnumerable<TypeName> GetRequiredServiceTypes()
+		public IEnumerable<TypeNode> GetRequiredServiceTypes()
 		{
 			return ReturnTypeResolution.AsEnumerable()
 				.Concat(Resolutions)
 				.SelectMany(x => x.Dependencies)
-				.Except(Parameters.Select(x => x.TypeName));
+				.Except(Parameters.Select(x => x.Type));
 		}
 
-		public IEnumerable<TypeName> GetCapableServiceTypes()
+		public IEnumerable<TypeNode> GetCapableServiceTypes()
 		{
 			yield return ReturnType;
 		}

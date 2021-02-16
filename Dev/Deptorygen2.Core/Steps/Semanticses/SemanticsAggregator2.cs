@@ -32,7 +32,8 @@ namespace Deptorygen2.Core.Steps.Semanticses
 
 			var dependency = Dependency.FromFactory(factory);
 			var namespaces = AggregateNamespaces(factory, dependency).ToArray();
-			return new Generation(namespaces, factory, dependency);
+			var disposableInfo = DisposableInfo.Aggregate(factory, dependency);
+			return new Generation(namespaces, factory, dependency, disposableInfo);
 		}
 
 		private Factory? AggregateFactory(Class @class)
@@ -54,7 +55,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 		private FactoryCommon GetFactoryCommon(INamedTypeSymbol symbol, Method[] methods)
 		{
 			return new FactoryCommon(
-				TypeName.FromSymbol(symbol),
+				TypeNode.FromSymbol(symbol),
 				AggregateResolver(methods),
 				AggregateMultiResolver(methods));
 		}
@@ -115,11 +116,11 @@ namespace Deptorygen2.Core.Steps.Semanticses
 		{
 			var parameters = method.GetParameters();
 			var attributes = method.GetAttributes();
-			var ctx = new Parameter(TypeName.FromType(typeof(ResolutionContext)), "context");
+			var ctx = new Parameter(TypeNode.FromRuntime(typeof(ResolutionContext)), "context");
 
 			return new ResolverCommon(
 				method.Symbol.DeclaredAccessibility,
-				TypeName.FromSymbol(method.Symbol.ReturnType),
+				TypeNode.FromSymbol(method.Symbol.ReturnType),
 				"__" + method.Symbol.Name,
 				AggregateParameter(parameters).Append(ctx).ToArray(),
 				AggregateResolution(attributes),

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Utilities;
@@ -11,22 +12,22 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 	internal record MultiResolver(ResolverCommon Common)
 		: IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
 	{
-		public TypeName ReturnType => Common.ReturnType;
+		public TypeNode ReturnType => Common.ReturnType;
 		public string MethodName => Common.MethodName;
 		public Parameter[] Parameters => Common.Parameters;
 		public Accessibility Accessibility => Common.Accessibility;
 		public Resolution[] Resolutions => Common.Resolutions;
 		public Hook[] Hooks => Common.Hooks;
 
-		public TypeName ElementType => ReturnType.TypeArguments[0];
+		public TypeNode ElementType => ReturnType.TypeArguments[0];
 
-		public IEnumerable<TypeName> GetRequiredServiceTypes()
+		public IEnumerable<TypeNode> GetRequiredServiceTypes()
 		{
 			return Resolutions.SelectMany(x => x.Dependencies)
-				.Except(Parameters.Select(x => x.TypeName));
+				.Except(Parameters.Select(x => x.Type));
 		}
 
-		public IEnumerable<TypeName> GetCapableServiceTypes()
+		public IEnumerable<TypeNode> GetCapableServiceTypes()
 		{
 			yield return ReturnType;
 		}

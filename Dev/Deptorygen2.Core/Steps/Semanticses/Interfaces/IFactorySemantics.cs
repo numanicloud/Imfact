@@ -5,7 +5,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Interfaces
 {
 	internal interface IFactorySemantics
 	{
-		TypeName Type { get; }
+		TypeNode Type { get; }
 		Resolver[] Resolvers { get; }
 		MultiResolver[] MultiResolvers { get; }
 	}

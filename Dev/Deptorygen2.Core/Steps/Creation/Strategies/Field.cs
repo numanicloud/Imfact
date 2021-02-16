@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Steps.Creation.Abstraction;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
@@ -22,9 +23,9 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 			return semantics.Dependencies;
 		}
 
-		protected override TypeName GetTypeInfo(Dependency source)
+		protected override TypeRecord GetTypeInfo(Dependency source)
 		{
-			return source.TypeName;
+			return source.TypeName.Record;
 		}
 	}
 }

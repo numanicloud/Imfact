@@ -13,7 +13,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 			yield return Common;
 		}
 
-		public TypeName Type => Common.Type;
+		public TypeNode Type => Common.Type;
 
 		public Resolver[] Resolvers => Common.Resolvers;
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Steps.Creation.Abstraction;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
@@ -23,9 +24,9 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 			return semantics.Factory.Resolvers;
 		}
 
-		protected override TypeName GetTypeInfo(Semanticses.Nodes.Resolver source)
+		protected override TypeRecord GetTypeInfo(Semanticses.Nodes.Resolver source)
 		{
-			return source.ReturnType;
+			return source.ReturnType.Record;
 		}
 	}
 }

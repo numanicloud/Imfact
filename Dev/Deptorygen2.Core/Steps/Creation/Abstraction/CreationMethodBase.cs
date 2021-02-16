@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
@@ -10,7 +11,7 @@ namespace Deptorygen2.Core.Steps.Creation.Abstraction
 	internal abstract class CreationMethodBase<T> : ICreationStrategy
 		where T : notnull
 	{
-		private readonly Dictionary<TypeName, T> _resolutionSource;
+		private readonly Dictionary<TypeRecord, T> _resolutionSource;
 
 		protected CreationMethodBase(Generation semantics)
 		{
@@ -22,7 +23,7 @@ namespace Deptorygen2.Core.Steps.Creation.Abstraction
 
 		public string? GetCode(CreationRequest request, ICreationAggregator aggregator)
 		{
-			if (_resolutionSource.GetValueOrDefault(request.TypeToResolve) is not { } resolution)
+			if (_resolutionSource.GetValueOrDefault(request.TypeToResolve.Record) is not { } resolution)
 			{
 				return null;
 			}
@@ -36,14 +37,14 @@ namespace Deptorygen2.Core.Steps.Creation.Abstraction
 
 		protected abstract IEnumerable<T> GetSource(Generation semantics);
 
-		protected abstract TypeName GetTypeInfo(T source);
+		protected abstract TypeRecord GetTypeInfo(T source);
 
 		protected string MethodInvocation(IResolverSemantics resolver,
 			GivenParameter[] given,
 			ICreationAggregator injector)
 		{
 			var request = new MultipleCreationRequest(
-				resolver.Parameters.Select(x => x.TypeName).ToArray(), given, false);
+				resolver.Parameters.Select(x => x.Type).ToArray(), given, false);
 
 			return $"{resolver.MethodName}({GetArgList(request, injector)})";
 		}

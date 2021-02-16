@@ -1,4 +1,6 @@
-﻿using Deptorygen2.Core.Utilities;
+﻿using Deptorygen2.Core.Steps.Semanticses;
+using Deptorygen2.Core.Steps.Semanticses.Nodes;
+using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Steps.Definitions
@@ -11,18 +13,17 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 	internal record Class(string Name, Constructor Constructor,
 		Method[] Methods, EnumMethod[] EnumMethods, Property[] Properties,
-		Field[] Fields,
-		EntryMethod[] EntryMethods);
+		Field[] Fields, EntryMethod[] EntryMethods, DisposableInfo DisposableInfo);
 
 	internal record Constructor(Accessibility Accessibility, string Name, Parameter[] Parameters,
 		Assignment[] Assignments);
 
 	// ユーザーからは触らない想定。実際の解決を行う実装が入っているメソッド
 	internal record Method(Accessibility Accessibility, Type ReturnType, string Name,
-		Parameter[] Parameters, TypeName ResolutionType, Hook[] Hooks);
+		Parameter[] Parameters, TypeNode ResolutionType, Hook[] Hooks);
 
 	internal record EnumMethod(Accessibility Accessibility, Type ElementType, string Name,
-		Parameter[] Parameters, TypeName[] ResolutionTypes, Hook[] Hooks);
+		Parameter[] Parameters, TypeNode[] ResolutionTypes, Hook[] Hooks);
 
 	// MethodNodeのほうのメソッドを呼び出すメソッド。ユーザーが直接使う
 	internal record EntryMethod(Accessibility Accessibility, Type ReturnType,
@@ -34,7 +35,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 	internal record Parameter(Type Type, string Name);
 
-	internal record Type(TypeName TypeName)
+	internal record Type(TypeNode TypeName)
 	{
 		public string Text => $"{TypeName.FullNamespace}.{TypeName.Name}" switch
 		{

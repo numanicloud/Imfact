@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Steps.Creation.Abstraction;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
@@ -25,9 +26,9 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 				x => x.MultiResolvers.Select(y => new Source(x, y)));
 		}
 
-		protected override TypeName GetTypeInfo(Source source)
+		protected override TypeRecord GetTypeInfo(Source source)
 		{
-			return source.MultiResolver.ReturnType;
+			return source.MultiResolver.ReturnType.Record;
 		}
 
 		public record Source(Delegation Delegation,

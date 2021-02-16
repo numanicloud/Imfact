@@ -8,7 +8,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
 	internal record ResolverCommon(
 		Accessibility Accessibility,
-		TypeName ReturnType,
+		TypeNode ReturnType,
 		string MethodName,
 		Parameter[] Parameters,
 		Resolution[] Resolutions,
@@ -16,6 +16,8 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 	{
 		public IEnumerable<ISemanticsNode> Traverse()
 		{
+			yield return ReturnType;
+
 			foreach (var parameter in Parameters)
 			{
 				yield return parameter;

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Steps.Creation.Abstraction;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
@@ -31,9 +32,9 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 				.Select(x => x.First());
 		}
 
-		protected override TypeName GetTypeInfo(Resolution source)
+		protected override TypeRecord GetTypeInfo(Resolution source)
 		{
-			return source.TypeName;
+			return source.TypeName.Record;
 		}
 	}
 }

@@ -41,7 +41,8 @@ namespace Deptorygen2.Core.Steps.Definitions
 				BuildEnumerableMethods(),
 				BuildPropertyNodes(),
 				BuildFieldNode(),
-				BuildEntryMethodNodes());
+				BuildEntryMethodNodes(),
+				_semantics.DisposableInfo);
 		}
 
 		private Constructor BuildConstructorNode()
@@ -78,7 +79,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 				.Select(x =>
 				{
 					var ps = x.Parameters.Select(
-						p => BuildParameterNode(p.TypeName, p.ParameterName));
+						p => BuildParameterNode(p.Type, p.ParameterName));
 
 					var resolution = x.Resolutions.FirstOrDefault()?.TypeName ?? x.ReturnType;
 					var hooks = x.Hooks.Select(y => new Hook(new Type(y.HookType), y.FieldName))
@@ -99,7 +100,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 				.Select(x =>
 				{
 					var ps = x.Parameters.Select(
-						p => BuildParameterNode(p.TypeName, p.ParameterName));
+						p => BuildParameterNode(p.Type, p.ParameterName));
 					var hooks = x.Hooks.Select(y => new Hook(new Type(y.HookType), y.FieldName))
 						.ToArray();
 
@@ -119,7 +120,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 			return rs.Select(x =>
 			{
 				var ps = x.Parameters.Select(p =>
-					BuildParameterNode(p.TypeName, p.ParameterName));
+					BuildParameterNode(p.Type, p.ParameterName));
 
 				return new EntryMethod(x.Accessibility,
 					new Type(x.ReturnType),
@@ -128,7 +129,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 			}).ToArray();
 		}
 
-		private Parameter BuildParameterNode(TypeName type, string name)
+		private Parameter BuildParameterNode(TypeNode type, string name)
 		{
 			return new Parameter(new Type(type), name);
 		}
@@ -143,17 +144,19 @@ namespace Deptorygen2.Core.Steps.Definitions
 		private Field[] BuildFieldNode()
 		{
 			var deps = _semantics.Dependencies
-				.Select(x => new Field(new Type(x.TypeName), x.FieldName));
+				.Select(x => (t: x.TypeName, f: x.FieldName));
 
 			var hooks = _semantics.Factory.Resolvers
 				.SelectMany(x => x.Hooks)
-				.Select(x => new Field(new Type(x.HookType), x.FieldName));
+				.Select(x => (t: x.HookType, f: x.FieldName));
 
 			var hooks2 = _semantics.Factory.MultiResolvers
 				.SelectMany(x => x.Hooks)
-				.Select(x => new Field(new Type(x.HookType), x.FieldName));
+				.Select(x => (t: x.HookType, f: x.FieldName));
 
-			return deps.Concat(hooks).Concat(hooks2).ToArray();
+			return deps.Concat(hooks).Concat(hooks2)
+				.Select(x => new Field(new Type(x.t), x.f, x.t.DisposableType))
+				.ToArray();
 		}
 	}
 }
