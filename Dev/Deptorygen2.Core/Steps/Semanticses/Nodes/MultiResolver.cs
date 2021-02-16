@@ -9,13 +9,16 @@ using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record MultiResolver(string MethodName,
-		TypeName ReturnType,
-		Parameter[] Parameters,
-		Resolution[] Resolutions,
-		Accessibility Accessibility,
-		Hook[] Hooks) : IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
+	internal record MultiResolver(ResolverCommon Common)
+		: IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
 	{
+		public TypeName ReturnType => Common.ReturnType;
+		public string MethodName => Common.MethodName;
+		public Parameter[] Parameters => Common.Parameters;
+		public Accessibility Accessibility => Common.Accessibility;
+		public Resolution[] Resolutions => Common.Resolutions;
+		public Hook[] Hooks => Common.Hooks;
+
 		public TypeName ElementType => ReturnType.TypeArguments[0];
 
 		public IEnumerable<TypeName> GetRequiredServiceTypes()
@@ -56,13 +59,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 
 			var ctxType = new Parameter(TypeName.FromType(typeof(ResolutionContext)), "context");
 
-			return new(method, tuple => new MultiResolver(
-				"__" + method.Symbol.Name,
-				TypeName.FromSymbol(method.Symbol.ReturnType),
-				tuple.Item1.Append(ctxType).ToArray(),
-				tuple.Item2,
-				method.Symbol.DeclaredAccessibility,
-				tuple.Item3));
+			return null;
 		}
 	}
 }

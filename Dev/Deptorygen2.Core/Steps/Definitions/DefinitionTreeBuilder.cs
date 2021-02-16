@@ -52,7 +52,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 					param: x.FieldName.TrimStart("_".ToCharArray())))
 				.ToArray();
 			var ps = _semantics.Factory.Delegations
-				.Select(x => (type: x.TypeName,
+				.Select(x => (type: x.Type,
 					name: x.PropertyName,
 					param: x.PropertyName.ToLowerCamelCase()))
 				.ToArray();
@@ -133,7 +133,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 		private Property[] BuildPropertyNodes()
 		{
 			return _semantics.Factory.Delegations
-				.Select(x => new Property(new Type(x.TypeName), x.PropertyName))
+				.Select(x => new Property(new Type(x.Type), x.PropertyName))
 				.ToArray();
 		}
 

@@ -1,22 +1,24 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Deptorygen2.Annotations;
+﻿using Deptorygen2.Annotations;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
+using System.Linq;
 using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record Resolver(string MethodName,
-		TypeName ReturnType,
-		Resolution? ReturnTypeResolution,
-		Resolution[] Resolutions,
-		Parameter[] Parameters,
-		Accessibility Accessibility,
-		Hook[] Hooks) : IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
+	internal record Resolver(ResolverCommon Common, Resolution? ReturnTypeResolution)
+		: IServiceConsumer, IServiceProvider, INamespaceClaimer, IResolverSemantics
 	{
+		public TypeName ReturnType => Common.ReturnType;
+		public string MethodName => Common.MethodName;
+		public Parameter[] Parameters => Common.Parameters;
+		public Accessibility Accessibility => Common.Accessibility;
+		public Resolution[] Resolutions => Common.Resolutions;
+		public Hook[] Hooks => Common.Hooks;
+
 		public IEnumerable<TypeName> GetRequiredServiceTypes()
 		{
 			return ReturnTypeResolution.AsEnumerable()
@@ -55,17 +57,10 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 			{
 				return null;
 			}
-			
+
 			var ctxType = new Parameter(TypeName.FromType(typeof(ResolutionContext)), "context");
 
-			return new(method, tuple => new Resolver(
-				"__" + method.Symbol.Name,
-				TypeName.FromSymbol(method.Symbol.ReturnType),
-				tuple.Item1,
-				tuple.Item2,
-				tuple.Item3.Append(ctxType).ToArray(),
-				method.Symbol.DeclaredAccessibility,
-				tuple.Item4));
+			return null;
 		}
 	}
 }

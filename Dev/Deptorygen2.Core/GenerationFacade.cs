@@ -13,12 +13,12 @@ namespace Deptorygen2.Core
 	{
 		private readonly IAnalysisContext _context;
 		private readonly AspectAggregator _aspectAggregator = new();
-		private readonly SemanticsAggregator _semanticsAggregator;
+		private readonly SemanticsAggregator2 _semanticsAggregator;
 
 		public GenerationFacade(SemanticModel semanticModel)
 		{
 			_context = new CompilationAnalysisContext(semanticModel);
-			_semanticsAggregator = new SemanticsAggregator(_context);
+			_semanticsAggregator = new SemanticsAggregator2(_context);
 		}
 
 		public SourceFile? RunGeneration(ClassDeclarationSyntax syntax)
@@ -36,7 +36,7 @@ namespace Deptorygen2.Core
 
 		private DeptorygenSemantics? SemanticsStep(SyntaxOnAspect aspect)
 		{
-			return _semanticsAggregator.Aggregate(aspect.Class, _context) is { } semantics
+			return _semanticsAggregator.Aggregate(aspect.Class) is { } semantics
 				? new DeptorygenSemantics(semantics) : null;
 		}
 

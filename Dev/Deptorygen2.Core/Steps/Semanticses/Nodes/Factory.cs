@@ -6,9 +6,7 @@ using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record Factory(TypeName Type,
-		Resolver[] Resolvers,
-		MultiResolver[] MultiResolvers,
+	internal record Factory(FactoryCommon Common,
 		Delegation[] Delegations,
 		Inheritance[] Inheritances,
 		EntryResolver[] EntryResolvers) : IServiceProvider, IFactorySemantics
@@ -18,7 +16,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 			yield return Type;
 			foreach (var delegation in Delegations)
 			{
-				yield return delegation.TypeName;
+				yield return delegation.Type;
 			}
 		}
 
@@ -37,8 +35,13 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 
 			var t = TypeName.FromSymbol(@class.Symbol);
 
-			return new(@class, tuple => new Factory(
-				t, tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, tuple.Item5));
+			return null;
 		}
+
+		public TypeName Type => Common.Type;
+
+		public Resolver[] Resolvers => Common.Resolvers;
+
+		public MultiResolver[] MultiResolvers => Common.MultiResolvers;
 	}
 }

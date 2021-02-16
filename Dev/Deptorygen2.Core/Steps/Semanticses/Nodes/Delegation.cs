@@ -8,10 +8,8 @@ using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record Delegation(string PropertyName,
-		TypeName TypeName,
-		Resolver[] Resolvers,
-		MultiResolver[] MultiResolvers) : IServiceProvider, INamespaceClaimer, IFactorySemantics
+	internal record Delegation(FactoryCommon Common, string PropertyName)
+		: IServiceProvider, INamespaceClaimer, IFactorySemantics
 	{
 		public IEnumerable<TypeName> GetCapableServiceTypes()
 		{
@@ -22,7 +20,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 
 		public IEnumerable<string> GetRequiredNamespaces()
 		{
-			yield return TypeName.FullNamespace;
+			yield return Type.FullNamespace;
 		}
 
 		public static Builder<Property,
@@ -33,12 +31,14 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 			{
 				return null;
 			}
-			
-			return new(property, tuple => new Delegation(
-				property.Symbol.Name,
-				Utilities.TypeName.FromSymbol(property.Symbol.Type),
-				tuple.Item1,
-				tuple.Item2));
+
+			return null;
 		}
+
+		public TypeName Type => Common.Type;
+
+		public Resolver[] Resolvers => Common.Resolvers;
+
+		public MultiResolver[] MultiResolvers => Common.MultiResolvers;
 	}
 }

@@ -25,7 +25,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 
 		protected override TypeName GetTypeInfo(Delegation source)
 		{
-			return source.TypeName;
+			return source.Type;
 		}
 	}
 }
