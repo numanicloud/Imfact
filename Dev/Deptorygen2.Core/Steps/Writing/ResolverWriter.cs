@@ -11,7 +11,7 @@ namespace Deptorygen2.Core.Steps.Writing
 {
 	internal class ResolverWriter
 	{
-		public void RenderImplementation(Method method, ICreationAggregator creation, StringBuilder builder)
+		public void RenderImplementation(Method method, ICreationAggregator creation, ICodeBuilder builder)
 		{
 			var given = method.Parameters
 				.Select(x => new GivenParameter(x.Type.TypeName, x.Name))
@@ -23,21 +23,22 @@ namespace Deptorygen2.Core.Steps.Writing
 			writers[0].Write(builder, writers.Skip(1).ToArray());
 		}
 
-		public void RenderImplementation(EnumMethod method, ICreationAggregator creation, StringBuilder builder)
+		public void RenderImplementation(EnumMethod method, ICreationAggregator creation, ICodeBuilder builder)
 		{
 			var given = method.Parameters
 				.Select(x => new GivenParameter(x.Type.TypeName, x.Name))
 				.ToArray();
 			var request = new MultipleCreationRequest(method.ResolutionTypes, given, true);
 
-			var expBuilder = new StringBuilder();
-			AppendBlock(expBuilder, $"new {method.ElementType.Text}[]", inner =>
+			var expBuilder = CodeHelper.GetBuilder();
+			expBuilder.AppendLine($"new {method.ElementType.Text}[]");
+			expBuilder.EnterBlock(inner =>
 			{
 				inner.AppendLine(creation.GetInjections(request).Join(",\n"));
 			});
 
 			var returnType = $"IEnumerable<{method.ElementType.Text}>";
-			var writers = GetHookWriters(returnType, method.Hooks, expBuilder.ToString()).ToArray();
+			var writers = GetHookWriters(returnType, method.Hooks, expBuilder.GetText()).ToArray();
 			writers[0].Write(builder, writers.Skip(1).ToArray());
 		}
 
@@ -53,12 +54,12 @@ namespace Deptorygen2.Core.Steps.Writing
 
 		private interface IHookWriter
 		{
-			void Write(StringBuilder builder, IHookWriter[] rest);
+			void Write(ICodeBuilder builder, IHookWriter[] rest);
 		}
 
 		private record RootWriter(string ReturnTypeName) : IHookWriter
 		{
-			public void Write(StringBuilder builder, IHookWriter[] rest)
+			public void Write(ICodeBuilder builder, IHookWriter[] rest)
 			{
 				builder.AppendLine($"{ReturnTypeName}? result;");
 				builder.AppendLine();
@@ -72,12 +73,13 @@ namespace Deptorygen2.Core.Steps.Writing
 
 		private record HookWriter(Hook Hook) : IHookWriter
 		{
-			public void Write(StringBuilder builder, IHookWriter[] rest)
+			public void Write(ICodeBuilder builder, IHookWriter[] rest)
 			{
 				builder.AppendLine($"result = {Hook.FieldName}.Before(context);");
-				AppendBlock(builder, "if(result is null)", inner =>
+				builder.AppendLine("if(result is null)");
+				builder.EnterBlock(block =>
 				{
-					rest[0].Write(inner, rest.Skip(1).ToArray());
+					rest[0].Write(block, rest.Skip(1).ToArray());
 				});
 				builder.AppendLine($"result = {Hook.FieldName}.After(result, context);");
 			}
@@ -85,7 +87,7 @@ namespace Deptorygen2.Core.Steps.Writing
 
 		private record CoreWriter(string Expression) : IHookWriter
 		{
-			public void Write(StringBuilder builder, IHookWriter[] rest)
+			public void Write(ICodeBuilder builder, IHookWriter[] rest)
 			{
 				builder.AppendLine($"result = {Expression};");
 			}

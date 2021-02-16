@@ -10,11 +10,11 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 	{
 		public static Dependency[] FromFactory(Factory semantics)
 		{
-			var consumers = semantics.Traverse().OfType<IServiceConsumer>()
+			var consumers = semantics.TraverseDeep().OfType<IServiceConsumer>()
 				.SelectMany(x => x.GetRequiredServiceTypes())
 				.Distinct();
 
-			var providers = semantics.Traverse().OfType<IServiceProvider>()
+			var providers = semantics.TraverseDeep().OfType<IServiceProvider>()
 				.SelectMany(x => x.GetCapableServiceTypes())
 				.Distinct();
 

@@ -64,7 +64,10 @@ namespace Deptorygen2.Core.Steps.Definitions
 				.SelectMany(x => x.Hooks)
 				.Select(x => new Assignment(x.FieldName, $"new {x.HookType.Name}()"));
 
-			return new Constructor(_semantics.Factory.Type.Name,
+			var a = Helpers.GetTypeAccessibilityMostStrict(
+				ps.Select(x => x.type.Accessibility).ToArray());
+
+			return new Constructor(a, _semantics.Factory.Type.Name,
 				parameters.ToArray(),
 				assignments.Concat(hooks).ToArray());
 		}

@@ -6,17 +6,11 @@ using Deptorygen2.Core.Utilities;
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
 	internal record Delegation(FactoryCommon Common, string PropertyName)
-		: INamespaceClaimer, IFactorySemantics
+		: IFactorySemantics, ISemanticsNode
 	{
 		public IEnumerable<ISemanticsNode> Traverse()
 		{
-			yield return this;
 			yield return Common;
-		}
-
-		public IEnumerable<string> GetRequiredNamespaces()
-		{
-			yield break;
 		}
 
 		public TypeName Type => Common.Type;

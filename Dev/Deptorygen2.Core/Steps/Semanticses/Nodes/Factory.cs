@@ -17,7 +17,6 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 
 		public IEnumerable<ISemanticsNode> Traverse()
 		{
-			yield return this;
 			yield return Common;
 
 			foreach (var delegation in Delegations)

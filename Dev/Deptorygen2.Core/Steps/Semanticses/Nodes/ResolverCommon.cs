@@ -16,8 +16,6 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 	{
 		public IEnumerable<ISemanticsNode> Traverse()
 		{
-			yield return this;
-
 			foreach (var parameter in Parameters)
 			{
 				yield return parameter;

@@ -12,8 +12,6 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 	{
 		public IEnumerable<ISemanticsNode> Traverse()
 		{
-			yield return this;
-
 			foreach (var resolver in Resolvers)
 			{
 				yield return resolver;

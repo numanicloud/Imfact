@@ -14,7 +14,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 		Field[] Fields,
 		EntryMethod[] EntryMethods);
 
-	internal record Constructor(string Name, Parameter[] Parameters,
+	internal record Constructor(Accessibility Accessibility, string Name, Parameter[] Parameters,
 		Assignment[] Assignments);
 
 	// ユーザーからは触らない想定。実際の解決を行う実装が入っているメソッド

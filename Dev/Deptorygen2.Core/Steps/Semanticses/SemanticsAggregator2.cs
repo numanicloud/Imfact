@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Deptorygen2.Annotations;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
+using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
@@ -113,12 +115,13 @@ namespace Deptorygen2.Core.Steps.Semanticses
 		{
 			var parameters = method.GetParameters();
 			var attributes = method.GetAttributes();
+			var ctx = new Parameter(TypeName.FromType(typeof(ResolutionContext)), "context");
 
 			return new ResolverCommon(
 				method.Symbol.DeclaredAccessibility,
 				TypeName.FromSymbol(method.Symbol.ReturnType),
 				"__" + method.Symbol.Name,
-				AggregateParameter(parameters),
+				AggregateParameter(parameters).Append(ctx).ToArray(),
 				AggregateResolution(attributes),
 				AggregateHooks(attributes, method));
 		}
@@ -144,13 +147,9 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				.ToArray();
 		}
 
-		private static IEnumerable<string> AggregateNamespaces(Factory semantics,
-			Dependency[] dependencies)
+		private static IEnumerable<string> AggregateNamespaces(Factory semantics, Dependency[] dependencies)
 		{
-			return semantics.Resolvers.Cast<INamespaceClaimer>()
-				.Concat(semantics.MultiResolvers)
-				.Concat(semantics.Delegations)
-				.Concat(semantics.Resolvers.SelectMany(x => x.Hooks))
+			return semantics.TraverseDeep().OfType<INamespaceClaimer>()
 				.Concat(dependencies)
 				.SelectMany(x => x.GetRequiredNamespaces())
 				.Except(semantics.Type.FullNamespace.WrapByArray())

@@ -27,52 +27,7 @@ namespace Deptorygen2.Core.Utilities
 
 			return GetFullNameSpace(typeSymbol.ContainingNamespace).Join(".");
 		}
-
-		// ReSharper disable once IdentifierTypo
-		public static bool IsStructualEqual<T>(this IEnumerable<T> source, IEnumerable<T> second)
-			where T : notnull
-		{
-			using var enumerator1 = source.GetEnumerator();
-			using var enumerator2 = second.GetEnumerator();
-
-			while (true)
-			{
-				var end1 = !enumerator1.MoveNext();
-				var end2 = !enumerator2.MoveNext();
-
-				if (end1 && end2)
-				{
-					return true;
-				}
-
-				if (end1 != end2 || !enumerator1.Current.Equals(enumerator2.Current))
-				{
-					return false;
-				}
-			}
-		}
-
-		public static bool IsSuperSet<T>(this IEnumerable<T> container, IEnumerable<T> contained)
-		{
-			var array = container.ToArray();
-			foreach (var item in contained)
-			{
-				if (!array.Contains(item))
-				{
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-
-		public static bool HasAttribute(this ITypeSymbol symbol, string attributeName)
-		{
-			return symbol.GetAttributes()
-				.Any(attr => attr.AttributeClass?.Name == attributeName);
-		}
-
+		
 		public static string ToLowerCamelCase(this string name)
 		{
 			return name[0].ToString().ToLower() + name.Substring(1);
@@ -85,26 +40,6 @@ namespace Deptorygen2.Core.Utilities
 				: new T[] { source };
 		}
 
-		public static IEnumerable<(T item, bool isLast)> WithFooterFlag<T>(this IEnumerable<T> source)
-			where T : class
-		{
-			T? prevItem = null;
-			foreach (var item in source)
-			{
-				if (prevItem is {})
-				{
-					yield return (prevItem, false);
-				}
-
-				prevItem = item;
-			}
-
-			if (prevItem is {})
-			{
-				yield return (prevItem, true);
-			}
-		}
-
 		public static TValue? GetValueOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dic, TKey key)
 			where TValue : notnull
 		{
@@ -114,6 +49,14 @@ namespace Deptorygen2.Core.Utilities
 			}
 
 			return default;
+		}
+
+		public static Accessibility GetTypeAccessibilityMostStrict(
+			params Accessibility[] accessibilities)
+		{
+			return accessibilities.Contains(Accessibility.Internal)
+				? Accessibility.Internal
+				: Accessibility.Public;
 		}
 	}
 }
