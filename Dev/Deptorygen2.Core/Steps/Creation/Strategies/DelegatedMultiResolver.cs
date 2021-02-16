@@ -23,7 +23,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 		protected override IEnumerable<Source> GetSource(Generation semantics)
 		{
 			return semantics.Factory.Delegations.SelectMany(
-				x => x.CollectionResolvers.Select(y => new Source(x, y)));
+				x => x.MultiResolvers.Select(y => new Source(x, y)));
 		}
 
 		protected override TypeName GetTypeInfo(Source source)

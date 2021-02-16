@@ -2,6 +2,7 @@
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
+using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Utilities;
 using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
@@ -10,12 +11,12 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 	internal record Delegation(string PropertyName,
 		TypeName TypeName,
 		Resolver[] Resolvers,
-		MultiResolver[] CollectionResolvers) : IServiceProvider, INamespaceClaimer
+		MultiResolver[] MultiResolvers) : IServiceProvider, INamespaceClaimer, IFactorySemantics
 	{
 		public IEnumerable<TypeName> GetCapableServiceTypes()
 		{
 			return Resolvers.Cast<IServiceProvider>()
-				.Concat(CollectionResolvers)
+				.Concat(MultiResolvers)
 				.SelectMany(x => x.GetCapableServiceTypes());
 		}
 

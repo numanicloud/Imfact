@@ -39,11 +39,21 @@ namespace Deptorygen2.Core.Steps.Semanticses
 						return (dr, dcr);
 					});
 
+					var inheritances = @class.GetBaseClasses(context)
+						.Select(Inheritance.GetBuilder)
+						.Build(x =>
+						{
+							var ms = x.GetMethods(context);
+							var dr = AggregateResolvers(ms);
+							var dcr = AggregateMultiResolvers(ms);
+							return (dr, dcr);
+						});
+
 					var entries = resolvers.Cast<IResolverSemantics>()
 						.Concat(multiResolvers)
 						.Select(EntryResolver.FromResolver).ToArray();
 
-					return (resolvers, multiResolvers, delegations, entries);
+					return (resolvers, multiResolvers, delegations, inheritances, entries);
 				});
 
 				if (factory is null)

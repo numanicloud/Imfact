@@ -74,6 +74,7 @@ namespace Deptorygen2.Core.Steps.Creation
 			yield return new DelegatedMultiResolver(semantics);
 			yield return new Resolver(semantics);
 			yield return new MultiResolver(semantics);
+			yield return new InheritanceResolver(semantics);
 			yield return new Field(semantics);
 			yield return new Constructor(semantics);
 		}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Deptorygen;
 using Deptorygen2.Annotations;
+using Deptorygen2.TestSubject.Sub;
 
 namespace Deptorygen
 {
@@ -38,6 +39,19 @@ namespace Deptorygen2.TestSubject
 	class Hoge2 : IHoge
 	{
 		
+	}
+
+	[Factory]
+	public partial class PinkFactory
+	{
+		internal partial Service ResolveService();
+	}
+
+	// 生成されるコンストラクタはinternalであるべきかも。あるいは依存関係の中で最も厳しいアクセシビリティ
+	[Factory]
+	public partial class YellowFactory : PinkFactory
+	{
+		internal partial Client ResolveClient();
 	}
 
 	[Factory]

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
@@ -14,6 +15,35 @@ namespace Deptorygen2.Core.Steps.Aspects.Nodes
 		{
 			return Syntax.AttributeLists.HasAttribute(new AttributeName("FactoryAttribute"))
 				&& Syntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
+		}
+
+		public Class[] GetBaseClasses(IAnalysisContext context)
+		{
+			IEnumerable<INamedTypeSymbol> Traverse(INamedTypeSymbol pivot)
+			{
+				if (pivot.BaseType is not null)
+				{
+					yield return pivot.BaseType;
+					foreach (var symbol in Traverse(pivot.BaseType))
+					{
+						yield return symbol;
+					}
+				}
+			}
+
+			// 果たしてここのGetSyntaxは上手くいくか？
+			return Traverse(Symbol).Select(x =>
+			{
+				var syntax = x.DeclaringSyntaxReferences.Select(y => y.GetSyntax())
+					.OfType<ClassDeclarationSyntax>()
+					.FirstOrDefault();
+				if (syntax is null)
+				{
+					return null;
+				}
+
+				return new Class(syntax, x);
+			}).FilterNull().ToArray();
 		}
 
 		public Method[] GetMethods(IAnalysisContext context)

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
+using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
@@ -8,7 +10,8 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		Resolver[] Resolvers,
 		MultiResolver[] MultiResolvers,
 		Delegation[] Delegations,
-		EntryResolver[] EntryResolvers) : Interfaces.IServiceProvider
+		Inheritance[] Inheritances,
+		EntryResolver[] EntryResolvers) : IServiceProvider, IFactorySemantics
 	{
 		public IEnumerable<TypeName> GetCapableServiceTypes()
 		{
@@ -23,6 +26,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 			(Resolver[],
 			MultiResolver[],
 			Delegation[],
+			Inheritance[],
 			EntryResolver[]),
 			Factory>? GetBuilder(Class @class)
 		{
@@ -34,7 +38,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 			var t = TypeName.FromSymbol(@class.Symbol);
 
 			return new(@class, tuple => new Factory(
-				t, tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4));
+				t, tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, tuple.Item5));
 		}
 	}
 }
