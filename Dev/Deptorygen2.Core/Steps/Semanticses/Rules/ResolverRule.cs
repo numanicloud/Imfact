@@ -3,6 +3,7 @@ using Deptorygen2.Annotations;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
+using Deptorygen2.Core.Steps.Semanticses.Rules;
 using NacHelpers.Extensions;
 using Parameter = Deptorygen2.Core.Steps.Semanticses.Nodes.Parameter;
 
@@ -11,6 +12,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 	internal sealed class ResolverRule
 	{
 		private readonly IAnalysisContext _context;
+		private readonly HookRule _hookRule = new ();
 
 		public ResolverRule(IAnalysisContext context)
 		{
@@ -55,7 +57,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 
 		private Hook[] AggregateHooks(Attribute[] attributes, Method method)
 		{
-			return attributes.Select(x => Hook.Build(x, _context, method))
+			return attributes.Select(x => _hookRule.Extract(x, method))
 				.FilterNull()
 				.ToArray();
 		}

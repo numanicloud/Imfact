@@ -38,4 +38,6 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		Hook[] Hooks) : IResolverSemantics;
 
 	internal record Dependency(TypeNode TypeName, string FieldName);
+
+	internal record Hook(TypeNode HookType, string FieldName);
 }
