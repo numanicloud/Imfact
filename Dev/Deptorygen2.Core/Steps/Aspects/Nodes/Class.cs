@@ -11,12 +11,14 @@ namespace Deptorygen2.Core.Steps.Aspects.Nodes
 {
 	internal record Class(ClassDeclarationSyntax Syntax, INamedTypeSymbol Symbol)
 	{
+		// TODO: IsFactory == false なものはSemanticsフェーズで必ず弾くので、このレコードをそもそも生成しなくていい
 		public bool IsFactory()
 		{
 			return Syntax.AttributeLists.HasAttribute(new AttributeName("FactoryAttribute"))
 				&& Syntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
 		}
 
+		// TODO: メソッドなどのネストされたAspectをメソッドで取得するようだと、SemanticsフェーズでIAnalysisContextが必要になってしまい依存関係が複雑になる。
 		public Class[] GetBaseClasses(IAnalysisContext context)
 		{
 			IEnumerable<INamedTypeSymbol> Traverse(INamedTypeSymbol pivot)

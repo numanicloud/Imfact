@@ -32,7 +32,7 @@ namespace Deptorygen2.Core.Steps.Semanticses
 				.Select(m =>
 				{
 					var ret = m.GetReturnType(_context) is { } t
-						? Resolution.Build(t, _context)
+						? Resolution.Build(t)
 						: null;
 					var abstraction = GetMethodCommon(m);
 

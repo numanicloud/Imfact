@@ -38,7 +38,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 			return null;
 		}
 
-		public static Resolution? Build(ReturnType returnType, IAnalysisContext context)
+		public static Resolution? Build(ReturnType returnType)
 		{
 			if (!returnType.IsResolution())
 			{
