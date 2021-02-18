@@ -1,16 +1,13 @@
-﻿using System.Collections.Generic;
-using Deptorygen2.Annotations;
-using Deptorygen2.Core.Entities;
+﻿using Deptorygen2.Annotations;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record Hook(TypeNode HookType, string FieldName) : ISemanticsNode
+	internal record Hook(TypeNode HookType, string FieldName)
 	{
 		public static Hook? Build(Attribute attribute,
 			IAnalysisContext context,
@@ -84,11 +81,6 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 
 				return null;
 			}
-		}
-
-		public IEnumerable<ISemanticsNode> Traverse()
-		{
-			yield break;
 		}
 	}
 }

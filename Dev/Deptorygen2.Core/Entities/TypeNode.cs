@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using NacHelpers.Extensions;
@@ -13,7 +10,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
 	internal record TypeNode(TypeRecord Record,
 		Accessibility Accessibility,
-		DisposableType DisposableType) : ISemanticsNode
+		DisposableType DisposableType)
 	{
 		public string FullNamespace => Record.FullNamespace;
 		public string Name => Record.Name;
@@ -22,11 +19,6 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		public string FullBoundName => TypeArguments.Any()
 			? $"{Name}<{TypeArguments.Select(x => x.FullBoundName).Join(", ")}>"
 			: Name;
-
-		public IEnumerable<ISemanticsNode> Traverse()
-		{
-			yield break;
-		}
 
 		public static TypeNode FromSymbol(INamedTypeSymbol symbol)
 		{

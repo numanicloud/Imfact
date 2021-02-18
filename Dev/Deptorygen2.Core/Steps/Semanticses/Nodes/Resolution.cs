@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -13,7 +11,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
 	internal record Resolution(TypeNode TypeName,
 		TypeNode[] Dependencies,
-		bool IsDisposable) : ISemanticsNode
+		bool IsDisposable)
 	{
 		public static Resolution? Build(Attribute attribute,
 			IAnalysisContext context)
@@ -62,11 +60,6 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 				TypeNode.FromSymbol(symbol),
 				dependencies,
 				isDisposable);
-		}
-
-		public IEnumerable<ISemanticsNode> Traverse()
-		{
-			yield break;
 		}
 	}
 }

@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using Deptorygen2.Core.Utilities;
+﻿using Deptorygen2.Core.Interfaces;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record Parameter(TypeNode Type, string ParameterName) : ISemanticsNode
+	internal record Parameter(TypeNode Type, string ParameterName)
 	{
 		public static Parameter? Build(Aspects.Nodes.Parameter parameter, IAnalysisContext context)
 		{
@@ -18,11 +15,6 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 			return new Parameter(
 				TypeNode.FromSymbol(symbol),
 				parameter.Syntax.Identifier.ValueText);
-		}
-
-		public IEnumerable<ISemanticsNode> Traverse()
-		{
-			yield return Type;
 		}
 	}
 }

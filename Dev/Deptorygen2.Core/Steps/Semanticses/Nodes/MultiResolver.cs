@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
+﻿using Deptorygen2.Core.Interfaces;
 using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
@@ -16,10 +14,5 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		public Hook[] Hooks => Common.Hooks;
 
 		public TypeNode ElementType => ReturnType.TypeArguments[0];
-
-		public IEnumerable<ISemanticsNode> Traverse()
-		{
-			yield return Common;
-		}
 	}
 }

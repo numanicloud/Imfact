@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 
@@ -12,7 +11,8 @@ namespace Deptorygen2.Core.Steps.Semanticses
 		{
 			var a = dependencies.Select(x => x.TypeName);
 			var b = factory.Delegations.Select(x => x.Type);
-			var c = factory.TraverseDeep().OfType<IResolverSemantics>()
+			var c = factory.Resolvers.Cast<IResolverSemantics>()
+				.Concat(factory.MultiResolvers)
 				.SelectMany(x => x.Hooks)
 				.Select(x => x.HookType);
 			var types = a.Concat(b).Concat(c).ToArray();
