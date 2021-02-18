@@ -13,12 +13,12 @@ namespace Deptorygen2.Core
 	{
 		private readonly IAnalysisContext _context;
 		private readonly AspectAggregator _aspectAggregator = new();
-		private readonly SemanticsAggregator2 _semanticsAggregator;
+		private readonly SemanticsRule _semanticsAggregator;
 
 		public GenerationFacade(SemanticModel semanticModel)
 		{
 			_context = new CompilationAnalysisContext(semanticModel);
-			_semanticsAggregator = new SemanticsAggregator2(_context);
+			_semanticsAggregator = new SemanticsRule(_context);
 		}
 
 		public SourceFile? RunGeneration(ClassDeclarationSyntax syntax)
