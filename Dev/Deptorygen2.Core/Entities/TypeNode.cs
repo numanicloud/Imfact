@@ -13,7 +13,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
 	internal record TypeNode(TypeRecord Record,
 		Accessibility Accessibility,
-		DisposableType DisposableType) : INamespaceClaimer
+		DisposableType DisposableType) : ISemanticsNode
 	{
 		public string FullNamespace => Record.FullNamespace;
 		public string Name => Record.Name;
@@ -26,11 +26,6 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		public IEnumerable<ISemanticsNode> Traverse()
 		{
 			yield break;
-		}
-
-		public IEnumerable<string> GetRequiredNamespaces()
-		{
-			yield return Record.FullNamespace;
 		}
 
 		public static TypeNode FromSymbol(INamedTypeSymbol symbol)

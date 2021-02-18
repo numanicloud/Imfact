@@ -13,7 +13,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
 	internal record Resolution(TypeNode TypeName,
 		TypeNode[] Dependencies,
-		bool IsDisposable) : INamespaceClaimer
+		bool IsDisposable) : ISemanticsNode
 	{
 		public static Resolution? Build(Attribute attribute,
 			IAnalysisContext context)
@@ -34,7 +34,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 			if (argument1?.Expression is TypeOfExpressionSyntax toes
 				&& context.GetTypeSymbol(toes.Type) is INamedTypeSymbol symbol)
 			{
-				return BuildInternal(toes.Type, symbol, context);
+				return BuildInternal(symbol);
 			}
 
 			return null;
@@ -47,12 +47,10 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 				return null;
 			}
 
-			return BuildInternal(returnType.Syntax, returnType.Symbol, context);
+			return BuildInternal(returnType.Symbol);
 		}
 
-		private static Resolution? BuildInternal(TypeSyntax syntax,
-			INamedTypeSymbol symbol,
-			IAnalysisContext context)
+		private static Resolution? BuildInternal(INamedTypeSymbol symbol)
 		{
 			var isDisposable = symbol.IsImplementing(typeof(IDisposable));
 
@@ -69,11 +67,6 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		public IEnumerable<ISemanticsNode> Traverse()
 		{
 			yield break;
-		}
-
-		public IEnumerable<string> GetRequiredNamespaces()
-		{
-			yield return TypeName.FullNamespace;
 		}
 	}
 }

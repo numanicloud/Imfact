@@ -10,7 +10,7 @@ using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record Hook(TypeNode HookType, string FieldName) : INamespaceClaimer
+	internal record Hook(TypeNode HookType, string FieldName) : ISemanticsNode
 	{
 		public static Hook? Build(Attribute attribute,
 			IAnalysisContext context,
@@ -89,11 +89,6 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		public IEnumerable<ISemanticsNode> Traverse()
 		{
 			yield break;
-		}
-
-		public IEnumerable<string> GetRequiredNamespaces()
-		{
-			yield return HookType.FullNamespace;
 		}
 	}
 }

@@ -5,8 +5,7 @@ using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record Parameter(TypeNode Type, string ParameterName)
-		: INamespaceClaimer
+	internal record Parameter(TypeNode Type, string ParameterName) : ISemanticsNode
 	{
 		public static Parameter? Build(Aspects.Nodes.Parameter parameter, IAnalysisContext context)
 		{
@@ -24,11 +23,6 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		public IEnumerable<ISemanticsNode> Traverse()
 		{
 			yield return Type;
-		}
-
-		public IEnumerable<string> GetRequiredNamespaces()
-		{
-			yield return Type.FullNamespace;
 		}
 	}
 }

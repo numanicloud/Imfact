@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
-using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using Deptorygen2.Core.Utilities;
-using IServiceProvider = Deptorygen2.Core.Interfaces.IServiceProvider;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
 	internal record FactoryCommon(TypeNode Type,
 		Resolver[] Resolvers,
-		MultiResolver[] MultiResolvers) : IFactorySemantics, INamespaceClaimer, IServiceProvider
+		MultiResolver[] MultiResolvers) : IFactorySemantics, ISemanticsNode
 	{
 		public IEnumerable<ISemanticsNode> Traverse()
 		{
@@ -23,16 +20,6 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 			{
 				yield return multiResolver;
 			}
-		}
-
-		public IEnumerable<TypeNode> GetCapableServiceTypes()
-		{
-			yield return Type;
-		}
-
-		public IEnumerable<string> GetRequiredNamespaces()
-		{
-			yield return Type.FullNamespace;
 		}
 	}
 }
