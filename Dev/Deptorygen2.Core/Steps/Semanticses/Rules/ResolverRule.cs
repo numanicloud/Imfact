@@ -49,8 +49,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Rules
 
 		private static Resolution ExtractResolution(TypeToCreate t)
 		{
-			return new Resolution(t.Node, t.ConstructorArguments,
-				t.Node.DisposableType == DisposableType.Disposable);
+			return new(t.Node, t.ConstructorArguments, t.Node.DisposableType);
 		}
 
 		private Hook? ExtractHook(MethodAttributeAspect aspect, MethodAspect method)

@@ -20,7 +20,7 @@ namespace Deptorygen2.Core.Steps.Definitions.Methods
 		}
 	}
 
-	internal record DisposeImplementation(Field[] Fields, Property[] Properties, bool IsAsync) : Implementation
+	internal record DisposeImplementation(string[] MemberNames, bool IsAsync) : Implementation
 	{
 		public override void Render(ICodeBuilder builder, ICreationAggregator creation,
 			ResolverWriter writer)
@@ -28,14 +28,9 @@ namespace Deptorygen2.Core.Steps.Definitions.Methods
 			var op = IsAsync ? "await " : "";
 			var method = IsAsync ? "DisposeAsync" : "Dispose";
 
-			foreach (var field in Fields)
+			foreach (var name in MemberNames)
 			{
-				builder.AppendLine(op + $"{field.Name}.{method}();");
-			}
-
-			foreach (var property in Properties)
-			{
-				builder.AppendLine(op + $"{property.Name}.{method}();");
+				builder.AppendLine(op + $"{name}.{method}();");
 			}
 		}
 	}

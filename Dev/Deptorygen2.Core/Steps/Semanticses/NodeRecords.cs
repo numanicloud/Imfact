@@ -15,7 +15,11 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		Delegation[] Delegations, Inheritance[] Inheritances, EntryResolver[] EntryResolvers)
 		: FactoryCommon(Common);
 
-	internal record Delegation(FactoryCommon Common, string PropertyName) : FactoryCommon(Common);
+	internal record Delegation(FactoryCommon Common, string PropertyName)
+		: FactoryCommon(Common), IProbablyDisposable
+	{
+		public string MemberName => PropertyName;
+	}
 
 	internal record Inheritance(FactoryCommon Common) : FactoryCommon(Common);
 
@@ -44,18 +48,32 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		Resolution[] Resolutions,
 		Hook[] Hooks) : IResolverSemantics;
 
-	internal record Dependency(TypeNode TypeName, string FieldName);
+	internal record Dependency(TypeNode TypeName, string FieldName) : IProbablyDisposable
+	{
+		public TypeNode Type => TypeName;
+		public string MemberName => FieldName;
+	}
 
-	internal record Hook(TypeNode HookType, string FieldName);
+	internal record Hook(TypeNode HookType, string FieldName) : IProbablyDisposable
+	{
+		public TypeNode Type => HookType;
+		public string MemberName => FieldName;
+	}
 
 	internal record Parameter(TypeNode Type, string ParameterName);
 
 	internal record Resolution(TypeNode TypeName,
 		TypeNode[] Dependencies,
-		bool IsDisposable);
+		DisposableType DisposableType);
 
 	internal record EntryResolver(string MethodName,
 		TypeNode ReturnType,
 		Parameter[] Parameters,
 		Accessibility Accessibility);
+
+	internal interface IProbablyDisposable
+	{
+		TypeNode Type { get; }
+		string MemberName { get; }
+	}
 }

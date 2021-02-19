@@ -14,10 +14,6 @@ namespace Deptorygen2.Core.Steps.Definitions.Methods
 			var parameter = GetParameterList(Parameters);
 
 			var mod = Modifiers.Any() ? Modifiers.Join(" ") : "";
-			if (Modifiers.Contains("async"))
-			{
-				ret = $"ValueTask<{ret}>";
-			}
 
 			return $"{access} {mod} {ret} {Name}({parameter})";
 		}

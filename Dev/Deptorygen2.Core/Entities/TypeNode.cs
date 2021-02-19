@@ -23,7 +23,9 @@ namespace Deptorygen2.Core.Entities
 		{
 			var type = symbol.ConstructedFrom;
 			var dispose = type.IsImplementing(typeof(IDisposable)) ? Disposable
+				: IsImplementing(type, "System.IAsyncDisposable") ? AsyncDisposable
 				: NonDisposable;
+
 			var typeArguments = symbol.TypeArguments
 				.Select(FromSymbol)
 				.ToArray();
@@ -36,6 +38,12 @@ namespace Deptorygen2.Core.Entities
 			};
 		}
 
+		private static bool IsImplementing(INamedTypeSymbol symbol, string interfaceName)
+		{
+			return symbol.AllInterfaces.Any(x =>
+				$"{x.GetFullNameSpace()}.{x.Name}" == interfaceName);
+		}
+
 		public static TypeNode FromSymbol(ITypeSymbol symbol)
 		{
 			return symbol is INamedTypeSymbol nts
@@ -46,6 +54,7 @@ namespace Deptorygen2.Core.Entities
 		public static TypeNode FromRuntime(Type type, TypeNode[]? typeArguments = null)
 		{
 			var dispose = type.GetInterface(nameof(IDisposable)) is not null ? Disposable
+				: type.GetInterface("IAsyncDisposable") is not null ? AsyncDisposable
 				: NonDisposable;
 
 			var args = typeArguments?.Select(x => x.Record).ToArray();

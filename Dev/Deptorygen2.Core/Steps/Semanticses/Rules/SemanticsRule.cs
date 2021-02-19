@@ -19,8 +19,8 @@ namespace Deptorygen2.Core.Steps.Semanticses.Rules
 			var factory = _factoryRule.ExtractFactory(@class);
 
 			var dependency = _dependencyRule.Extract(factory);
-			var namespaces = _usingRule.Extract(factory, dependency);
 			var disposableInfo = DisposableInfo.Aggregate(factory, dependency);
+			var namespaces = _usingRule.Extract(factory, dependency, disposableInfo);
 			return new Generation(namespaces, factory, dependency, disposableInfo);
 		}
 	}

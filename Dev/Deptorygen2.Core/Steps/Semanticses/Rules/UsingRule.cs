@@ -8,7 +8,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Rules
 {
 	internal sealed class UsingRule
 	{
-		public string[] Extract(Factory factory, Dependency[] dependencies)
+		public string[] Extract(Factory factory, Dependency[] dependencies, DisposableInfo disposableInfo)
 		{
 			var namespaces = new IEnumerable<string>[]
 			{
@@ -35,7 +35,18 @@ namespace Deptorygen2.Core.Steps.Semanticses.Rules
 				},
 			};
 
-			return namespaces.SelectMany(x => x).Distinct().ToArray();
+			var add = new List<string>();
+			if (disposableInfo.HasDisposable)
+			{
+				add.Add("System");
+			}
+
+			if (disposableInfo.HasAsyncDisposable)
+			{
+				add.Add("System.Threading.Tasks");
+			}
+
+			return namespaces.SelectMany(x => x).Concat(add).Distinct().ToArray();
 		}
 	}
 }

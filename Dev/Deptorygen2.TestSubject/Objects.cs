@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Deptorygen;
 using Deptorygen2.Annotations;
 using Deptorygen2.TestSubject.Sub;
@@ -41,10 +42,36 @@ namespace Deptorygen2.TestSubject
 		
 	}
 
+	public class Resource : IDisposable
+	{
+		public void Dispose()
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public class ResourceAsync : IAsyncDisposable
+	{
+		public ValueTask DisposeAsync()
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public class Consumer
+	{
+		public Consumer(Resource r, ResourceAsync ra)
+		{
+			
+		}
+	}
+
+
 	[Factory]
 	public partial class PinkFactory
 	{
 		internal partial Service ResolveService();
+		public partial Consumer ResolveConsumer();
 	}
 
 	// 生成されるコンストラクタはinternalであるべきかも。あるいは依存関係の中で最も厳しいアクセシビリティ

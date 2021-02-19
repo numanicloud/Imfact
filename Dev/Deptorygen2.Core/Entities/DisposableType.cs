@@ -1,7 +1,12 @@
-﻿namespace Deptorygen2.Core.Utilities
+﻿using System;
+
+namespace Deptorygen2.Core.Utilities
 {
+	[Flags]
 	internal enum DisposableType
 	{
-		NonDisposable, Disposable, AsyncDisposable
+		NonDisposable = 0,
+		Disposable = 1,
+		AsyncDisposable = 2
 	}
 }
