@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Deptorygen2.Core.Steps.Writing
@@ -11,9 +10,9 @@ namespace Deptorygen2.Core.Steps.Writing
 			return new CodeBuilder(builder);
 		}
 
-		public static void EnterBlock(this ICodeBuilder baseBuilder, Action<ICodeBuilder> build)
+		public static void EnterBlock(this ICodeBuilder baseBuilder, Action<ICodeBuilder> build, bool withTrailingSemicolon = false)
 		{
-			using var block = BlockBuilder.EnterBlock(baseBuilder);
+			using var block = BlockBuilder.EnterBlock(baseBuilder, withTrailingSemicolon);
 			build.Invoke(block);
 		}
 
@@ -27,17 +26,6 @@ namespace Deptorygen2.Core.Steps.Writing
 		{
 			using var chunk = new ChunkBuilder(baseBuilder);
 			build.Invoke(chunk);
-		}
-
-		public static void EnterSequenceChunk<T>(this ICodeBuilder baseBuilder, IEnumerable<T> source, Action<T, ICodeBuilder> build)
-		{
-			baseBuilder.EnterChunk(chunk => chunk.EnterSequence(inner =>
-			{
-				foreach (var item in source)
-				{
-					build.Invoke(item, inner);
-				}
-			}));
 		}
 	}
 }

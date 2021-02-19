@@ -8,14 +8,19 @@ namespace Deptorygen2.Core.Steps.Writing
 		private readonly ICodeBuilder _codeBuilder;
 		private bool _isOnLineStart = true;
 
+		public bool WithTrailingSemicolon { get; init; } = false;
+
 		private BlockBuilder(ICodeBuilder codeBuilder)
 		{
 			_codeBuilder = codeBuilder;
 		}
 
-		public static BlockBuilder EnterBlock(ICodeBuilder codeBuilder)
+		public static BlockBuilder EnterBlock(ICodeBuilder codeBuilder, bool withTrailingSemicolon = false)
 		{
-			var instance = new BlockBuilder(codeBuilder);
+			var instance = new BlockBuilder(codeBuilder)
+			{
+				WithTrailingSemicolon = withTrailingSemicolon
+			};
 			codeBuilder.AppendLine("{");
 			return instance;
 		}
@@ -36,7 +41,8 @@ namespace Deptorygen2.Core.Steps.Writing
 
 		public void Dispose()
 		{
-			_codeBuilder.AppendLine("}");
+			var semicolon = WithTrailingSemicolon ? ";" : "";
+			_codeBuilder.AppendLine("}" + semicolon);
 		}
 	}
 }

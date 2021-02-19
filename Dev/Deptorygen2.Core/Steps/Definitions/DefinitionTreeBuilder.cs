@@ -34,7 +34,6 @@ namespace Deptorygen2.Core.Steps.Definitions
 			
 			return new SourceTreeDefinition(new DefinitionRoot(usings, nss),
 				new CreationAggregator(_semantics));
-
 		}
 
 		private Class BuildClass()

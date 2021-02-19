@@ -2,6 +2,7 @@
 using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
+using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
@@ -25,9 +26,8 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 	internal record Resolver(ResolverCommon Common, Resolution? ReturnTypeResolution)
 		: ResolverCommon(Common)
 	{
-		public Resolution ActualResolution = ReturnTypeResolution is not null
-			? ReturnTypeResolution
-			: Common.Resolutions.First();
+		public Resolution ActualResolution = ReturnTypeResolution.AsEnumerable()
+			.Concat(Common.Resolutions).First();
 	}
 
 	internal record MultiResolver(ResolverCommon Common)

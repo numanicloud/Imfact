@@ -52,8 +52,7 @@ namespace Deptorygen2.Core.Steps.Writing
 
 		private void RenderClass(Class @class, ICodeBuilder builder)
 		{
-			builder.Append($"partial class {@class.Name}");
-
+			RenderClassSignature(@class, builder);
 			builder.EnterBlock(block =>
 			{
 				block.EnterSequence(seqOuter =>
@@ -74,7 +73,17 @@ namespace Deptorygen2.Core.Steps.Writing
 			});
 		}
 
+		private void RenderClassSignature(Class @class, ICodeBuilder builder)
+		{
+			builder.Append($"partial class {@class.Name}");
 
+			var interfaces = GetInterfaces(@class).ToArray();
+			var baseTypeList = interfaces.Any()
+				? " : " + interfaces.Join(", ")
+				: "";
+
+			builder.AppendLine(baseTypeList);
+		}
 
 		private IEnumerable<string> GetInterfaces(Class @class)
 		{
