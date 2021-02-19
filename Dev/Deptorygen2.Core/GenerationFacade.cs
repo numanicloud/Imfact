@@ -30,7 +30,7 @@ namespace Deptorygen2.Core
 
 		private SyntaxOnAspect? AspectStep(ClassDeclarationSyntax syntax)
 		{
-			return _aspectAggregator.Aggregate(syntax, _context) is { } aspect
+			return _aspectAggregator.Aggregatexx(syntax, _context) is { } aspect
 				? new SyntaxOnAspect(aspect) : null;
 		}
 

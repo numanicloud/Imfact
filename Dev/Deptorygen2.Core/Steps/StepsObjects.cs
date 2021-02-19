@@ -1,13 +1,14 @@
-﻿using Deptorygen2.Core.Steps.Aspects.Nodes;
+﻿using Deptorygen2.Core.Steps.Aspects;
+using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 
 namespace Deptorygen2.Core.Steps
 {
 	public class SyntaxOnAspect
 	{
-		internal Class Class { get; }
+		internal ClassAspect Class { get; }
 
-		internal SyntaxOnAspect(Class @class)
+		internal SyntaxOnAspect(ClassAspect @class)
 		{
 			Class = @class;
 		}

@@ -20,6 +20,8 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			var members = factory.Type.WrapByArray()
 				.Concat(factory.Delegations.Select(x => x.Type))
 				.Concat(factory.Inheritances.Select(x => x.Type))
+				.GroupBy(x => x.Record)
+				.Select(x => x.First())
 				.ToDictionary(x => x.Record, x => x);
 
 			var provided = delegated

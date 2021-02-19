@@ -1,6 +1,5 @@
 ﻿using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Steps.Aspects.Nodes;
-using Attribute = Deptorygen2.Core.Steps.Aspects.Nodes.Attribute;
+using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Steps.Aspects
 {
@@ -14,22 +13,28 @@ namespace Deptorygen2.Core.Steps.Aspects
 		Resolution, Hook, CacheHookPreset, CachePrHookPreset
 	}
 
-	internal record ClassAspect(ClassAspect[] BaseClasses,
+	internal record ClassAspect(TypeNode Type,
+		ClassAspect[] BaseClasses,
 		MethodAspect[] Methods,
 		PropertyAspect[] Properties);
 
-	internal record MethodAspect(ResolverKind Kind,
+	internal record MethodAspect(string Name,
+		Accessibility Accessibility,
+		ResolverKind Kind,
 		ReturnTypeAspect ReturnType,
 		MethodAttributeAspect[] Attributes,
 		ParameterAspect[] Parameters);
 
-	internal record PropertyAspect(MethodAspect[] MethodsInType);
+	internal record PropertyAspect(TypeNode Type, string Name, MethodAspect[] MethodsInType);
 
 	internal record ParameterAspect(TypeNode Type, string Name);
 
 	internal record MethodAttributeAspect(AnnotationKind Kind,
 		TypeNode OwnerReturnType,
-		string OwnerName);
+		string OwnerName,
+		TypeToCreate TypeToCreate);
 
-	internal record ReturnTypeAspect(TypeNode Type, bool IsAbstract);
+	internal record ReturnTypeAspect(TypeToCreate Type, bool IsAbstract);
+
+	internal record TypeToCreate(TypeNode Node, TypeNode[] ConstructorArguments);
 }

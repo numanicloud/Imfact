@@ -48,11 +48,11 @@ namespace Deptorygen2.Core.Steps.Aspects
 					.OfType<ClassDeclarationSyntax>()
 					.FirstOrDefault();
 				return syntax is not null
-					? ExtractAspect(syntax, context)
+					? ExtractAspect(syntax, symbol, context)
 					: null;
 			}).FilterNull().ToArray();
 
-			return ExtractAspect(root, context, baseClasses);
+			return ExtractAspect(root, symbol, context, baseClasses);
 
 			static IEnumerable<INamedTypeSymbol> TraverseBase(INamedTypeSymbol pivot)
 			{
@@ -68,6 +68,7 @@ namespace Deptorygen2.Core.Steps.Aspects
 		}
 
 		private ClassAspect ExtractAspect(ClassDeclarationSyntax syntax,
+			INamedTypeSymbol symbol,
 			IAnalysisContext context, ClassAspect[]? baseClasses = null)
 		{
 			var methods = syntax.Members
@@ -82,8 +83,10 @@ namespace Deptorygen2.Core.Steps.Aspects
 				.FilterNull()
 				.ToArray();
 
-			return new ClassAspect(baseClasses ?? new ClassAspect[0],
-				methods, properties);
+			return new ClassAspect(TypeNode.FromSymbol(symbol),
+				baseClasses ?? new ClassAspect[0],
+				methods,
+				properties);
 		}
 
 		private MethodAspect? ExtractAspect(MethodDeclarationSyntax syntax,
@@ -109,7 +112,8 @@ namespace Deptorygen2.Core.Steps.Aspects
 				.FilterNull()
 				.ToArray();
 
-			return new MethodAspect(GetKind(), returnType, attributes, parameters);
+			return new MethodAspect(symbol.Name, symbol.DeclaredAccessibility,
+				GetKind(), returnType, attributes, parameters);
 
 			ResolverKind GetKind()
 			{
@@ -122,7 +126,21 @@ namespace Deptorygen2.Core.Steps.Aspects
 
 		private ReturnTypeAspect ExtractReturnTypeAspect(INamedTypeSymbol symbol)
 		{
-			return new(TypeNode.FromSymbol(symbol), symbol.IsAbstract);
+			return new(ExtractTypeToCreate(symbol), symbol.IsAbstract);
+		}
+
+		private TypeToCreate ExtractTypeToCreate(INamedTypeSymbol symbol, params ITypeSymbol[] typeArguments)
+		{
+			var args = symbol.Constructors.FirstOrDefault()?.Parameters
+				.Select(x => TypeNode.FromSymbol(x.Type))
+				.ToArray() ?? new TypeNode[0];
+
+			if (symbol.IsUnboundGenericType)
+			{
+				symbol = symbol.ConstructedFrom.Construct(typeArguments);
+			}
+
+			return new TypeToCreate(TypeNode.FromSymbol(symbol), args);
 		}
 
 		private ParameterAspect? ExtractAspect(ParameterSyntax syntax, IAnalysisContext context)
@@ -145,13 +163,16 @@ namespace Deptorygen2.Core.Steps.Aspects
 			}
 
 			AnnotationKind kind;
+			TypeToCreate? type;
 
 			if (_resAt.MatchWithAnyName(name))
 			{
 				if (data.ConstructorArguments.Length == 1
-					&& data.ConstructorArguments[0].Kind == TypedConstantKind.Type)
+					&& data.ConstructorArguments[0].Kind == TypedConstantKind.Type
+					&& data.ConstructorArguments[0].Value is INamedTypeSymbol t)
 				{
 					kind = AnnotationKind.Resolution;
+					type = ExtractTypeToCreate(t, ownerReturn);
 				}
 				else
 				{
@@ -166,6 +187,7 @@ namespace Deptorygen2.Core.Steps.Aspects
 					&& arg.ConstructedFrom.IsImplementing(typeof(IHook<>)))
 				{
 					kind = AnnotationKind.Hook;
+					type = ExtractTypeToCreate(arg, ownerReturn);
 				}
 				else
 				{
@@ -175,17 +197,23 @@ namespace Deptorygen2.Core.Steps.Aspects
 			else if (_cacAt.MatchWithAnyName(name))
 			{
 				kind = AnnotationKind.CacheHookPreset;
+				var node = TypeNode.FromRuntime(typeof(Cache<>),
+					new[] {TypeNode.FromSymbol(ownerReturn)});
+				type = new TypeToCreate(node, new TypeNode[0]);
 			}
 			else if (_cprAt.MatchWithAnyName(name))
 			{
 				kind = AnnotationKind.CachePrHookPreset;
+				var node = TypeNode.FromRuntime(typeof(CachePerResolution<>),
+					new[] { TypeNode.FromSymbol(ownerReturn) });
+				type = new TypeToCreate(node, new TypeNode[0]);
 			}
 			else
 			{
 				return null;
 			}
 
-			return new MethodAttributeAspect(kind, TypeNode.FromSymbol(ownerReturn), ownerName);
+			return new MethodAttributeAspect(kind, TypeNode.FromSymbol(ownerReturn), ownerName, type);
 		}
 
 		private PropertyAspect? ExtractAspect(PropertyDeclarationSyntax syntax,
@@ -216,7 +244,9 @@ namespace Deptorygen2.Core.Steps.Aspects
 					return mm is null ? null : ExtractAspect(mm, context);
 				}).FilterNull().ToArray();
 
-			return new PropertyAspect(methods);
+			return new PropertyAspect(TypeNode.FromSymbol(symbol.Type),
+				symbol.Name,
+				methods);
 		}
 	}
 }
