@@ -11,14 +11,18 @@ using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Aspects
 {
-	internal class AspectAggregator
+	internal class AspectRule
 	{
-		readonly AttributeName _resAt = new(nameof(ResolutionAttribute));
-		readonly AttributeName _hokAt = new(nameof(HookAttribute));
-		readonly AttributeName _cacAt = new(nameof(CacheAttribute));
-		readonly AttributeName _cprAt = new(nameof(CachePerResolutionAttribute));
+		private readonly IAnalysisContext _context;
+		private readonly AttributeReceptor _attributeReceptor;
 
-		public ClassAspect? Aggregatexx(ClassDeclarationSyntax root, IAnalysisContext context)
+		public AspectRule(IAnalysisContext context)
+		{
+			_context = context;
+			_attributeReceptor = new AttributeReceptor(this);
+		}
+
+		public ClassAspect? Aggregate(ClassDeclarationSyntax root)
 		{
 			var hasAttr = root.AttributeLists.HasAttribute(new AttributeName(nameof(FactoryAttribute)));
 			var isPartial = root.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
@@ -28,7 +32,7 @@ namespace Deptorygen2.Core.Steps.Aspects
 				return null;
 			}
 
-			if (context.GetNamedTypeSymbol(root) is not { } symbol)
+			if (_context.GetNamedTypeSymbol(root) is not { } symbol)
 			{
 				return null;
 			}
@@ -40,11 +44,11 @@ namespace Deptorygen2.Core.Steps.Aspects
 					.OfType<ClassDeclarationSyntax>()
 					.FirstOrDefault();
 				return syntax is not null
-					? ExtractAspect(syntax, symbol, context)
+					? ExtractAspect(syntax, symbol)
 					: null;
 			}).FilterNull().ToArray();
 
-			return ExtractAspect(root, symbol, context, baseClasses);
+			return ExtractAspect(root, symbol, baseClasses);
 
 			static IEnumerable<INamedTypeSymbol> TraverseBase(INamedTypeSymbol pivot)
 			{
@@ -61,17 +65,17 @@ namespace Deptorygen2.Core.Steps.Aspects
 
 		private ClassAspect ExtractAspect(ClassDeclarationSyntax syntax,
 			INamedTypeSymbol symbol,
-			IAnalysisContext context, ClassAspect[]? baseClasses = null)
+			ClassAspect[]? baseClasses = null)
 		{
 			var methods = syntax.Members
 				.OfType<MethodDeclarationSyntax>()
-				.Select(m => ExtractAspect(m, context))
+				.Select(ExtractAspect)
 				.FilterNull()
 				.ToArray();
 
 			var properties = syntax.Members
 				.OfType<PropertyDeclarationSyntax>()
-				.Select(m => ExtractAspect(m, context))
+				.Select(ExtractAspect)
 				.FilterNull()
 				.ToArray();
 
@@ -81,10 +85,9 @@ namespace Deptorygen2.Core.Steps.Aspects
 				properties);
 		}
 
-		private MethodAspect? ExtractAspect(MethodDeclarationSyntax syntax,
-			IAnalysisContext context)
+		private MethodAspect? ExtractAspect(MethodDeclarationSyntax syntax)
 		{
-			if (context.GetMethodSymbol(syntax) is not { } symbol)
+			if (_context.GetMethodSymbol(syntax) is not { } symbol)
 			{
 				return null;
 			}
@@ -96,11 +99,11 @@ namespace Deptorygen2.Core.Steps.Aspects
 
 			var returnType = ExtractReturnTypeAspect(returnSymbol);
 			var attributes = symbol.GetAttributes()
-				.Select(x => ExtractAspect(x, returnSymbol, symbol.Name))
+				.Select(x => _attributeReceptor.ExtractAspect(x, returnSymbol, symbol.Name))
 				.FilterNull()
 				.ToArray();
 			var parameters = syntax.ParameterList.Parameters
-				.Select(x => ExtractAspect(x, context))
+				.Select(ExtractAspect)
 				.FilterNull()
 				.ToArray();
 
@@ -121,7 +124,7 @@ namespace Deptorygen2.Core.Steps.Aspects
 			return new(ExtractTypeToCreate(symbol), symbol.IsAbstract);
 		}
 
-		private TypeToCreate ExtractTypeToCreate(INamedTypeSymbol symbol, params ITypeSymbol[] typeArguments)
+		internal TypeToCreate ExtractTypeToCreate(INamedTypeSymbol symbol, params ITypeSymbol[] typeArguments)
 		{
 			var args = symbol.Constructors.FirstOrDefault()?.Parameters
 				.Select(x => TypeNode.FromSymbol(x.Type))
@@ -135,9 +138,9 @@ namespace Deptorygen2.Core.Steps.Aspects
 			return new TypeToCreate(TypeNode.FromSymbol(symbol), args);
 		}
 
-		private ParameterAspect? ExtractAspect(ParameterSyntax syntax, IAnalysisContext context)
+		private ParameterAspect? ExtractAspect(ParameterSyntax syntax)
 		{
-			if (syntax.Type is null || context.GetTypeSymbol(syntax.Type) is not { } symbol)
+			if (syntax.Type is null || _context.GetTypeSymbol(syntax.Type) is not { } symbol)
 			{
 				return null;
 			}
@@ -145,73 +148,9 @@ namespace Deptorygen2.Core.Steps.Aspects
 			return new ParameterAspect(TypeNode.FromSymbol(symbol), symbol.Name);
 		}
 
-		private MethodAttributeAspect? ExtractAspect(AttributeData data,
-			INamedTypeSymbol ownerReturn,
-			string ownerName)
+		private PropertyAspect? ExtractAspect(PropertyDeclarationSyntax syntax)
 		{
-			if (data.AttributeClass?.Name is not { } name)
-			{
-				return null;
-			}
-
-			AnnotationKind kind;
-			TypeToCreate? type;
-
-			if (_resAt.MatchWithAnyName(name))
-			{
-				if (data.ConstructorArguments.Length == 1
-					&& data.ConstructorArguments[0].Kind == TypedConstantKind.Type
-					&& data.ConstructorArguments[0].Value is INamedTypeSymbol t)
-				{
-					kind = AnnotationKind.Resolution;
-					type = ExtractTypeToCreate(t, ownerReturn);
-				}
-				else
-				{
-					return null;
-				}
-			}
-			else if (_hokAt.MatchWithAnyName(name))
-			{
-				if (data.ConstructorArguments.Length == 1
-					&& data.ConstructorArguments[0].Kind == TypedConstantKind.Type
-					&& data.ConstructorArguments[0].Value is INamedTypeSymbol arg
-					&& arg.ConstructedFrom.IsImplementing(typeof(IHook<>)))
-				{
-					kind = AnnotationKind.Hook;
-					type = ExtractTypeToCreate(arg, ownerReturn);
-				}
-				else
-				{
-					return null;
-				}
-			}
-			else if (_cacAt.MatchWithAnyName(name))
-			{
-				kind = AnnotationKind.CacheHookPreset;
-				var node = TypeNode.FromRuntime(typeof(Cache<>),
-					new[] {TypeNode.FromSymbol(ownerReturn)});
-				type = new TypeToCreate(node, new TypeNode[0]);
-			}
-			else if (_cprAt.MatchWithAnyName(name))
-			{
-				kind = AnnotationKind.CachePrHookPreset;
-				var node = TypeNode.FromRuntime(typeof(CachePerResolution<>),
-					new[] { TypeNode.FromSymbol(ownerReturn) });
-				type = new TypeToCreate(node, new TypeNode[0]);
-			}
-			else
-			{
-				return null;
-			}
-
-			return new MethodAttributeAspect(kind, TypeNode.FromSymbol(ownerReturn), ownerName, type);
-		}
-
-		private PropertyAspect? ExtractAspect(PropertyDeclarationSyntax syntax,
-			IAnalysisContext context)
-		{
-			if (context.GetPropertySymbol(syntax) is not { } symbol)
+			if (_context.GetPropertySymbol(syntax) is not { } symbol)
 			{
 				return null;
 			}
@@ -233,7 +172,7 @@ namespace Deptorygen2.Core.Steps.Aspects
 						.Select(x => x.GetSyntax())
 						.OfType<MethodDeclarationSyntax>()
 						.FirstOrDefault();
-					return mm is null ? null : ExtractAspect(mm, context);
+					return mm is null ? null : ExtractAspect(mm);
 				}).FilterNull().ToArray();
 
 			return new PropertyAspect(TypeNode.FromSymbol(symbol.Type),

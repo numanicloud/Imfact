@@ -14,13 +14,14 @@ namespace Deptorygen2.Core
 	public class GenerationFacade
 	{
 		private readonly IAnalysisContext _context;
-		private readonly AspectAggregator _aspectAggregator = new();
+		private readonly AspectRule _aspectAggregator;
 		private readonly SemanticsRule _semanticsAggregator;
 
 		public GenerationFacade(SemanticModel semanticModel)
 		{
 			_context = new CompilationAnalysisContext(semanticModel);
 			_semanticsAggregator = new SemanticsRule();
+			_aspectAggregator = new AspectRule(_context);
 		}
 
 		public SourceFile? RunGeneration(ClassDeclarationSyntax syntax)
@@ -33,7 +34,7 @@ namespace Deptorygen2.Core
 
 		private SyntaxOnAspect? AspectStep(ClassDeclarationSyntax syntax)
 		{
-			return _aspectAggregator.Aggregatexx(syntax, _context) is { } aspect
+			return _aspectAggregator.Aggregate(syntax) is { } aspect
 				? new SyntaxOnAspect(aspect) : null;
 		}
 
