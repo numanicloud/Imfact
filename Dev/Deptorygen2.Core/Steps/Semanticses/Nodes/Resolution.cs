@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Utilities;

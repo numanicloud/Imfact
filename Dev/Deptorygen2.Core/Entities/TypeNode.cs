@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
-using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using NacHelpers.Extensions;
 using static Deptorygen2.Core.Utilities.DisposableType;
 
-namespace Deptorygen2.Core.Steps.Semanticses.Nodes
+namespace Deptorygen2.Core.Entities
 {
 	internal record TypeNode(TypeRecord Record,
 		Accessibility Accessibility,

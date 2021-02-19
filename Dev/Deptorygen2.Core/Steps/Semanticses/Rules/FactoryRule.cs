@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;

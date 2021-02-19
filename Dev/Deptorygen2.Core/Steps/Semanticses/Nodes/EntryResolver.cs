@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Deptorygen2.Annotations;
+using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
 using Microsoft.CodeAnalysis;
 

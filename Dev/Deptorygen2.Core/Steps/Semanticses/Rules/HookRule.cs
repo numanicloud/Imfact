@@ -1,4 +1,5 @@
 ﻿using Deptorygen2.Annotations;
+using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
