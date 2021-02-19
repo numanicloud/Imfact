@@ -43,7 +43,8 @@ namespace Deptorygen2.Core.Steps.Semanticses.Rules
 
 			return new ResolverCommon(method.Accessibility,
 				method.ReturnType.Type.Node,
-				method.Name, parameters, resolutions, hooks);
+				"__" + method.Name,
+				parameters, resolutions, hooks);
 		}
 
 		private static Resolution ExtractResolution(TypeToCreate t)

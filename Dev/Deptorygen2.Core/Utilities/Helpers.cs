@@ -71,5 +71,13 @@ namespace Deptorygen2.Core.Utilities
 
 			return func(prevStep);
 		}
+
+		public static Dictionary<TKey, TValue> ToDictionaryWithDistinct<T, TKey, TValue>(
+			this IEnumerable<T> source, Func<T, TKey> keySelector, Func<T, TValue> valueSelector,
+			Func<IEnumerable<T>, T> selectFromGroup)
+		{
+			return source.GroupBy(keySelector).Select(selectFromGroup)
+				.ToDictionary(keySelector, valueSelector);
+		}
 	}
 }

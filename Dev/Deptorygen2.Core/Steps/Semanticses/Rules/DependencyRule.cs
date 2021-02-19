@@ -3,7 +3,6 @@ using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
-using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Rules
 {
@@ -11,57 +10,36 @@ namespace Deptorygen2.Core.Steps.Semanticses.Rules
 	{
 		public Dependency[] Extract(Factory factory)
 		{
-			var delegated = factory.Delegations.Cast<IFactorySemantics>()
-				.Concat(factory.Inheritances)
-				.SelectMany(x => x.Resolvers).Cast<IResolverSemantics>()
-				.Concat(factory.Resolvers)
-				.Concat(factory.MultiResolvers);
+			// 戻り値からの依存先は、自身のリゾルバーを使ってもよい
+			var cannotReturn = factory.Resolvers
+				.Concat<IResolverSemantics>(factory.MultiResolvers)
+				.Select(x => x.ReturnType)
+				.ToDictionaryWithDistinct(x => x.Record, x => x, g => g.First());
 
-			var members = factory.Type.WrapByArray()
+			// 戻り値そのものは委譲または継承されたリゾルバーのみを使って解決できる
+			var canReturn = factory.Delegations
+				.Concat<IFactorySemantics>(factory.Inheritances)
+				.SelectMany(x =>
+					x.Resolvers.Concat<IResolverSemantics>(x.MultiResolvers))
+				.Select(x => x.ReturnType)
+				.Append(factory.Type)
 				.Concat(factory.Delegations.Select(x => x.Type))
 				.Concat(factory.Inheritances.Select(x => x.Type))
-				.GroupBy(x => x.Record)
-				.Select(x => x.First())
-				.ToDictionary(x => x.Record, x => x);
+				.ToDictionaryWithDistinct(x => x.Record, x => x, g => g.First());
 
-			var provided = delegated
-				.GroupBy(x => x.ReturnType.Record)
-				.Select(x => x.First())
-				.ToDictionary(x => x.ReturnType.Record, x => x);
+			// 戻り値そのものが解決されてしまうなら、その依存先も解決された扱いにする
+			var singleResolutions = factory.Resolvers
+				.Select(x => x.ActualResolution)
+				.Where(x => !canReturn.ContainsKey(x.TypeName.Record));
 
-			// リゾルバーの依存先のうち、解決可能なものはフィールド化しない。
-			// リゾルバーのうち、その戻り値が解決可能なものはリゾルバーの依存先をフィールド化しない。
-			// ただし、自分自身を呼び出すことで解決できるようなものは解決可能とは見なさない。
-			var forResolve = factory.Resolvers
-				.SelectMany(x =>
-				{
-					var res = x.ReturnTypeResolution is null
-						? x.Resolutions
-						: x.ReturnTypeResolution.WrapByArray();
-					return res.Where(r =>
-					{
-						var inverse = provided.GetValueOrDefault(r.TypeName.Record) is { } p 
-						              && p.MethodName != x.MethodName;
-						return !inverse;
-					});
-				})
-				.Where(x => !members.ContainsKey(x.TypeName.Record))
-				.SelectMany(x => x.Dependencies);
+			var multiResolutions = factory.MultiResolvers
+				.SelectMany(x => x.Resolutions);
 
-			var forMultiResolve = factory.MultiResolvers
-				.SelectMany(x =>
-				{
-					return x.Resolutions.Where(r =>
-					{
-						var inverse = provided.GetValueOrDefault(r.TypeName.Record) is { } p
-						              && p.MethodName != x.MethodName;
-						return !inverse;
-					});
-				})
-				.Where(x => !members.ContainsKey(x.TypeName.Record))
-				.SelectMany(x => x.Dependencies);
-
-			return forResolve.Concat(forMultiResolve)
+			// 依存先たちの中でも、ファクトリー内のリゾルバーで解決できるものはファクトリーとしての依存先にはならない
+			return singleResolutions.Concat(multiResolutions)
+				.SelectMany(x => x.Dependencies)
+				.Where(x => !canReturn.ContainsKey(x.Record))
+				.Where(x => !cannotReturn.ContainsKey(x.Record))
 				.Select(x => new Dependency(x, "_" + x.Name.ToLowerCamelCase()))
 				.ToArray();
 		}
