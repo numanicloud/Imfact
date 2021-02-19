@@ -41,4 +41,15 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 	internal record Dependency(TypeNode TypeName, string FieldName);
 
 	internal record Hook(TypeNode HookType, string FieldName);
+
+	internal record Parameter(TypeNode Type, string ParameterName);
+
+	internal record Resolution(TypeNode TypeName,
+		TypeNode[] Dependencies,
+		bool IsDisposable);
+
+	internal record EntryResolver(string MethodName,
+		TypeNode ReturnType,
+		Parameter[] Parameters,
+		Accessibility Accessibility);
 }

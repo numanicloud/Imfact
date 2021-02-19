@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Deptorygen2.Annotations;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
@@ -18,13 +17,6 @@ namespace Deptorygen2.Core.Steps.Aspects
 		readonly AttributeName _hokAt = new(nameof(HookAttribute));
 		readonly AttributeName _cacAt = new(nameof(CacheAttribute));
 		readonly AttributeName _cprAt = new(nameof(CachePerResolutionAttribute));
-
-		public Class? Aggregate(ClassDeclarationSyntax root, IAnalysisContext context)
-		{
-			return context.GetNamedTypeSymbol(root) is { } symbol
-				? new Class(root, symbol)
-				: null;
-		}
 
 		public ClassAspect? Aggregatexx(ClassDeclarationSyntax root, IAnalysisContext context)
 		{
