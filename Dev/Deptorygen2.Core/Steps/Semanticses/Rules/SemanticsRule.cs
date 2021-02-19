@@ -1,9 +1,7 @@
-﻿using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Aspects;
-using Deptorygen2.Core.Steps.Aspects.Nodes;
+﻿using Deptorygen2.Core.Steps.Aspects;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 
-namespace Deptorygen2.Core.Steps.Semanticses
+namespace Deptorygen2.Core.Steps.Semanticses.Rules
 {
 	internal sealed class SemanticsRule
 	{
@@ -11,12 +9,12 @@ namespace Deptorygen2.Core.Steps.Semanticses
 		private readonly UsingRule _usingRule = new();
 		private readonly DependencyRule _dependencyRule = new();
 
-		public SemanticsRule(IAnalysisContext context)
+		public SemanticsRule()
 		{
-			_factoryRule = new FactoryRule(context, new ResolverRule(context));
+			_factoryRule = new FactoryRule(new ResolverRule());
 		}
 
-		public Generation? Aggregate(ClassAspect @class)
+		public Generation Aggregate(ClassAspect @class)
 		{
 			var factory = _factoryRule.ExtractFactory(@class);
 

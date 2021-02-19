@@ -3,9 +3,11 @@ using Deptorygen2.Core.Steps;
 using Deptorygen2.Core.Steps.Aspects;
 using Deptorygen2.Core.Steps.Definitions;
 using Deptorygen2.Core.Steps.Semanticses;
+using Deptorygen2.Core.Steps.Semanticses.Rules;
 using Deptorygen2.Core.Steps.Writing;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core
 {
@@ -18,14 +20,15 @@ namespace Deptorygen2.Core
 		public GenerationFacade(SemanticModel semanticModel)
 		{
 			_context = new CompilationAnalysisContext(semanticModel);
-			_semanticsAggregator = new SemanticsRule(_context);
+			_semanticsAggregator = new SemanticsRule();
 		}
 
 		public SourceFile? RunGeneration(ClassDeclarationSyntax syntax)
 		{
-			return AspectStep(syntax) is not { } aspect ? null
-				: SemanticsStep(aspect) is not { } semantics ? null
-				: SourceCodeStep(DefinitionStep(semantics));
+			return AspectStep(syntax)
+				.Then(SemanticsStep)
+				.Then(DefinitionStep)
+				.Then(SourceCodeStep);
 		}
 
 		private SyntaxOnAspect? AspectStep(ClassDeclarationSyntax syntax)

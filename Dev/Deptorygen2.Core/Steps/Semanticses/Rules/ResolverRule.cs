@@ -1,27 +1,16 @@
 ﻿using System.Linq;
 using Deptorygen2.Annotations;
 using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Aspects;
-using Deptorygen2.Core.Steps.Aspects.Nodes;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
-using Deptorygen2.Core.Steps.Semanticses.Rules;
 using Deptorygen2.Core.Utilities;
 using NacHelpers.Extensions;
 using Parameter = Deptorygen2.Core.Steps.Semanticses.Nodes.Parameter;
 
-namespace Deptorygen2.Core.Steps.Semanticses
+namespace Deptorygen2.Core.Steps.Semanticses.Rules
 {
 	internal sealed class ResolverRule
 	{
-		private readonly IAnalysisContext _context;
-		private readonly HookRule _hookRule = new ();
-
-		public ResolverRule(IAnalysisContext context)
-		{
-			_context = context;
-		}
-
 		public MultiResolver[] ExtractMultiResolver(MethodAspect[] methods)
 		{
 			return methods.Where(x => x.Kind == ResolverKind.Multi)
@@ -73,75 +62,8 @@ namespace Deptorygen2.Core.Steps.Semanticses
 			}
 
 			var typeNode = aspect.TypeToCreate.Node;
-
-			if (!typeNode.TypeArguments.Any())
-			{
-				typeNode = typeNode with
-				{
-					TypeArguments = new[] { method.ReturnType.Type.Node }
-				};
-			}
-
 			var name = $"_{method.Name}_{typeNode.Name}";
 			return new Hook(typeNode, name);
-		}
-
-
-		public MultiResolver[] ExtractMultiResolver(Method[] methods)
-		{
-			return methods.Where(x => x.IsCollectionResolver())
-				.Select(m => new MultiResolver(GetMethodCommon(m)))
-				.ToArray();
-		}
-
-		public Resolver[] ExtractResolver(Method[] getMethods)
-		{
-			return getMethods.Where(x => x.IsSingleResolver())
-				.Select(m =>
-				{
-					var ret = m.GetReturnType(_context) is { } t
-						? Resolution.Build(t)
-						: null;
-					var abstraction = GetMethodCommon(m);
-
-					return new Resolver(abstraction, ret);
-				}).ToArray();
-		}
-
-		private ResolverCommon GetMethodCommon(Method method)
-		{
-			var parameters = method.GetParameters();
-			var attributes = method.GetAttributes();
-			var ctx = new Parameter(TypeNode.FromRuntime(typeof(ResolutionContext)), "context");
-
-			return new ResolverCommon(
-				method.Symbol.DeclaredAccessibility,
-				TypeNode.FromSymbol(method.Symbol.ReturnType),
-				"__" + method.Symbol.Name,
-				AggregateParameter(parameters).Append(ctx).ToArray(),
-				AggregateResolution(attributes),
-				AggregateHooks(attributes, method));
-		}
-
-		private Hook[] AggregateHooks(Attribute[] attributes, Method method)
-		{
-			return attributes.Select(x => _hookRule.Extract(x, method))
-				.FilterNull()
-				.ToArray();
-		}
-
-		private Parameter[] AggregateParameter(Aspects.Nodes.Parameter[] parameters)
-		{
-			return parameters.Select(x => Parameter.Build(x, _context))
-				.FilterNull()
-				.ToArray();
-		}
-
-		private Resolution[] AggregateResolution(Attribute[] attributes)
-		{
-			return attributes.Select(x => Resolution.Build(x, _context))
-				.FilterNull()
-				.ToArray();
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using NacHelpers.Extensions;
@@ -57,6 +58,18 @@ namespace Deptorygen2.Core.Utilities
 			return accessibilities.Contains(Accessibility.Internal)
 				? Accessibility.Internal
 				: Accessibility.Public;
+		}
+
+		public static TResult? Then<T, TResult>(this T? prevStep, Func<T, TResult?> func)
+			where T : class
+			where TResult : class
+		{
+			if (prevStep is null)
+			{
+				return null;
+			}
+
+			return func(prevStep);
 		}
 	}
 }

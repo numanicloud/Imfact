@@ -4,7 +4,7 @@ using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using NacHelpers.Extensions;
 
-namespace Deptorygen2.Core.Steps.Semanticses
+namespace Deptorygen2.Core.Steps.Semanticses.Rules
 {
 	internal sealed class UsingRule
 	{
