@@ -6,17 +6,17 @@ using Microsoft.CodeAnalysis;
 
 namespace Deptorygen2.Core.Steps.Aspects
 {
-	internal class AttributeReceptor
+	internal class AttributeRule
 	{
-		private readonly AspectRule _originalxx;
+		private readonly TypeRule _typeRule;
 		private readonly AttributeName _resAt = new(nameof(ResolutionAttribute));
 		private readonly AttributeName _hokAt = new(nameof(HookAttribute));
 		private readonly AttributeName _cacAt = new(nameof(CacheAttribute));
 		private readonly AttributeName _cprAt = new(nameof(CachePerResolutionAttribute));
 
-		public AttributeReceptor(AspectRule originalxx)
+		public AttributeRule(TypeRule typeRule)
 		{
-			_originalxx = originalxx;
+			_typeRule = typeRule;
 		}
 
 		public MethodAttributeAspect? ExtractAspect(AttributeData data,
@@ -75,7 +75,7 @@ namespace Deptorygen2.Core.Steps.Aspects
 			    && data.ConstructorArguments[0].Value is INamedTypeSymbol t)
 			{
 				var kind = AnnotationKind.Resolution;
-				var type = _originalxx.ExtractTypeToCreate(t, ownerReturn);
+				var type = _typeRule.ExtractTypeToCreate(t, ownerReturn);
 				return (kind, type);
 			}
 
@@ -91,7 +91,7 @@ namespace Deptorygen2.Core.Steps.Aspects
 			    && arg.ConstructedFrom.IsImplementing(typeof(IHook<>)))
 			{
 				var kind = AnnotationKind.Hook;
-				var type = _originalxx.ExtractTypeToCreate(arg, ownerReturn);
+				var type = _typeRule.ExtractTypeToCreate(arg, ownerReturn);
 				return (kind, type);
 			}
 

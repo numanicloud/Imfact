@@ -11,15 +11,20 @@ using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Aspects
 {
-	internal class AspectRule
+	internal class ClassRule
 	{
 		private readonly IAnalysisContext _context;
-		private readonly AttributeReceptor _attributeReceptor;
+		private readonly MethodRule _methodRule;
 
-		public AspectRule(IAnalysisContext context)
+		public ClassRule(IAnalysisContext context)
 		{
+			var typeRule = new TypeRule();
+
 			_context = context;
-			_attributeReceptor = new AttributeReceptor(this);
+
+			_methodRule = new MethodRule(context,
+				new AttributeRule(typeRule),
+				typeRule);
 		}
 
 		public ClassAspect? Aggregate(ClassDeclarationSyntax root)
@@ -69,7 +74,7 @@ namespace Deptorygen2.Core.Steps.Aspects
 		{
 			var methods = syntax.Members
 				.OfType<MethodDeclarationSyntax>()
-				.Select(ExtractAspect)
+				.Select(syntax1 => _methodRule.ExtractAspect(syntax1))
 				.FilterNull()
 				.ToArray();
 
@@ -83,69 +88,6 @@ namespace Deptorygen2.Core.Steps.Aspects
 				baseClasses ?? new ClassAspect[0],
 				methods,
 				properties);
-		}
-
-		private MethodAspect? ExtractAspect(MethodDeclarationSyntax syntax)
-		{
-			if (_context.GetMethodSymbol(syntax) is not { } symbol)
-			{
-				return null;
-			}
-
-			if (symbol.ReturnType is not INamedTypeSymbol returnSymbol)
-			{
-				return null;
-			}
-
-			var returnType = ExtractReturnTypeAspect(returnSymbol);
-			var attributes = symbol.GetAttributes()
-				.Select(x => _attributeReceptor.ExtractAspect(x, returnSymbol, symbol.Name))
-				.FilterNull()
-				.ToArray();
-			var parameters = syntax.ParameterList.Parameters
-				.Select(ExtractAspect)
-				.FilterNull()
-				.ToArray();
-
-			return new MethodAspect(symbol.Name, symbol.DeclaredAccessibility,
-				GetKind(), returnType, attributes, parameters);
-
-			ResolverKind GetKind()
-			{
-				var idSymbol = returnSymbol.ConstructedFrom;
-				var typeNameValid = idSymbol.MetadataName == typeof(IEnumerable<>).Name;
-				var typeArgValid = idSymbol.TypeArguments.Length == 1;
-				return typeNameValid && typeArgValid ? ResolverKind.Multi : ResolverKind.Single;
-			}
-		}
-
-		private ReturnTypeAspect ExtractReturnTypeAspect(INamedTypeSymbol symbol)
-		{
-			return new(ExtractTypeToCreate(symbol), symbol.IsAbstract);
-		}
-
-		internal TypeToCreate ExtractTypeToCreate(INamedTypeSymbol symbol, params ITypeSymbol[] typeArguments)
-		{
-			var args = symbol.Constructors.FirstOrDefault()?.Parameters
-				.Select(x => TypeNode.FromSymbol(x.Type))
-				.ToArray() ?? new TypeNode[0];
-
-			if (symbol.IsUnboundGenericType)
-			{
-				symbol = symbol.ConstructedFrom.Construct(typeArguments);
-			}
-
-			return new TypeToCreate(TypeNode.FromSymbol(symbol), args);
-		}
-
-		private ParameterAspect? ExtractAspect(ParameterSyntax syntax)
-		{
-			if (syntax.Type is null || _context.GetTypeSymbol(syntax.Type) is not { } symbol)
-			{
-				return null;
-			}
-
-			return new ParameterAspect(TypeNode.FromSymbol(symbol), symbol.Name);
 		}
 
 		private PropertyAspect? ExtractAspect(PropertyDeclarationSyntax syntax)
@@ -172,7 +114,7 @@ namespace Deptorygen2.Core.Steps.Aspects
 						.Select(x => x.GetSyntax())
 						.OfType<MethodDeclarationSyntax>()
 						.FirstOrDefault();
-					return mm is null ? null : ExtractAspect(mm);
+					return mm is null ? null : _methodRule.ExtractAspect(mm);
 				}).FilterNull().ToArray();
 
 			return new PropertyAspect(TypeNode.FromSymbol(symbol.Type),
