@@ -50,10 +50,18 @@ namespace Deptorygen2.Core.Steps.Definitions
 				.Select(x => BuildParameterNode(x.Type, x.ParamName))
 				.ToArray();
 
+			var baseParameters = _semantics.Factory.Inheritances
+				.FirstOrDefault()?.Parameters
+				.Select(x => BuildParameterNode(x.Type, x.ParameterName))
+				.ToArray();
+
 			var a = Helpers.GetTypeAccessibilityMostStrict(
 				ps.Select(x => x.Type.Accessibility).ToArray());
 
-			return new ConstructorSignature(a, _semantics.Factory.Type.Name, parameters);
+			return new ConstructorSignature(a,
+				_semantics.Factory.Type.Name,
+				parameters,
+				baseParameters);
 		}
 
 		private InitializeImplementation GetCtorImpl(Initialization[] asignee)

@@ -38,7 +38,7 @@ namespace Deptorygen2.Core
 				.ToArray();
 		}
 
-		public SourceFile? RunGeneration(RankedClass syntax)
+		private SourceFile? RunGeneration(RankedClass syntax)
 		{
 			return AspectStep(syntax)
 				.Then(SemanticsStep)

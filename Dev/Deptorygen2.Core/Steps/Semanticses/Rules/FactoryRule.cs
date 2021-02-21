@@ -32,8 +32,15 @@ namespace Deptorygen2.Core.Steps.Semanticses.Rules
 
 		private Inheritance[] ExtractInheritance(ClassAspect[] baseClasses)
 		{
-			return baseClasses.Select(x => new Inheritance(GetFactoryCommon(x.Type, x.Methods)))
-				.ToArray();
+			return baseClasses.Select(x =>
+			{
+				var parameters = x.KnownConstructor?.Parameters
+					.Select(y => new Parameter(y.Type, y.Name))
+					.ToArray();
+				return new Inheritance(
+					GetFactoryCommon(x.Type, x.Methods),
+					parameters ?? new Parameter[0]);
+			}).ToArray();
 		}
 
 		private Delegation[] ExtractDelegations(PropertyAspect[] properties)

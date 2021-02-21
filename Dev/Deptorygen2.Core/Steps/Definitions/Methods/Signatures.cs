@@ -19,14 +19,31 @@ namespace Deptorygen2.Core.Steps.Definitions.Methods
 		}
 	}
 
-	internal record ConstructorSignature(Accessibility Accessibility, string Name,
-		Parameter[] Parameters) : Signature
+	internal record ConstructorSignature(Accessibility Accessibility,
+		string Name,
+		Parameter[] Parameters,
+		Parameter[]? BaseParameters) : Signature
 	{
 		public override string GetSignatureString()
 		{
+			var ps = Parameters;
+			if (BaseParameters is not null)
+			{
+				ps = ps.Concat(BaseParameters).ToArray();
+			}
+
 			var access = Accessibility.ToString().ToLower();
-			var parameter = GetParameterList(Parameters);
-			return $"{access} {Name}({parameter})";
+			var parameterList = GetParameterList(ps);
+
+			if (BaseParameters is not null)
+			{
+				var baseParamList = GetParameterList(BaseParameters);
+				return $"{access} {Name}({parameterList}) : base({baseParamList})";
+			}
+			else
+			{
+				return $"{access} {Name}({parameterList})";
+			}
 		}
 	}
 }

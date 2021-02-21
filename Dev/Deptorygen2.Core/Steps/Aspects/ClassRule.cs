@@ -7,7 +7,6 @@ using System.Linq;
 using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Steps.Ranking;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Aspects
@@ -42,55 +41,10 @@ namespace Deptorygen2.Core.Steps.Aspects
 					return null;
 				}
 
-				return ExtractAspect(syntax, root.Symbol, constructor: GetConstructor(x));
+				return ExtractAspect(syntax, x, constructor: GetConstructor(x));
 			}).FilterNull().ToArray();
 
 			return ExtractAspect(root.Syntax, root.Symbol, baseClasses);
-
-			static IEnumerable<INamedTypeSymbol> TraverseBase(INamedTypeSymbol pivot)
-			{
-				if (pivot.BaseType is not null)
-				{
-					yield return pivot.BaseType;
-					foreach (var baseSymbol in TraverseBase(pivot.BaseType))
-					{
-						yield return baseSymbol;
-					}
-				}
-			}
-		}
-
-		public ClassAspect? Aggregate(ClassDeclarationSyntax root)
-		{
-			var hasAttr = root.AttributeLists.HasAttribute(new AttributeName(nameof(FactoryAttribute)));
-			var isPartial = root.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
-
-			if (!hasAttr || !isPartial)
-			{
-				return null;
-			}
-
-			if (_context.GetNamedTypeSymbol(root) is not { } symbol)
-			{
-				return null;
-			}
-
-			var baseClasses = TraverseBase(symbol).Select(x =>
-			{
-				var syntax = x.DeclaringSyntaxReferences
-					.Select(y => y.GetSyntax())
-					.OfType<ClassDeclarationSyntax>()
-					.FirstOrDefault();
-
-				if (syntax is null)
-				{
-					return null;
-				}
-
-				return ExtractAspect(syntax, symbol, constructor: GetConstructor(x));
-			}).FilterNull().ToArray();
-
-			return ExtractAspect(root, symbol, baseClasses);
 
 			static IEnumerable<INamedTypeSymbol> TraverseBase(INamedTypeSymbol pivot)
 			{

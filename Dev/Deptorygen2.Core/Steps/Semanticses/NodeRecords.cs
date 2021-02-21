@@ -21,7 +21,8 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		public string MemberName => PropertyName;
 	}
 
-	internal record Inheritance(FactoryCommon Common) : FactoryCommon(Common);
+	internal record Inheritance(FactoryCommon Common, Parameter[] Parameters)
+		: FactoryCommon(Common);
 
 	internal record FactoryCommon(TypeNode Type,
 		Resolver[] Resolvers,
