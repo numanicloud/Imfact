@@ -29,13 +29,11 @@ namespace Deptorygen2.Generator
 			var semanticModel = context.Compilation.GetSemanticModel(receiver.SyntaxTree);
 			var facade = new GenerationFacade(semanticModel);
 
-			foreach (var candidateClass in receiver.CandidateClasses)
+			var sourceFiles = facade.Run(receiver.CandidateClasses.ToArray());
+			foreach (var file in sourceFiles)
 			{
-				if (facade.RunGeneration(candidateClass) is {} sourceFile)
-				{
-					var sourceText = SourceText.From(sourceFile.Contents, Encoding.UTF8);
-					context.AddSource(sourceFile.FileName, sourceText);
-				}
+				var sourceText = SourceText.From(file.Contents, Encoding.UTF8);
+				context.AddSource(file.FileName, sourceText);
 			}
 		}
 	}

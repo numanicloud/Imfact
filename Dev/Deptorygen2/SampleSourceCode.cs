@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Text;
 using Deptorygen2.Core;
 using Deptorygen2.Generator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Deptorygen2
 {
@@ -112,11 +114,10 @@ namespace Deptorygen2.TestSubject.Sub
 					from type in ns.ChildNodes().OfType<ClassDeclarationSyntax>()
 					select type;
 
-			foreach (var classDeclarationSyntax in classes)
+			var sourceFiles = generation.Run(classes.ToArray());
+			foreach (var file in sourceFiles)
 			{
-				var newSource = generation.RunGeneration(classDeclarationSyntax);
-				Console.WriteLine(newSource?.Contents);
-				Console.WriteLine();
+				Console.WriteLine(file.Contents);
 			}
 		}
 	}

@@ -28,14 +28,36 @@ namespace Deptorygen2.Core.Steps.Aspects
 				typeRule);
 		}
 
-		public ClassAspect[] AggregatePlural(RankedClass[] ranked)
+		public ClassAspect Aggregate(RankedClass root)
 		{
-			var byRank = ranked.ToDictionary(x => x.Rank, x => x);
+			var baseClasses = TraverseBase(root.Symbol).Select(x =>
+			{
+				var syntax = x.DeclaringSyntaxReferences
+					.Select(y => y.GetSyntax())
+					.OfType<ClassDeclarationSyntax>()
+					.FirstOrDefault();
 
-			// TODO: コンストラクタ引数を収集するようにする
-			return byRank.Select(x => Aggregate(x.Value.Syntax))
-				.FilterNull()
-				.ToArray();
+				if (syntax is null)
+				{
+					return null;
+				}
+
+				return ExtractAspect(syntax, root.Symbol, constructor: GetConstructor(x));
+			}).FilterNull().ToArray();
+
+			return ExtractAspect(root.Syntax, root.Symbol, baseClasses);
+
+			static IEnumerable<INamedTypeSymbol> TraverseBase(INamedTypeSymbol pivot)
+			{
+				if (pivot.BaseType is not null)
+				{
+					yield return pivot.BaseType;
+					foreach (var baseSymbol in TraverseBase(pivot.BaseType))
+					{
+						yield return baseSymbol;
+					}
+				}
+			}
 		}
 
 		public ClassAspect? Aggregate(ClassDeclarationSyntax root)
@@ -59,9 +81,13 @@ namespace Deptorygen2.Core.Steps.Aspects
 					.Select(y => y.GetSyntax())
 					.OfType<ClassDeclarationSyntax>()
 					.FirstOrDefault();
-				return syntax is not null
-					? ExtractAspect(syntax, symbol)
-					: null;
+
+				if (syntax is null)
+				{
+					return null;
+				}
+
+				return ExtractAspect(syntax, symbol, constructor: GetConstructor(x));
 			}).FilterNull().ToArray();
 
 			return ExtractAspect(root, symbol, baseClasses);
@@ -79,9 +105,20 @@ namespace Deptorygen2.Core.Steps.Aspects
 			}
 		}
 
+		private ConstructorAspect GetConstructor(INamedTypeSymbol symbol)
+		{
+			var c = symbol.Constructors.Single();
+			var ps = c.Parameters
+				.Select(x => new ParameterAspect(TypeNode.FromSymbol(x.Type), x.Name))
+				.ToArray();
+
+			return new ConstructorAspect(c.DeclaredAccessibility, ps);
+		}
+
 		private ClassAspect ExtractAspect(ClassDeclarationSyntax syntax,
 			INamedTypeSymbol symbol,
-			ClassAspect[]? baseClasses = null)
+			ClassAspect[]? baseClasses = null,
+			ConstructorAspect? constructor = null)
 		{
 			var methods = syntax.Members
 				.OfType<MethodDeclarationSyntax>()
@@ -98,7 +135,8 @@ namespace Deptorygen2.Core.Steps.Aspects
 			return new ClassAspect(TypeNode.FromSymbol(symbol),
 				baseClasses ?? new ClassAspect[0],
 				methods,
-				properties);
+				properties,
+				constructor);
 		}
 
 		private PropertyAspect? ExtractAspect(PropertyDeclarationSyntax syntax)

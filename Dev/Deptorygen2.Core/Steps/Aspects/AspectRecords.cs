@@ -16,7 +16,12 @@ namespace Deptorygen2.Core.Steps.Aspects
 	internal record ClassAspect(TypeNode Type,
 		ClassAspect[] BaseClasses,
 		MethodAspect[] Methods,
-		PropertyAspect[] Properties);
+		PropertyAspect[] Properties,
+		ConstructorAspect? KnownConstructor);
+
+	internal record ConstructorAspect(
+		Accessibility Accessibility,
+		ParameterAspect[] Parameters);
 
 	internal record MethodAspect(string Name,
 		Accessibility Accessibility,

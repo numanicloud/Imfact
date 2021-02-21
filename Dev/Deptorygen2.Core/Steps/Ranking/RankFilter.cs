@@ -36,8 +36,12 @@ namespace Deptorygen2.Core.Steps.Ranking
 				.ToArray();
 
 			// 0番目のランクとそれ以外のランクに分ける
-			var rank0 = relations.Where(x => x.BaseSymbol is null).ToList();
-			var notRank0 = relations.Where(x => x.BaseSymbol is not null).ToList();
+			var rank0 = relations
+				.Where(x => x.BaseSymbol?.SpecialType == SpecialType.System_Object)
+				.ToList();
+			var notRank0 = relations
+				.Where(x => x.BaseSymbol is {} b && b.SpecialType != SpecialType.System_Object)
+				.ToList();
 			var ranks = new Dictionary<int, List<Relation>>()
 			{
 				[0] = rank0
@@ -58,6 +62,11 @@ namespace Deptorygen2.Core.Steps.Ranking
 				}
 
 				reference += 1;
+
+				if (reference > 10)
+				{
+					throw new Exception();
+				}
 			}
 
 			// レコード型にまとめて出力する

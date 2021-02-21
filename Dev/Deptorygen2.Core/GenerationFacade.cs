@@ -1,13 +1,16 @@
-﻿using Deptorygen2.Core.Interfaces;
+﻿using System.Linq;
+using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps;
 using Deptorygen2.Core.Steps.Aspects;
 using Deptorygen2.Core.Steps.Definitions;
+using Deptorygen2.Core.Steps.Ranking;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Semanticses.Rules;
 using Deptorygen2.Core.Steps.Writing;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Deptorygen2.Core.Utilities;
+using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core
 {
@@ -24,7 +27,18 @@ namespace Deptorygen2.Core
 			_classAggregator = new ClassRule(_context);
 		}
 
-		public SourceFile? RunGeneration(ClassDeclarationSyntax syntax)
+		public SourceFile[] Run(ClassDeclarationSyntax[] syntaxes)
+		{
+			var ranking = new RankFilter();
+			var ranked = ranking.FilterClasses(syntaxes, _context);
+
+			return ranked.OrderBy(x => x.Rank)
+				.Select(RunGeneration)
+				.FilterNull()
+				.ToArray();
+		}
+
+		public SourceFile? RunGeneration(RankedClass syntax)
 		{
 			return AspectStep(syntax)
 				.Then(SemanticsStep)
@@ -32,10 +46,10 @@ namespace Deptorygen2.Core
 				.Then(SourceCodeStep);
 		}
 
-		private SyntaxOnAspect? AspectStep(ClassDeclarationSyntax syntax)
+		private SyntaxOnAspect AspectStep(RankedClass syntax)
 		{
-			return _classAggregator.Aggregate(syntax) is { } aspect
-				? new SyntaxOnAspect(aspect) : null;
+			var aspect = _classAggregator.Aggregate(syntax);
+			return new SyntaxOnAspect(aspect);
 		}
 
 		private DeptorygenSemantics? SemanticsStep(SyntaxOnAspect aspect)

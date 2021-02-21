@@ -62,7 +62,7 @@ namespace Deptorygen2.Core.Steps.Aspects
 			return new(_typeRule.ExtractTypeToCreate(symbol), symbol.IsAbstract);
 		}
 
-		private ParameterAspect? ExtractAspect(ParameterSyntax syntax)
+		public ParameterAspect? ExtractAspect(ParameterSyntax syntax)
 		{
 			if (syntax.Type is null || _context.GetTypeSymbol(syntax.Type) is not { } symbol)
 			{
