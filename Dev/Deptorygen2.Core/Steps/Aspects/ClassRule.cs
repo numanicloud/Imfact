@@ -5,6 +5,7 @@ using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
 using Deptorygen2.Core.Entities;
+using Deptorygen2.Core.Steps.Ranking;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using NacHelpers.Extensions;
@@ -25,6 +26,16 @@ namespace Deptorygen2.Core.Steps.Aspects
 			_methodRule = new MethodRule(context,
 				new AttributeRule(typeRule),
 				typeRule);
+		}
+
+		public ClassAspect[] AggregatePlural(RankedClass[] ranked)
+		{
+			var byRank = ranked.ToDictionary(x => x.Rank, x => x);
+
+			// TODO: コンストラクタ引数を収集するようにする
+			return byRank.Select(x => Aggregate(x.Value.Syntax))
+				.FilterNull()
+				.ToArray();
 		}
 
 		public ClassAspect? Aggregate(ClassDeclarationSyntax root)
