@@ -21,15 +21,11 @@ namespace Deptorygen2.Core.Steps.Creation.Abstraction
 
 		public string? GetCode(CreationRequest request, ICreationAggregator aggregator)
 		{
-			if (_resolutionSource is null)
-			{
-				var xx = GetSource(_semantics)
-					.Select(x => (type: GetTypeInfo(x), source: x))
-					.GroupBy(x => x.type)
-					.Select(x => x.First());
-				_resolutionSource = xx
-					.ToDictionary(x => x.type, x => x.source);
-			}
+			_resolutionSource ??= GetSource(_semantics)
+				.Select(x => (type: GetTypeInfo(x), source: x))
+				.GroupBy(x => x.type)
+				.Select(x => x.First())
+				.ToDictionary(x => x.type, x => x.source);
 
 			if (_resolutionSource.GetValueOrDefault(request.TypeToResolve.Record) is not { } resolution)
 			{
@@ -46,16 +42,6 @@ namespace Deptorygen2.Core.Steps.Creation.Abstraction
 		protected abstract IEnumerable<T> GetSource(Generation semantics);
 
 		protected abstract TypeRecord GetTypeInfo(T source);
-
-		protected string MethodInvocation(IResolverSemantics resolver,
-			GivenParameter[] given,
-			ICreationAggregator injector)
-		{
-			var request = new MultipleCreationRequest(
-				resolver.Parameters.Select(x => x.Type).ToArray(), given, false);
-
-			return $"{resolver.MethodName}({GetArgList(request, injector)})";
-		}
 
 		protected string GetArgList(MultipleCreationRequest request,
 			ICreationAggregator aggregator)

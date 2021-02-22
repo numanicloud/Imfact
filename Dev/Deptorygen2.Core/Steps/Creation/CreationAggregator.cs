@@ -69,9 +69,9 @@ namespace Deptorygen2.Core.Steps.Creation
 
 		public static IEnumerable<ICreationStrategy> GetCreations(Generation semantics)
 		{
-			var factory = new RootFactorySource();
-			var delegation = new DelegationSource();
-			var inheritance = new InheritanceSource();
+			var factory = new RootFactorySource(semantics);
+			var delegation = new DelegationSource(semantics);
+			var inheritance = new InheritanceSource(semantics);
 			var resolver = new ResolverSource();
 			var multiResolver = new MultiResolverSource();
 

@@ -47,7 +47,20 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 		string MethodName,
 		Parameter[] Parameters,
 		Resolution[] Resolutions,
-		Hook[] Hooks) : IResolverSemantics;
+		Hook[] Hooks) : IResolverSemantics
+	{
+		public override int GetHashCode()
+		{
+			var value = 1;
+			value += (int) Accessibility * 3;
+			value += ReturnType.Record.GetHashCode() * 7;
+			value += MethodName.GetHashCode() * 19;
+			value += Parameters.Length * 11;
+			value += Resolutions.Length * 23;
+			value += Hooks.Length * 2;
+			return value;
+		}
+	}
 
 	internal record Dependency(TypeNode TypeName, string FieldName) : IProbablyDisposable
 	{

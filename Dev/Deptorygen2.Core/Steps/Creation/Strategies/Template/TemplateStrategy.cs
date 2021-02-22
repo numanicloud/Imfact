@@ -32,7 +32,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies.Template
 
 		protected override IEnumerable<Source> GetSource(Generation semantics)
 		{
-			return from delegation in _factorySource.GetDelegationSource(semantics)
+			return from delegation in _factorySource.GetDelegationSource()
 				   from resolver in _resolverSource.GetResolverSource(delegation)
 				   select new Source(delegation, resolver);
 		}
@@ -40,6 +40,16 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies.Template
 		protected override TypeRecord GetTypeInfo(Source source)
 		{
 			return source.Resolver.ReturnType.Record;
+		}
+
+		private string MethodInvocation(IResolverSemantics resolver,
+			GivenParameter[] given,
+			ICreationAggregator injector)
+		{
+			var request = new MultipleCreationRequest(
+				resolver.Parameters.Select(x => x.Type).ToArray(), given, false);
+
+			return $"{resolver.MethodName}({GetArgList(request, injector)})";
 		}
 
 		public record Source(TFactory Factory, TResolver Resolver);

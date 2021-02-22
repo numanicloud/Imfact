@@ -25,7 +25,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies.Template
 
 		protected override IEnumerable<TFactory> GetSource(Generation semantics)
 		{
-			return _factorySource.GetDelegationSource(semantics);
+			return _factorySource.GetDelegationSource();
 		}
 
 		protected override TypeRecord GetTypeInfo(TFactory source)
