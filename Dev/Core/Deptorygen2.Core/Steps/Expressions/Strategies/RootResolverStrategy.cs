@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Creation.Strategies.Template;
-using Deptorygen2.Core.Steps.Semanticses.Nodes;
+using Deptorygen2.Core.Steps.Semanticses;
+using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 
 namespace Deptorygen2.Core.Steps.Expressions.Strategies
 {

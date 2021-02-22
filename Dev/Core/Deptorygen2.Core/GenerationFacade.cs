@@ -6,7 +6,6 @@ using Deptorygen2.Core.Steps.Definitions;
 using Deptorygen2.Core.Steps.Expressions;
 using Deptorygen2.Core.Steps.Ranking;
 using Deptorygen2.Core.Steps.Semanticses;
-using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Steps.Semanticses.Rules;
 using Deptorygen2.Core.Steps.Writing;
 using Microsoft.CodeAnalysis;

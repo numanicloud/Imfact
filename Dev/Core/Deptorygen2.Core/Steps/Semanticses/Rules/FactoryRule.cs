@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Steps.Aspects;
-using Deptorygen2.Core.Steps.Semanticses.Nodes;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Rules
 {
@@ -55,7 +54,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Rules
 			return aspect.Methods.Select(x =>
 			{
 				var parameters = x.Parameters
-					.Select(y => new Nodes.Parameter(y.Type, y.Name))
+					.Select(y => new Parameter(y.Type, y.Name))
 					.ToArray();
 
 				return new EntryResolver(x.Name,

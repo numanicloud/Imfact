@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Semanticses.Nodes;
+using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Rules

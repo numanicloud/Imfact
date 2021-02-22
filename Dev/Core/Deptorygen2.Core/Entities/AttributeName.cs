@@ -1,4 +1,4 @@
-﻿namespace Deptorygen2.Core.Utilities
+﻿namespace Deptorygen2.Core.Entities
 {
 	internal record AttributeName(string NameWithAttributeSuffix)
 	{

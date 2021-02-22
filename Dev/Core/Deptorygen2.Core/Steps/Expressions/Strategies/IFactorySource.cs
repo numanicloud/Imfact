@@ -1,8 +1,8 @@
-﻿using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using Deptorygen2.Core.Steps.Semanticses.Nodes;
+﻿using Deptorygen2.Core.Steps.Semanticses;
+using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using NacHelpers.Extensions;
 
-namespace Deptorygen2.Core.Steps.Creation.Strategies.Template
+namespace Deptorygen2.Core.Steps.Expressions.Strategies
 {
 	interface IFactorySource<T> where T : IFactorySemantics
 	{

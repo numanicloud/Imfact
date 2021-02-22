@@ -1,7 +1,7 @@
 ﻿using System;
 using NacHelpers.Extensions;
 
-namespace Deptorygen2.Core.Steps.Writing
+namespace Deptorygen2.Core.Steps.Writing.Coding
 {
 	internal class BlockBuilder : ICodeBuilder, IDisposable
 	{

@@ -1,4 +1,4 @@
-﻿namespace Deptorygen2.Core.Steps.Writing
+﻿namespace Deptorygen2.Core.Steps.Writing.Coding
 {
 	internal interface ICodeBuilder
 	{

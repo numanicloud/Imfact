@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Deptorygen2.Core.Steps.Writing;
+using Deptorygen2.Core.Steps.Writing.Coding;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Definitions.Methods

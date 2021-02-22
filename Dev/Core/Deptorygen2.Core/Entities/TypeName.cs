@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using NacHelpers.Extensions;
-using System.Text.RegularExpressions;
 
-namespace Deptorygen2.Core.Utilities
+namespace Deptorygen2.Core.Entities
 {
 	public class TypeName : IEquatable<TypeName>
 	{

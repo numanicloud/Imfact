@@ -1,13 +1,11 @@
 ﻿using System.Linq;
 using System.Text;
 using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using NacHelpers.Extensions;
 
-namespace Deptorygen2.Core.Steps.Semanticses.Nodes
+namespace Deptorygen2.Core.Steps.Semanticses
 {
 	internal record Factory(FactoryCommon Common,
 		Delegation[] Delegations, Inheritance[] Inheritances, EntryResolver[] EntryResolvers)

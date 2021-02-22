@@ -1,4 +1,6 @@
-﻿namespace Deptorygen2.Core.Steps.Writing
+﻿using Deptorygen2.Core.Steps.Writing.Coding;
+
+namespace Deptorygen2.Core.Steps.Writing
 {
 	internal class SequenceBuilder : ICodeBuilder
 	{

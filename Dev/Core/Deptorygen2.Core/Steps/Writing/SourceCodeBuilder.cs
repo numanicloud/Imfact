@@ -2,6 +2,7 @@
 using System.Linq;
 using Deptorygen2.Core.Steps.Definitions;
 using Deptorygen2.Core.Steps.Definitions.Methods;
+using Deptorygen2.Core.Steps.Writing.Coding;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Writing

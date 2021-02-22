@@ -1,23 +1,23 @@
-﻿using Deptorygen2.Core.Interfaces;
+﻿using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 
-namespace Deptorygen2.Core.Steps.Creation.Strategies.Template
+namespace Deptorygen2.Core.Steps.Expressions.Strategies
 {
 	interface IResolverSource<out T> where T : IResolverSemantics
 	{
 		T[] GetResolverSource(IFactorySemantics semantics);
 	}
-	class ResolverSource : IResolverSource<Semanticses.Nodes.Resolver>
+	class ResolverSource : IResolverSource<Resolver>
 	{
-		public Semanticses.Nodes.Resolver[] GetResolverSource(IFactorySemantics semantics)
+		public Resolver[] GetResolverSource(IFactorySemantics semantics)
 		{
 			return semantics.Resolvers;
 		}
 	}
 
-	class MultiResolverSource : IResolverSource<Semanticses.Nodes.MultiResolver>
+	class MultiResolverSource : IResolverSource<MultiResolver>
 	{
-		public Semanticses.Nodes.MultiResolver[] GetResolverSource(IFactorySemantics semantics)
+		public MultiResolver[] GetResolverSource(IFactorySemantics semantics)
 		{
 			return semantics.MultiResolvers;
 		}

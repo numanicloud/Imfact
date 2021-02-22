@@ -2,10 +2,9 @@
 using System.Linq;
 using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Creation.Strategies.Template;
 using Deptorygen2.Core.Steps.Expressions.Strategies;
+using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Expressions

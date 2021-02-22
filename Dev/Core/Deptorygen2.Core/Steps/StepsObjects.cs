@@ -1,5 +1,5 @@
 ﻿using Deptorygen2.Core.Steps.Aspects;
-using Deptorygen2.Core.Steps.Semanticses.Nodes;
+using Deptorygen2.Core.Steps.Semanticses;
 
 namespace Deptorygen2.Core.Steps
 {

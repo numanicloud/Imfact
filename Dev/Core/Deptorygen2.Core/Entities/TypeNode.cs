@@ -4,7 +4,7 @@ using System.Text;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using NacHelpers.Extensions;
-using static Deptorygen2.Core.Utilities.DisposableType;
+using static Deptorygen2.Core.Entities.DisposableType;
 
 namespace Deptorygen2.Core.Entities
 {

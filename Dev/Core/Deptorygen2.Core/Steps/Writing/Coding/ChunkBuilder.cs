@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Deptorygen2.Core.Steps.Writing
+namespace Deptorygen2.Core.Steps.Writing.Coding
 {
 	internal class ChunkBuilder : ICodeBuilder, IDisposable
 	{

@@ -1,4 +1,4 @@
-﻿namespace System.Runtime.CompilerServices
+﻿namespace Deptorygen2.Core.Utilities
 {
 	internal class IsExternalInit { }
 }
