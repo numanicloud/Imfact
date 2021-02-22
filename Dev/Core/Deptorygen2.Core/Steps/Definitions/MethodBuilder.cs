@@ -144,7 +144,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 				.Concat<IResolverSemantics>(_semantics.Factory.MultiResolvers)
 				.SelectMany(x => x.Hooks);
 
-			var disposables = _semantics.Dependencies
+			var disposables = _injection.Dependencies
 				.Concat<IProbablyDisposable>(_semantics.Factory.Delegations)
 				.Concat(hooks)
 				.ToArray();

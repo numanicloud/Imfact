@@ -22,9 +22,9 @@ namespace Deptorygen2.Core.Steps.Expressions
 		public ResolutionRoot Build()
 		{
 			var injectionResult = BuildInjection();
-			var usings = _usingRule.Extract(_semantics, injectionResult);
 			var disposable = DisposableInfo.Aggregate(_semantics.Factory,
 				injectionResult.Dependencies);
+			var usings = _usingRule.Extract(_semantics, injectionResult, disposable);
 
 			return new ResolutionRoot(_semantics, injectionResult, usings, disposable);
 		}

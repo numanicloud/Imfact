@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Steps.Creation.Abstraction;
 using Deptorygen2.Core.Steps.Definitions;
 using Deptorygen2.Core.Steps.Definitions.Methods;
 using NacHelpers.Extensions;
@@ -10,13 +9,11 @@ namespace Deptorygen2.Core.Steps.Writing
 	internal class SourceCodeBuilder
 	{
 		private readonly DefinitionRoot _definitionRoot;
-		private readonly ICreationAggregator _creation;
 		private readonly ResolverWriter _resolverWriter;
 
 		public SourceCodeBuilder(SourceTreeDefinition definition)
 		{
 			_definitionRoot = definition.DefinitionRoot;
-			_creation = definition.Creation;
 			_resolverWriter = new ResolverWriter();
 		}
 
@@ -109,7 +106,7 @@ namespace Deptorygen2.Core.Steps.Writing
 				chunk.AppendLine(method.Signature.GetSignatureString());
 				chunk.EnterBlock(block =>
 				{
-					method.Implementation.Render(block, _creation, _resolverWriter);
+					method.Implementation.Render(block, _resolverWriter);
 				});
 			});
 		}

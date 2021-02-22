@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Interfaces;
+using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using NacHelpers.Extensions;
 
@@ -8,23 +9,24 @@ namespace Deptorygen2.Core.Steps.Expressions
 {
 	internal sealed class UsingRule
 	{
-		public string[] Extract(SemanticsRoot semantics, InjectionResult injection)
+		public string[] Extract(SemanticsRoot semantics, InjectionResult injection, DisposableInfo disposableInfo)
 		{
-			return Stage1(semantics, injection).Distinct().ToArray();
+			return Stage1(semantics, injection, disposableInfo).Distinct().ToArray();
 		}
 
-		private IEnumerable<string> Stage1(SemanticsRoot semantics, InjectionResult injection)
+		private IEnumerable<string> Stage1(SemanticsRoot semantics, InjectionResult injection,
+			DisposableInfo disposableInfo)
 		{
 			yield return semantics.Factory.Type.FullNamespace;
 			yield return "System.Collections.Generic";
 			yield return "System.ComponentModel";
 
-			if (semantics.DisposableInfo.HasDisposable)
+			if (disposableInfo.HasDisposable)
 			{
 				yield return "System";
 			}
 
-			if (semantics.DisposableInfo.HasAsyncDisposable)
+			if (disposableInfo.HasAsyncDisposable)
 			{
 				yield return "System.Threading.Tasks";
 			}

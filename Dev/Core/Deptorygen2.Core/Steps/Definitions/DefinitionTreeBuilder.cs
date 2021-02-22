@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Creation;
 using Deptorygen2.Core.Steps.Definitions.Methods;
 using Deptorygen2.Core.Steps.Expressions;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
@@ -36,7 +35,6 @@ namespace Deptorygen2.Core.Steps.Definitions
 				.First();
 
 			return new SourceTreeDefinition(new DefinitionRoot(usings, nss),
-				new CreationAggregator(_semantics),
 				BuildConstructorRecord(ctor));
 		}
 

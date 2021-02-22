@@ -1,7 +1,5 @@
 ﻿using System.Linq;
-using Deptorygen2.Core.Steps.Creation.Abstraction;
 using Deptorygen2.Core.Steps.Writing;
-using Microsoft.CodeAnalysis;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Definitions.Methods
@@ -22,7 +20,6 @@ namespace Deptorygen2.Core.Steps.Definitions.Methods
 
 	internal abstract record Implementation
 	{
-		public abstract void Render(ICodeBuilder builder, ICreationAggregator creation,
-			ResolverWriter writer);
+		public abstract void Render(ICodeBuilder builder, ResolverWriter writer);
 	}
 }
