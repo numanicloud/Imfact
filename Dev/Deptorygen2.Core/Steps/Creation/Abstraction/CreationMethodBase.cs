@@ -11,20 +11,26 @@ namespace Deptorygen2.Core.Steps.Creation.Abstraction
 	internal abstract class CreationMethodBase<T> : ICreationStrategy
 		where T : notnull
 	{
-		private readonly Dictionary<TypeRecord, T> _resolutionSource;
+		private readonly Generation _semantics;
+		private Dictionary<TypeRecord, T>? _resolutionSource;
 
 		protected CreationMethodBase(Generation semantics)
 		{
-			var xx = GetSource(semantics)
-				.Select(x => (type: GetTypeInfo(x), source: x))
-				.GroupBy(x => x.type)
-				.Select(x => x.First());
-			_resolutionSource = xx
-				.ToDictionary(x => x.type, x => x.source);
+			_semantics = semantics;
 		}
 
 		public string? GetCode(CreationRequest request, ICreationAggregator aggregator)
 		{
+			if (_resolutionSource is null)
+			{
+				var xx = GetSource(_semantics)
+					.Select(x => (type: GetTypeInfo(x), source: x))
+					.GroupBy(x => x.type)
+					.Select(x => x.First());
+				_resolutionSource = xx
+					.ToDictionary(x => x.type, x => x.source);
+			}
+
 			if (_resolutionSource.GetValueOrDefault(request.TypeToResolve.Record) is not { } resolution)
 			{
 				return null;

@@ -1,37 +1,24 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Steps.Creation.Abstraction;
+﻿using Deptorygen2.Core.Steps.Creation.Abstraction;
+using Deptorygen2.Core.Steps.Creation.Strategies.Template;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
-using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Creation.Strategies
 {
-	internal class DelegatedResolver : CreationMethodBase<DelegatedResolver.Source>
+	internal class DelegatedResolver : ICreationStrategy
 	{
-		public DelegatedResolver(Generation semantics) : base(semantics)
+		private readonly TemplateStrategy<Delegation, Semanticses.Nodes.Resolver> _template;
+
+		public DelegatedResolver(Generation semantics)
 		{
+			_template = new TemplateStrategy<Delegation, Semanticses.Nodes.Resolver>(
+				new DelegationSource(),
+				new ResolverSource(),
+				semantics);
 		}
 
-		protected override string GetCreationCode(Source resolution,
-			GivenParameter[] given,
-			ICreationAggregator aggregator)
+		public string? GetCode(CreationRequest request, ICreationAggregator aggregator)
 		{
-			var invocation = MethodInvocation(resolution.Resolver, given, aggregator);
-			return $"{resolution.Delegation.PropertyName}.{invocation}";
+			return _template.GetCode(request, aggregator);
 		}
-
-		protected override IEnumerable<Source> GetSource(Generation semantics)
-		{
-			return semantics.Factory.Delegations.SelectMany(
-				x => x.Resolvers.Select(y => new Source(x, y)));
-		}
-
-		protected override TypeRecord GetTypeInfo(Source source)
-		{
-			return source.Resolver.ReturnType.Record;
-		}
-
-		public record Source(Delegation Delegation, Semanticses.Nodes.Resolver Resolver);
 	}
 }

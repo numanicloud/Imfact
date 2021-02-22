@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Creation.Abstraction;
 using Deptorygen2.Core.Steps.Creation.Strategies;
+using Deptorygen2.Core.Steps.Creation.Strategies.Template;
+using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 using NacHelpers.Extensions;
@@ -68,16 +71,42 @@ namespace Deptorygen2.Core.Steps.Creation
 
 		public static IEnumerable<ICreationStrategy> GetCreations(Generation semantics)
 		{
+			var factory = new RootFactorySource();
+			var delegation = new DelegationSource();
+			var inheritance = new InheritanceSource();
+			var resolver = new ResolverSource();
+			var multiResolver = new MultiResolverSource();
+
 			// この順で評価されて、最初にマッチした解決方法が使われる
-			yield return new FactoryItself(semantics);
-			yield return new DelegationItself(semantics);
-			yield return new DelegatedResolver(semantics);
-			yield return new DelegatedMultiResolver(semantics);
-			yield return new Resolver(semantics);
-			yield return new MultiResolver(semantics);
-			yield return new InheritanceResolver(semantics);
+			yield return factory.GetStrategy(semantics);
+			yield return delegation.GetStrategy(semantics);
+			yield return (delegation, resolver).GetStrategy(semantics);
+			yield return (delegation, multiResolver).GetStrategy(semantics);
+			yield return (factory, resolver).GetStrategy(semantics);
+			yield return (factory, multiResolver).GetStrategy(semantics);
+			yield return (inheritance, resolver).GetStrategy(semantics);
+			yield return (inheritance, multiResolver).GetStrategy(semantics);
 			yield return new Field(semantics);
 			yield return new Constructor(semantics);
+		}
+	}
+
+	static class CreationExtensions
+	{
+		public static FactoryStrategy<TFactory> GetStrategy<TFactory>(
+			this IFactorySource<TFactory> source, Generation semantics)
+			where TFactory : IFactorySemantics
+		{
+			return new(semantics, source);
+		}
+
+		public static TemplateStrategy<TFactory, TResolver> GetStrategy<TFactory, TResolver>(
+			this (IFactorySource<TFactory>, IResolverSource<TResolver>) components,
+			Generation semantics)
+			where TFactory : IFactorySemantics
+			where TResolver : IResolverSemantics
+		{
+			return new(components.Item1, components.Item2, semantics);
 		}
 	}
 }
