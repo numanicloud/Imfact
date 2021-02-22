@@ -12,9 +12,9 @@ namespace Deptorygen2.Core.Steps.Writing
 		private readonly DefinitionRoot _definitionRoot;
 		private readonly ResolverWriter _resolverWriter;
 
-		public SourceCodeBuilder(SourceTreeDefinition definition)
+		public SourceCodeBuilder(DefinitionStepResult definitionStepResult)
 		{
-			_definitionRoot = definition.DefinitionRoot;
+			_definitionRoot = definitionStepResult.DefinitionRoot;
 			_resolverWriter = new ResolverWriter();
 		}
 

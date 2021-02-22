@@ -18,20 +18,20 @@ namespace Deptorygen2.Core
 	public class GenerationFacade
 	{
 		private readonly IAnalysisContext _context;
-		private readonly ClassRule _classAggregator;
-		private readonly SemanticsRule _semanticsAggregator;
+		private readonly AspectStep _classAggregator;
+		private readonly SemanticsStep _semanticsAggregator;
 
 		public GenerationFacade(SemanticModel semanticModel)
 		{
 			_context = new CompilationAnalysisContext(semanticModel);
-			_semanticsAggregator = new SemanticsRule();
-			_classAggregator = new ClassRule(_context);
+			_classAggregator = new AspectStep(_context);
+			_semanticsAggregator = new SemanticsStep();
 		}
 
 		public SourceFile[] Run(ClassDeclarationSyntax[] syntaxes)
 		{
-			var ranking = new RankFilter();
-			var ranked = ranking.FilterClasses(syntaxes, _context);
+			var ranking = new RankingStep();
+			var ranked = ranking.Run(syntaxes, _context);
 
 			return ranked.OrderBy(x => x.Rank)
 				.Select(RunGeneration)
@@ -58,30 +58,30 @@ namespace Deptorygen2.Core
 
 		private SyntaxOnAspect AspectStep(RankedClass syntax)
 		{
-			var aspect = _classAggregator.Aggregate(syntax);
+			var aspect = _classAggregator.Run(syntax);
 			return new SyntaxOnAspect(aspect);
 		}
 
-		private SemanticsRoot? SemanticsStep(SyntaxOnAspect aspect)
+		private SemanticsRoot SemanticsStep(SyntaxOnAspect aspect)
 		{
-			return _semanticsAggregator.Aggregate(aspect.Class);
+			return _semanticsAggregator.Run(aspect.Class);
 		}
 
-		private ResolutionRoot ResolutionStep(SemanticsRoot semantics)
+		private DependencyRoot ResolutionStep(SemanticsRoot semantics)
 		{
-			var builder = new ExpressionBuilder(semantics);
+			var builder = new DependencyStep(semantics);
+			return builder.Run();
+		}
+
+		private DefinitionStepResult DefinitionStep(DependencyRoot dependency)
+		{
+			var builder = new DefinitionStep(dependency);
 			return builder.Build();
 		}
 
-		private SourceTreeDefinition DefinitionStep(ResolutionRoot resolution)
+		private SourceFile SourceCodeStep(DefinitionStepResult definitionStepResult)
 		{
-			var builder = new DefinitionTreeBuilder(resolution);
-			return builder.Build();
-		}
-
-		private SourceFile SourceCodeStep(SourceTreeDefinition definition)
-		{
-			var writer = new SourceCodeBuilder(definition);
+			var writer = new SourceCodeBuilder(definitionStepResult);
 			return writer.Write();
 		}
 	}

@@ -13,9 +13,9 @@ using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Ranking
 {
-	internal class RankFilter
+	internal class RankingStep
 	{
-		public RankedClass[] FilterClasses(ClassDeclarationSyntax[] classes,
+		public RankedClass[] Run(ClassDeclarationSyntax[] classes,
 			IAnalysisContext context)
 		{
 			// ファクトリーではないものを弾く

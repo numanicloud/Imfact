@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Interfaces;
+using Deptorygen2.Core.Steps.Expressions;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using NacHelpers.Extensions;
 
-namespace Deptorygen2.Core.Steps.Expressions
+namespace Deptorygen2.Core.Steps.Dependency.Components
 {
 	internal sealed class UsingRule
 	{

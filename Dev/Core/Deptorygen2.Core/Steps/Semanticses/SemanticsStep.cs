@@ -2,16 +2,16 @@
 
 namespace Deptorygen2.Core.Steps.Semanticses.Rules
 {
-	internal sealed class SemanticsRule
+	internal sealed class SemanticsStep
 	{
 		private readonly FactoryRule _factoryRule;
 
-		public SemanticsRule()
+		public SemanticsStep()
 		{
 			_factoryRule = new FactoryRule(new ResolverRule());
 		}
 
-		public SemanticsRoot Aggregate(ClassAspect @class)
+		public SemanticsRoot Run(ClassAspect @class)
 		{
 			var factory = _factoryRule.ExtractFactory(@class);
 			return new SemanticsRoot(factory);

@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using Deptorygen2.Core.Interfaces;
+using Deptorygen2.Core.Steps.Dependency.Components;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 
 namespace Deptorygen2.Core.Steps.Expressions
 {
-	internal record ResolutionRoot(SemanticsRoot Semantics,
+	internal record DependencyRoot(SemanticsRoot Semantics,
 		InjectionResult Injection,
 		string[] Usings,
 		DisposableInfo DisposableInfo);
@@ -13,5 +13,5 @@ namespace Deptorygen2.Core.Steps.Expressions
 	internal record InjectionResult(
 		Dictionary<IResolverSemantics, CreationExpTree> Table,
 		Dictionary<IResolverSemantics, MultiCreationExpTree> MultiCreation,
-		Dependency[] Dependencies);
+		Semanticses.Dependency[] Dependencies);
 }

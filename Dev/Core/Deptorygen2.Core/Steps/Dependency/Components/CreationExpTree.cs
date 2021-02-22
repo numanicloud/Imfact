@@ -2,7 +2,7 @@
 using Deptorygen2.Core.Entities;
 using NacHelpers.Extensions;
 
-namespace Deptorygen2.Core.Steps.Expressions
+namespace Deptorygen2.Core.Steps.Dependency.Components
 {
 	internal record CreationExpTree(ICreationNode Root);
 

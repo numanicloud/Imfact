@@ -1,14 +1,13 @@
 ﻿using System.Linq;
 using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Interfaces;
+using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using Deptorygen2.Core.Utilities;
 
-namespace Deptorygen2.Core.Steps.Semanticses
+namespace Deptorygen2.Core.Steps.Dependency.Components
 {
 	internal record DisposableInfo(bool HasDisposable, bool HasAsyncDisposable)
 	{
-		public static DisposableInfo Aggregate(Factory factory, Dependency[] dependencies)
+		public static DisposableInfo Aggregate(Factory factory, Semanticses.Dependency[] dependencies)
 		{
 			var a = dependencies.Select(x => x.TypeName);
 			var b = factory.Delegations.Select(x => x.Type);

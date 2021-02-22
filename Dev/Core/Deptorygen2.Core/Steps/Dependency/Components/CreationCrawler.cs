@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Interfaces;
+using Deptorygen2.Core.Steps.Expressions;
 using Deptorygen2.Core.Steps.Expressions.Strategies;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Utilities;
 
-namespace Deptorygen2.Core.Steps.Expressions
+namespace Deptorygen2.Core.Steps.Dependency.Components
 {
 	internal class CreationCrawler
 	{

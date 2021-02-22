@@ -1,32 +1,32 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Interfaces;
+using Deptorygen2.Core.Steps.Dependency.Components;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Expressions
 {
-	internal class ExpressionBuilder
+	internal class DependencyStep
 	{
 		private readonly SemanticsRoot _semantics;
 		private readonly CreationCrawler _crawler;
 		private readonly UsingRule _usingRule = new();
 
-		public ExpressionBuilder(SemanticsRoot semantics)
+		public DependencyStep(SemanticsRoot semantics)
 		{
 			_semantics = semantics;
 			_crawler = new CreationCrawler(semantics);
 		}
 
-		public ResolutionRoot Build()
+		public DependencyRoot Run()
 		{
 			var injectionResult = BuildInjection();
 			var disposable = DisposableInfo.Aggregate(_semantics.Factory,
 				injectionResult.Dependencies);
 			var usings = _usingRule.Extract(_semantics, injectionResult, disposable);
 
-			return new ResolutionRoot(_semantics, injectionResult, usings, disposable);
+			return new DependencyRoot(_semantics, injectionResult, usings, disposable);
 		}
 
 		private InjectionResult BuildInjection()
@@ -39,7 +39,7 @@ namespace Deptorygen2.Core.Steps.Expressions
 				.SelectMany(FindFields)
 				.GroupBy(x => x.Type.Record)
 				.Select(x => x.First())
-				.Select(x => new Dependency(x.Type, x.Name))
+				.Select(x => new Semanticses.Dependency(x.Type, x.Name))
 				.ToArray();
 
 			var injectionResult = new InjectionResult(result, resultMulti, deps);

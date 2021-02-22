@@ -2,6 +2,7 @@
 using System.Linq;
 using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
+using Deptorygen2.Core.Steps.Dependency.Components;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Utilities;
 

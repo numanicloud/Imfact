@@ -24,7 +24,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 		private record Initialization(TypeNode Type, string Name, string ParamName);
 
-		public MethodBuilder(ResolutionRoot semantics)
+		public MethodBuilder(DependencyRoot semantics)
 		{
 			_semantics = semantics.Semantics;
 			_injection = semantics.Injection;

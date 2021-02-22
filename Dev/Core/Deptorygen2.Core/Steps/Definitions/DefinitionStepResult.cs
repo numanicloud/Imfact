@@ -2,12 +2,12 @@
 
 namespace Deptorygen2.Core.Steps.Definitions
 {
-	internal class SourceTreeDefinition
+	internal class DefinitionStepResult
 	{
 		public DefinitionRoot DefinitionRoot { get; }
 		public ConstructorRecord ConstructorRecord { get; }
 
-		public SourceTreeDefinition(DefinitionRoot definitionRoot, ConstructorRecord constructorRecord)
+		public DefinitionStepResult(DefinitionRoot definitionRoot, ConstructorRecord constructorRecord)
 		{
 			DefinitionRoot = definitionRoot;
 			ConstructorRecord = constructorRecord;

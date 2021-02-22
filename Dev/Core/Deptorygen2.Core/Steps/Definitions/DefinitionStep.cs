@@ -7,22 +7,22 @@ using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Definitions
 {
-	internal class DefinitionTreeBuilder
+	internal class DefinitionStep
 	{
 		private readonly SemanticsRoot _semantics;
-		private readonly ResolutionRoot _resolution;
+		private readonly DependencyRoot _dependency;
 		private readonly MethodBuilder _methodBuilder;
 
-		public DefinitionTreeBuilder(ResolutionRoot resolution)
+		public DefinitionStep(DependencyRoot dependency)
 		{
-			_semantics = resolution.Semantics;
-			_resolution = resolution;
-			_methodBuilder = new MethodBuilder(resolution);
+			_semantics = dependency.Semantics;
+			_dependency = dependency;
+			_methodBuilder = new MethodBuilder(dependency);
 		}
 
-		public SourceTreeDefinition Build()
+		public DefinitionStepResult Build()
 		{
-			var usings = _resolution.Usings
+			var usings = _dependency.Usings
 				.Select(x => new Using(x))
 				.ToArray();
 
@@ -34,7 +34,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 				.OfType<ConstructorSignature>()
 				.First();
 
-			return new SourceTreeDefinition(new DefinitionRoot(usings, nss),
+			return new DefinitionStepResult(new DefinitionRoot(usings, nss),
 				BuildConstructorRecord(ctor));
 		}
 
@@ -56,7 +56,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 				BuildMethods(),
 				BuildPropertyNodes(),
 				BuildFieldNode(),
-				_resolution.DisposableInfo);
+				_dependency.DisposableInfo);
 		}
 
 		private MethodInfo[] BuildMethods()
@@ -78,7 +78,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 		private Field[] BuildFieldNode()
 		{
-			var deps = _resolution.Injection.Dependencies
+			var deps = _dependency.Injection.Dependencies
 				.Select(x => (t: x.TypeName, f: x.FieldName));
 
 			var hooks = _semantics.Factory.Resolvers
