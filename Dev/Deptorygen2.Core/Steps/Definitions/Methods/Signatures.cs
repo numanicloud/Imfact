@@ -37,8 +37,8 @@ namespace Deptorygen2.Core.Steps.Definitions.Methods
 
 			if (BaseParameters is not null)
 			{
-				var baseParamList = GetParameterList(BaseParameters);
-				return $"{access} {Name}({parameterList}) : base({baseParamList})";
+				var baseArgList = BaseParameters.Select(x => x.Name).Join(", ");
+				return $"{access} {Name}({parameterList}) : base({baseArgList})";
 			}
 			else
 			{

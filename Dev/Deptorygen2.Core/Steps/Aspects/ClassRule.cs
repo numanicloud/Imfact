@@ -61,12 +61,13 @@ namespace Deptorygen2.Core.Steps.Aspects
 
 		private ConstructorAspect GetConstructor(INamedTypeSymbol symbol)
 		{
-			var c = symbol.Constructors.Single();
-			var ps = c.Parameters
-				.Select(x => new ParameterAspect(TypeNode.FromSymbol(x.Type), x.Name))
+			var classType = TypeNode.FromSymbol(symbol);
+			var ctor = _context.Constructors[classType.Record];
+			var parameters = ctor.Parameters
+				.Select(x => new ParameterAspect(x.Type, x.Name))
 				.ToArray();
 
-			return new ConstructorAspect(c.DeclaredAccessibility, ps);
+			return new ConstructorAspect(ctor.Accessibility, parameters);
 		}
 
 		private ClassAspect ExtractAspect(ClassDeclarationSyntax syntax,

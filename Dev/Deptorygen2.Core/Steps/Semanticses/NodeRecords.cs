@@ -53,6 +53,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 	{
 		public TypeNode Type => TypeName;
 		public string MemberName => FieldName;
+		public string ParameterName => FieldName.TrimStart("_".ToCharArray());
 	}
 
 	internal record Hook(TypeNode HookType, string FieldName) : IProbablyDisposable

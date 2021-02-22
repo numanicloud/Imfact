@@ -85,7 +85,7 @@ namespace Deptorygen2.TestSubject
 	internal partial class CapturedFactory
 	{
 		[Hook(typeof(Cache<>))]
-		internal partial Client ResolveClient2();
+		internal partial Client ResolveClient2(Service service);
 	}
 	
 	// Next: BaseType, Hook, CollectionResolver

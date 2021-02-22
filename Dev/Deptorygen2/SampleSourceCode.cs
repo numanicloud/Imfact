@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using Deptorygen2.Core;
-using Deptorygen2.Generator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

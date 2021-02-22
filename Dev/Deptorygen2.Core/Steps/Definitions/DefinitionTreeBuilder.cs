@@ -1,12 +1,8 @@
 ﻿using System.Linq;
-using Deptorygen2.Annotations;
-using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Creation;
 using Deptorygen2.Core.Steps.Definitions.Methods;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
-using Deptorygen2.Core.Utilities;
-using Microsoft.CodeAnalysis;
 using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Definitions
@@ -31,9 +27,26 @@ namespace Deptorygen2.Core.Steps.Definitions
 			var nss = new Namespace(
 				_semantics.Factory.Type.FullNamespace,
 				BuildClass());
-			
+
+			var ctor = nss.Class.Methods.Select(x => x.Signature)
+				.OfType<ConstructorSignature>()
+				.First();
+
 			return new SourceTreeDefinition(new DefinitionRoot(usings, nss),
-				new CreationAggregator(_semantics));
+				new CreationAggregator(_semantics),
+				BuildConstructorRecord(ctor));
+		}
+
+		private ConstructorRecord BuildConstructorRecord(ConstructorSignature signature)
+		{
+			var ps = signature.BaseParameters
+				.AsEnumerable()
+				.SelectMany(x => x)
+				.Concat(signature.Parameters)
+				.Select(x => new ParameterRecord(x.Type.TypeName, x.Name))
+				.ToArray();
+
+			return new ConstructorRecord(_semantics.Factory.Type, signature.Accessibility, ps);
 		}
 
 		private Class BuildClass()

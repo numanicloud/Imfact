@@ -1,4 +1,6 @@
-﻿using Deptorygen2.Core.Interfaces;
+﻿using System.Collections.Generic;
+using Deptorygen2.Core.Entities;
+using Deptorygen2.Core.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -7,6 +9,8 @@ namespace Deptorygen2.Core
 	internal class CompilationAnalysisContext : IAnalysisContext
 	{
 		private readonly SemanticModel _semanticModel;
+
+		public Dictionary<TypeRecord, ConstructorRecord> Constructors { get; } = new();
 
 		public CompilationAnalysisContext(SemanticModel semanticModel)
 		{

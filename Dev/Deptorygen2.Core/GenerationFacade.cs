@@ -42,7 +42,15 @@ namespace Deptorygen2.Core
 		{
 			return AspectStep(syntax)
 				.Then(SemanticsStep)
-				.Then(DefinitionStep)
+				.Then(semantics =>
+				{
+					var result = DefinitionStep(semantics);
+
+					var ctor = result.ConstructorRecord;
+					_context.Constructors[ctor.ClassType.Record] = ctor;
+
+					return result;
+				})
 				.Then(SourceCodeStep);
 		}
 
