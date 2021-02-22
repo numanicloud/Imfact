@@ -14,14 +14,14 @@ namespace Deptorygen2.Core.Steps.Semanticses.Rules
 			_factoryRule = new FactoryRule(new ResolverRule());
 		}
 
-		public Generation Aggregate(ClassAspect @class)
+		public SemanticsRoot Aggregate(ClassAspect @class)
 		{
 			var factory = _factoryRule.ExtractFactory(@class);
 
 			var dependency = _dependencyRule.Extract(factory);
 			var disposableInfo = DisposableInfo.Aggregate(factory, dependency);
 			var namespaces = _usingRule.Extract(factory, dependency, disposableInfo);
-			return new Generation(namespaces, factory, dependency, disposableInfo);
+			return new SemanticsRoot(namespaces, factory, dependency, disposableInfo);
 		}
 	}
 }

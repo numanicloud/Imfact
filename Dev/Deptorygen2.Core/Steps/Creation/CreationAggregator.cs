@@ -15,7 +15,7 @@ namespace Deptorygen2.Core.Steps.Creation
 	{
 		private readonly ICreationStrategy[] _instantiationCoders;
 
-		public CreationAggregator(Generation semantics)
+		public CreationAggregator(SemanticsRoot semantics)
 		{
 			_instantiationCoders = GetCreations(semantics).ToArray();
 		}
@@ -67,7 +67,7 @@ namespace Deptorygen2.Core.Steps.Creation
 				.FirstOrDefault(x => x is not null);
 		}
 
-		public static IEnumerable<ICreationStrategy> GetCreations(Generation semantics)
+		public static IEnumerable<ICreationStrategy> GetCreations(SemanticsRoot semantics)
 		{
 			var factory = new RootFactorySource(semantics);
 			var delegation = new DelegationSource(semantics);
@@ -92,7 +92,7 @@ namespace Deptorygen2.Core.Steps.Creation
 	static class CreationExtensions
 	{
 		public static FactoryStrategy<TFactory> GetStrategy<TFactory>(
-			this IFactorySource<TFactory> source, Generation semantics)
+			this IFactorySource<TFactory> source, SemanticsRoot semantics)
 			where TFactory : IFactorySemantics
 		{
 			return new(semantics, source);
@@ -100,7 +100,7 @@ namespace Deptorygen2.Core.Steps.Creation
 
 		public static TemplateStrategy<TFactory, TResolver> GetStrategy<TFactory, TResolver>(
 			this (IFactorySource<TFactory>, IResolverSource<TResolver>) components,
-			Generation semantics)
+			SemanticsRoot semantics)
 			where TFactory : IFactorySemantics
 			where TResolver : IResolverSemantics
 		{

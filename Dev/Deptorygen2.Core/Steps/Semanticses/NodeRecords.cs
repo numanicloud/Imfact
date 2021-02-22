@@ -1,16 +1,14 @@
 ﻿using System.Linq;
+using System.Text;
 using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
+using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 {
-	internal record Generation(
-		string[] RequiredNamespaces, Factory Factory,
-		Dependency[] Dependencies, DisposableInfo DisposableInfo);
-
 	internal record Factory(FactoryCommon Common,
 		Delegation[] Delegations, Inheritance[] Inheritances, EntryResolver[] EntryResolvers)
 		: FactoryCommon(Common);
@@ -31,8 +29,16 @@ namespace Deptorygen2.Core.Steps.Semanticses.Nodes
 	internal record Resolver(ResolverCommon Common, Resolution? ReturnTypeResolution)
 		: ResolverCommon(Common)
 	{
-		public Resolution ActualResolution = ReturnTypeResolution.AsEnumerable()
-			.Concat(Common.Resolutions).First();
+		public Resolution ActualResolution = Common.Resolutions
+			.Append(ReturnTypeResolution)
+			.FilterNull()
+			.First();
+
+		protected override bool PrintMembers(StringBuilder builder)
+		{
+			builder.Append($"{Accessibility} {ReturnType.Name} {MethodName}({Parameters.Select(x => x.ParameterName).Join(", ")})");
+			return true;
+		}
 	}
 
 	internal record MultiResolver(ResolverCommon Common)

@@ -12,6 +12,13 @@ namespace Deptorygen2.Core.Steps.Expressions.Strategies
 
 			var resolution = context.Caller.Resolutions
 				.FirstOrDefault(x => x.TypeName.Record == ttr);
+
+			if (resolution is null && context.Caller is Resolver single
+				&& single.ActualResolution.TypeName.Record == ttr)
+			{
+				resolution = single.ActualResolution;
+			}
+
 			if (resolution is not null)
 			{
 				return new Invocation($"new {ttr.Name}", GetArgs(resolution, context).ToArray());

@@ -8,7 +8,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 {
 	internal class Field : CreationMethodBase<Dependency>
 	{
-		public Field(Generation semantics) : base(semantics)
+		public Field(SemanticsRoot semantics) : base(semantics)
 		{
 		}
 
@@ -18,7 +18,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 			return resolution.FieldName;
 		}
 
-		protected override IEnumerable<Dependency> GetSource(Generation semantics)
+		protected override IEnumerable<Dependency> GetSource(SemanticsRoot semantics)
 		{
 			return semantics.Dependencies;
 		}

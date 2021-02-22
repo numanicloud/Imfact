@@ -11,9 +11,9 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies.Template
 	}
 	class RootFactorySource : IFactorySource<Factory>
 	{
-		private readonly Generation _semantics;
+		private readonly SemanticsRoot _semantics;
 
-		public RootFactorySource(Generation semantics)
+		public RootFactorySource(SemanticsRoot semantics)
 		{
 			this._semantics = semantics;
 		}
@@ -26,9 +26,9 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies.Template
 
 	class DelegationSource : IFactorySource<Delegation>
 	{
-		private readonly Generation _semantics;
+		private readonly SemanticsRoot _semantics;
 
-		public DelegationSource(Generation semantics)
+		public DelegationSource(SemanticsRoot semantics)
 		{
 			this._semantics = semantics;
 		}
@@ -40,9 +40,9 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies.Template
 
 	class InheritanceSource : IFactorySource<Inheritance>
 	{
-		private readonly Generation _semantics;
+		private readonly SemanticsRoot _semantics;
 
-		public InheritanceSource(Generation semantics)
+		public InheritanceSource(SemanticsRoot semantics)
 		{
 			this._semantics = semantics;
 		}

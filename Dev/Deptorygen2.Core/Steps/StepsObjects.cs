@@ -15,9 +15,9 @@ namespace Deptorygen2.Core.Steps
 
 	public class DeptorygenSemantics
 	{
-		internal Generation Semantics { get; }
+		internal SemanticsRoot Semantics { get; }
 
-		internal DeptorygenSemantics(Generation semantics)
+		internal DeptorygenSemantics(SemanticsRoot semantics)
 		{
 			Semantics = semantics;
 		}

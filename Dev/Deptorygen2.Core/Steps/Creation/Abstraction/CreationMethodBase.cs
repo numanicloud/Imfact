@@ -11,10 +11,10 @@ namespace Deptorygen2.Core.Steps.Creation.Abstraction
 	internal abstract class CreationMethodBase<T> : ICreationStrategy
 		where T : notnull
 	{
-		private readonly Generation _semantics;
+		private readonly SemanticsRoot _semantics;
 		private Dictionary<TypeRecord, T>? _resolutionSource;
 
-		protected CreationMethodBase(Generation semantics)
+		protected CreationMethodBase(SemanticsRoot semantics)
 		{
 			_semantics = semantics;
 		}
@@ -39,7 +39,7 @@ namespace Deptorygen2.Core.Steps.Creation.Abstraction
 			GivenParameter[] given,
 			ICreationAggregator aggregator);
 
-		protected abstract IEnumerable<T> GetSource(Generation semantics);
+		protected abstract IEnumerable<T> GetSource(SemanticsRoot semantics);
 
 		protected abstract TypeRecord GetTypeInfo(T source);
 

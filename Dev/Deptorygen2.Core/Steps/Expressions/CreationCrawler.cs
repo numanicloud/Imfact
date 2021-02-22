@@ -14,7 +14,7 @@ namespace Deptorygen2.Core.Steps.Expressions
 	{
 		private readonly IExpressionStrategy[] _strategies;
 
-		public CreationCrawler(Generation semantics)
+		public CreationCrawler(SemanticsRoot semantics)
 		{
 			_strategies = GetCreations(semantics).ToArray();
 		}
@@ -41,7 +41,7 @@ namespace Deptorygen2.Core.Steps.Expressions
 			}
 		}
 
-		private static IEnumerable<IExpressionStrategy> GetCreations(Generation semantics)
+		private static IEnumerable<IExpressionStrategy> GetCreations(SemanticsRoot semantics)
 		{
 			var factory = new RootFactorySource(semantics);
 			var delegation = new DelegationSource(semantics);

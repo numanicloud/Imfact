@@ -8,16 +8,16 @@ namespace Deptorygen2.Core.Steps.Expressions
 {
 	internal class ExpressionBuilder
 	{
-		private readonly Generation _semantics;
+		private readonly SemanticsRoot _semantics;
 		private readonly CreationCrawler _crawler;
 
-		public ExpressionBuilder(Generation semantics)
+		public ExpressionBuilder(SemanticsRoot semantics)
 		{
 			_semantics = semantics;
 			_crawler = new CreationCrawler(semantics);
 		}
 
-		public Dictionary<IResolverSemantics, CreationExpTree> Build()
+		public ResolutionRoot Build()
 		{
 			Dictionary<IResolverSemantics, CreationExpTree> result = new();
 
@@ -32,7 +32,29 @@ namespace Deptorygen2.Core.Steps.Expressions
 				result[method] = new CreationExpTree(creation);
 			}
 
-			return result;
+			var deps = result.Values.SelectMany(x => FindFields(x.Root))
+				.Select(x => new Dependency(x.Type, x.Name))
+				.ToArray();
+
+			return new ResolutionRoot(_semantics, new InjectionResult(result, deps));
+		}
+
+		private IEnumerable<UnsatisfiedField> FindFields(ICreationNode pivot)
+		{
+			if (pivot is UnsatisfiedField field)
+			{
+				yield return field;
+			}
+			else if (pivot is Invocation invocation)
+			{
+				foreach (var arg in invocation.Arguments)
+				{
+					foreach (var child in FindFields(arg))
+					{
+						yield return child;
+					}
+				}
+			}
 		}
 	}
 }

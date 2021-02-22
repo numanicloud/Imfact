@@ -16,12 +16,12 @@ namespace Deptorygen2.Core.Steps.Definitions
 {
 	internal sealed class MethodBuilder
 	{
-		private readonly Generation _semantics;
+		private readonly SemanticsRoot _semantics;
 		private readonly TypeNode _ctxType;
 
 		private record Initialization(TypeNode Type, string Name, string ParamName);
 
-		public MethodBuilder(Generation semantics)
+		public MethodBuilder(SemanticsRoot semantics)
 		{
 			_semantics = semantics;
 			_ctxType = TypeNode.FromRuntime(typeof(ResolutionContext));

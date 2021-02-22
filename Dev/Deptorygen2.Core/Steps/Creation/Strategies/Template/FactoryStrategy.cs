@@ -13,7 +13,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies.Template
 	{
 		private readonly IFactorySource<TFactory> _factorySource;
 
-		public FactoryStrategy(Generation semantics, IFactorySource<TFactory> factorySource) : base(semantics)
+		public FactoryStrategy(SemanticsRoot semantics, IFactorySource<TFactory> factorySource) : base(semantics)
 		{
 			this._factorySource = factorySource;
 		}
@@ -23,7 +23,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies.Template
 			return _factorySource.GetVariableName(resolution);
 		}
 
-		protected override IEnumerable<TFactory> GetSource(Generation semantics)
+		protected override IEnumerable<TFactory> GetSource(SemanticsRoot semantics)
 		{
 			return _factorySource.GetDelegationSource();
 		}

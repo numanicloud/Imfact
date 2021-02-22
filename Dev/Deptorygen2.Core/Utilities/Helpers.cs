@@ -33,13 +33,7 @@ namespace Deptorygen2.Core.Utilities
 		{
 			return name[0].ToString().ToLower() + name.Substring(1);
 		}
-
-		public static IEnumerable<T> AsEnumerable<T>(this T? source) where T : class
-		{
-			return source is null
-				? Enumerable.Empty<T>()
-				: new T[] { source };
-		}
+		
 
 		public static TValue? GetValueOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dic, TKey key)
 			where TValue : notnull

@@ -10,7 +10,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 {
 	internal class Constructor : CreationMethodBase<Resolution>
 	{
-		public Constructor(Generation semantics) : base(semantics)
+		public Constructor(SemanticsRoot semantics) : base(semantics)
 		{
 		}
 
@@ -22,7 +22,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies
 			return $"new {resolution.TypeName.Name}({GetArgList(request, aggregator)})";
 		}
 
-		protected override IEnumerable<Resolution> GetSource(Generation semantics)
+		protected override IEnumerable<Resolution> GetSource(SemanticsRoot semantics)
 		{
 			var rr = semantics.Factory.Resolvers.Select(x => x.ReturnTypeResolution).FilterNull();
 			var rs = semantics.Factory.Resolvers.SelectMany(x => x.Resolutions);

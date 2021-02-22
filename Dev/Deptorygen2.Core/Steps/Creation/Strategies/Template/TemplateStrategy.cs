@@ -17,7 +17,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies.Template
 
 		public TemplateStrategy(IFactorySource<TFactory> factorySource,
 			IResolverSource<TResolver> resolverSource,
-			Generation semantics) : base(semantics)
+			SemanticsRoot semantics) : base(semantics)
 		{
 			_factorySource = factorySource;
 			_resolverSource = resolverSource;
@@ -30,7 +30,7 @@ namespace Deptorygen2.Core.Steps.Creation.Strategies.Template
 			return $"{variable}.{invocation}";
 		}
 
-		protected override IEnumerable<Source> GetSource(Generation semantics)
+		protected override IEnumerable<Source> GetSource(SemanticsRoot semantics)
 		{
 			return from delegation in _factorySource.GetDelegationSource()
 				   from resolver in _resolverSource.GetResolverSource(delegation)

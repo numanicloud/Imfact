@@ -2,6 +2,7 @@
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Creation;
 using Deptorygen2.Core.Steps.Definitions.Methods;
+using Deptorygen2.Core.Steps.Expressions;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using NacHelpers.Extensions;
 
@@ -9,12 +10,14 @@ namespace Deptorygen2.Core.Steps.Definitions
 {
 	internal class DefinitionTreeBuilder
 	{
-		private readonly Generation _semantics;
+		private readonly SemanticsRoot _semantics;
+		private readonly ResolutionRoot _resolution;
 		private readonly MethodBuilder _methodBuilder;
 
-		public DefinitionTreeBuilder(Generation semantics)
+		public DefinitionTreeBuilder(ResolutionRoot resolution)
 		{
-			_semantics = semantics; 
+			_semantics = resolution.Semantics;
+			_resolution = resolution;
 			_methodBuilder = new MethodBuilder(_semantics);
 		}
 

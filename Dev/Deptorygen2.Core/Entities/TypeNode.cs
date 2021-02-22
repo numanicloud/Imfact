@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using NacHelpers.Extensions;
@@ -65,6 +66,12 @@ namespace Deptorygen2.Core.Entities
 			{
 				TypeArguments = typeArguments ?? new TypeNode[0]
 			};
+		}
+
+		protected virtual bool PrintMembers(StringBuilder builder)
+		{
+			builder.Append($"{Accessibility} {FullNamespace}.{FullBoundName}");
+			return true;
 		}
 	}
 }
