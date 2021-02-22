@@ -58,7 +58,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 				BuildMethods(),
 				BuildPropertyNodes(),
 				BuildFieldNode(),
-				_semantics.DisposableInfo);
+				_resolution.DisposableInfo);
 		}
 
 		private MethodInfo[] BuildMethods()

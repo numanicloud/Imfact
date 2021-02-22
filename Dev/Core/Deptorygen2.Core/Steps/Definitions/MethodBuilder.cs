@@ -83,14 +83,10 @@ namespace Deptorygen2.Core.Steps.Definitions
 			return _semantics.Factory.Resolvers
 				.Select(x =>
 				{
-					return BuildMethodCommon(x, (hooks1, parameters) =>
+					return BuildMethodCommon(x, hooks1 =>
 					{
 						var exp = _injection.Table[x].Root.Code;
 						return new ExpressionImplementation(hooks1, new Type(x.ReturnType), exp);
-
-						var resolution = x.Resolutions.FirstOrDefault()?.TypeName ?? x.ReturnType;
-						return new ResolveImplementation(hooks1, new Type(resolution),
-							new Type(x.ReturnType), parameters);
 					});
 				}).ToArray();
 		}
@@ -100,20 +96,16 @@ namespace Deptorygen2.Core.Steps.Definitions
 			return _semantics.Factory.MultiResolvers
 				.Select(x =>
 				{
-					return BuildMethodCommon(x, (hooks1, parameters) =>
+					return BuildMethodCommon(x, hooks1 =>
 					{
 						var exp = _injection.MultiCreation[x].Roots.Select(y => y.Code).ToArray();
 						return new MultiExpImplementation(hooks1, new Type(x.ElementType), exp);
-
-						var resolutions = x.Resolutions.Select(y => new Type(y.TypeName)).ToArray();
-						return new MultiResolveImplementation(hooks1, new Type(x.ElementType),
-							resolutions, parameters);
 					});
 				}).ToArray();
 		}
 
 		private MethodInfo BuildMethodCommon(IResolverSemantics x,
-			Func<Hook[], Parameter[], Implementation> makeImpl)
+			Func<Hook[], Implementation> makeImpl)
 		{
 			var ps = x.Parameters.Select(
 					p => BuildParameterNode(p.Type, p.ParameterName))
@@ -124,7 +116,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 			var signature = new OrdinalSignature(Accessibility.Internal,
 				new Type(x.ReturnType), x.MethodName, ps, new string[0]);
 			var attribute = new Attribute("[EditorBrowsable(EditorBrowsableState.Never)]");
-			var impl = makeImpl(hooks, ps);
+			var impl = makeImpl(hooks);
 
 			return new MethodInfo(signature, attribute.WrapByArray(), impl);
 		}
