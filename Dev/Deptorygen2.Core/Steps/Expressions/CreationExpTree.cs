@@ -6,6 +6,8 @@ namespace Deptorygen2.Core.Steps.Expressions
 {
 	internal record CreationExpTree(ICreationNode Root);
 
+	internal record MultiCreationExpTree(ICreationNode[] Roots);
+
 	internal interface ICreationNode
 	{
 		string Code { get; }

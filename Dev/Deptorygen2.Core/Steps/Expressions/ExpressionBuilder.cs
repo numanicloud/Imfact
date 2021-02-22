@@ -20,23 +20,43 @@ namespace Deptorygen2.Core.Steps.Expressions
 		public ResolutionRoot Build()
 		{
 			Dictionary<IResolverSemantics, CreationExpTree> result = new();
+			Dictionary<IResolverSemantics, MultiCreationExpTree> resultMulti = new();
 
 			var methods = _semantics.Factory.Resolvers;
 			foreach (var method in methods)
 			{
 				var context = new CreationContext(method,
 					method.ActualResolution.TypeName.WrapByArray(),
-					method.Parameters.ToList(),
+					new List<Parameter>(),
 					_crawler);
 				var creation = _crawler.GetExpression(context).First();
 				result[method] = new CreationExpTree(creation);
 			}
 
+			var multi = _semantics.Factory.MultiResolvers;
+			foreach (var multiResolver in multi)
+			{
+				var context = new CreationContext(multiResolver,
+					multiResolver.Resolutions.Select(x => x.TypeName).ToArray(),
+					new List<Parameter>(),
+					_crawler);
+				var creations = _crawler.GetExpression(context);
+				resultMulti[multiResolver] = new MultiCreationExpTree(creations.ToArray());
+			}
+
 			var deps = result.Values.SelectMany(x => FindFields(x.Root))
+				.Concat(resultMulti.Values.SelectMany(x => x.Roots.SelectMany(FindFields)))
+				.GroupBy(x => x.Type.Record)
+				.Select(x => x.First())
 				.Select(x => new Dependency(x.Type, x.Name))
 				.ToArray();
 
-			return new ResolutionRoot(_semantics, new InjectionResult(result, deps));
+			var injectionResult = new InjectionResult(result, resultMulti, deps);
+
+			var usingRule = new UsingRule();
+			var usings = usingRule.Extract(_semantics, injectionResult);
+
+			return new ResolutionRoot(_semantics, injectionResult, usings);
 		}
 
 		private IEnumerable<UnsatisfiedField> FindFields(ICreationNode pivot)

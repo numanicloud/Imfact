@@ -49,6 +49,31 @@ namespace Deptorygen2.Core.Steps.Definitions.Methods
 		}
 	}
 
+	internal record ExpressionImplementation(Hook[] Hooks, Type ReturnType, string Expression) : Implementation
+	{
+		public override void Render(ICodeBuilder builder, ICreationAggregator creation, ResolverWriter writer)
+		{
+			writer.Render(ReturnType.Text, Hooks, Expression, builder);
+		}
+	}
+
+	internal record MultiExpImplementation(Hook[] Hooks, Type ElementType, string[] Expressions)
+		: Implementation
+	{
+		public override void Render(ICodeBuilder builder, ICreationAggregator creation, ResolverWriter writer)
+		{
+			var expBuilder = CodeHelper.GetBuilder();
+			expBuilder.AppendLine($"new {ElementType.Text}[]");
+			expBuilder.EnterBlock(inner =>
+			{
+				inner.AppendLine(Expressions.Join(",\n"));
+			});
+
+			var returnType = $"IEnumerable<{ElementType.Text}>";
+			writer.Render(returnType, Hooks, expBuilder.GetText(), builder);
+		}
+	}
+
 	internal record ResolveImplementation(Hook[] Hooks, Type Resolution,
 		Type ReturnType, Parameter[] Parameters) : Implementation
 	{

@@ -6,6 +6,7 @@ using Deptorygen2.Annotations;
 using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Definitions.Methods;
+using Deptorygen2.Core.Steps.Expressions;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
@@ -17,19 +18,21 @@ namespace Deptorygen2.Core.Steps.Definitions
 	internal sealed class MethodBuilder
 	{
 		private readonly SemanticsRoot _semantics;
+		private readonly InjectionResult _injection;
 		private readonly TypeNode _ctxType;
 
 		private record Initialization(TypeNode Type, string Name, string ParamName);
 
-		public MethodBuilder(SemanticsRoot semantics)
+		public MethodBuilder(ResolutionRoot semantics)
 		{
-			_semantics = semantics;
+			_semantics = semantics.Semantics;
+			_injection = semantics.Injection;
 			_ctxType = TypeNode.FromRuntime(typeof(ResolutionContext));
 		}
 
 		public MethodInfo BuildConstructorInfo()
 		{
-			var fs = _semantics.Dependencies
+			var fs = _injection.Dependencies
 				.Select(x => new Initialization(x.TypeName, x.FieldName, x.FieldName))
 				.Select(x => x with {ParamName = x.ParamName.TrimStart("_".ToCharArray())})
 				.ToArray();
@@ -82,6 +85,9 @@ namespace Deptorygen2.Core.Steps.Definitions
 				{
 					return BuildMethodCommon(x, (hooks1, parameters) =>
 					{
+						var exp = _injection.Table[x].Root.Code;
+						return new ExpressionImplementation(hooks1, new Type(x.ReturnType), exp);
+
 						var resolution = x.Resolutions.FirstOrDefault()?.TypeName ?? x.ReturnType;
 						return new ResolveImplementation(hooks1, new Type(resolution),
 							new Type(x.ReturnType), parameters);
@@ -96,6 +102,9 @@ namespace Deptorygen2.Core.Steps.Definitions
 				{
 					return BuildMethodCommon(x, (hooks1, parameters) =>
 					{
+						var exp = _injection.MultiCreation[x].Roots.Select(y => y.Code).ToArray();
+						return new MultiExpImplementation(hooks1, new Type(x.ElementType), exp);
+
 						var resolutions = x.Resolutions.Select(y => new Type(y.TypeName)).ToArray();
 						return new MultiResolveImplementation(hooks1, new Type(x.ElementType),
 							resolutions, parameters);

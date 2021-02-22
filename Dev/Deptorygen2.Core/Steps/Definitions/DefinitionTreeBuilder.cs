@@ -18,12 +18,12 @@ namespace Deptorygen2.Core.Steps.Definitions
 		{
 			_semantics = resolution.Semantics;
 			_resolution = resolution;
-			_methodBuilder = new MethodBuilder(_semantics);
+			_methodBuilder = new MethodBuilder(resolution);
 		}
 
 		public SourceTreeDefinition Build()
 		{
-			var usings = _semantics.RequiredNamespaces
+			var usings = _resolution.Usings
 				.Select(x => new Using(x))
 				.ToArray();
 
@@ -80,7 +80,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 		private Field[] BuildFieldNode()
 		{
-			var deps = _semantics.Dependencies
+			var deps = _resolution.Injection.Dependencies
 				.Select(x => (t: x.TypeName, f: x.FieldName));
 
 			var hooks = _semantics.Factory.Resolvers
