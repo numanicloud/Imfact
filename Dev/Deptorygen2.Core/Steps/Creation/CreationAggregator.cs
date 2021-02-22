@@ -8,8 +8,6 @@ using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses.Nodes;
 using Deptorygen2.Core.Utilities;
 using NacHelpers.Extensions;
-using MultiResolver = Deptorygen2.Core.Steps.Creation.Strategies.MultiResolver;
-using Resolver = Deptorygen2.Core.Steps.Creation.Strategies.Resolver;
 
 namespace Deptorygen2.Core.Steps.Creation
 {
@@ -59,8 +57,8 @@ namespace Deptorygen2.Core.Steps.Creation
 					// 自分自身を呼び出さないように
 					if (request.IsRootRequest)
 					{
-						return x is not Resolver
-							and not MultiResolver;
+						return x is not TemplateStrategy<FactoryCommon, Semanticses.Nodes.MultiResolver>
+							and not TemplateStrategy<Factory, Semanticses.Nodes.Resolver>;
 					}
 
 					return true;
