@@ -15,7 +15,7 @@ jobs:
     name: build, pack & publish
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@2
+      - uses: actions/checkout@v2
         with:
           ref: ${{github.event.inputs.branch}}
       - uses: actions/setup-dotnet@v1
