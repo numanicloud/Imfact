@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Deptorygen2.Core.Entities;
-using NacHelpers.Extensions;
+using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Dependency.Components
 {

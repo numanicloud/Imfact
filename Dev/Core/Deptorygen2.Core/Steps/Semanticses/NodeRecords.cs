@@ -2,8 +2,8 @@
 using System.Text;
 using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
+using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
-using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Semanticses
 {

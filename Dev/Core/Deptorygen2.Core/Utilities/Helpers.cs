@@ -1,40 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.CodeAnalysis;
-using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Utilities
 {
 	public static class Helpers
 	{
-		public static string GetFullNameSpace(this ITypeSymbol typeSymbol)
-		{
-			static IEnumerable<string> GetFullNameSpace(INamespaceSymbol nss)
-			{
-				if (nss.IsGlobalNamespace)
-				{
-					yield break;
-				}
-
-				var ns = nss.ContainingNamespace;
-				foreach (var part in GetFullNameSpace(ns))
-				{
-					yield return part;
-				}
-
-				yield return nss.Name;
-			}
-
-			return GetFullNameSpace(typeSymbol.ContainingNamespace).Join(".");
-		}
-		
-		public static string ToLowerCamelCase(this string name)
-		{
-			return name[0].ToString().ToLower() + name.Substring(1);
-		}
-		
-
 		public static TValue? GetValueOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dic, TKey key)
 			where TValue : notnull
 		{
@@ -44,14 +15,6 @@ namespace Deptorygen2.Core.Utilities
 			}
 
 			return default;
-		}
-
-		public static Accessibility GetTypeAccessibilityMostStrict(
-			params Accessibility[] accessibilities)
-		{
-			return accessibilities.Contains(Accessibility.Internal)
-				? Accessibility.Internal
-				: Accessibility.Public;
 		}
 
 		public static TResult? Then<T, TResult>(this T? prevStep, Func<T, TResult?> func)
@@ -72,6 +35,41 @@ namespace Deptorygen2.Core.Utilities
 		{
 			return source.GroupBy(keySelector).Select(selectFromGroup)
 				.ToDictionary(keySelector, valueSelector);
+		}
+
+		/// <summary>
+		/// 単一の値を、それ1つだけを含むコレクションに変換します。
+		/// </summary>
+		/// <typeparam name="T">値の型。</typeparam>
+		/// <param name="source">コレクションに含む値。</param>
+		/// <returns></returns>
+		public static IEnumerable<T> WrapOrEmpty<T>(this T? source) where T : class
+		{
+			return source is null
+				? Enumerable.Empty<T>()
+				: new T[] { source };
+		}
+
+		/// <summary>
+		/// 単一の値を、それ1つだけを含む配列に変換します。
+		/// </summary>
+		/// <typeparam name="T">値の型。</typeparam>
+		/// <param name="item">配列に含む値。</param>
+		/// <returns></returns>
+		public static T[] WrapByArray<T>(this T item)
+		{
+			return new T[] { item };
+		}
+
+		public static IEnumerable<T> FilterNull<T>(this IEnumerable<T?> source) where T : notnull
+		{
+			foreach (var item in source)
+			{
+				if (item is not null)
+				{
+					yield return item;
+				}
+			}
 		}
 	}
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Deptorygen2.Annotations;
 using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
@@ -9,7 +8,6 @@ using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Ranking
 {

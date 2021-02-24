@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Modules\NacHelper\NacHelpers\NacHelpers.csproj" />
     <ProjectReference Include="..\..\Interfaces\Deptorygen2.Annotations\Deptorygen2.Annotations.csproj" />
   </ItemGroup>
 

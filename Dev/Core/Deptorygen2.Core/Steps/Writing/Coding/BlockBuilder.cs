@@ -1,5 +1,5 @@
 ﻿using System;
-using NacHelpers.Extensions;
+using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Writing.Coding
 {

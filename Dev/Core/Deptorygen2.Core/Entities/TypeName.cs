@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
-using NacHelpers.Extensions;
+//using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Entities
 {

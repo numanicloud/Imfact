@@ -4,14 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Deptorygen2.Annotations;
 using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Definitions.Methods;
 using Deptorygen2.Core.Steps.Expressions;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
-using NacHelpers.Extensions;
 using Attribute = Deptorygen2.Core.Steps.Definitions.Methods.Attribute;
 
 namespace Deptorygen2.Core.Steps.Definitions
@@ -59,7 +57,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 				.Select(x => BuildParameterNode(x.Type, x.ParameterName))
 				.ToArray();
 
-			var a = Helpers.GetTypeAccessibilityMostStrict(
+			var a = AnalyzerHelper.GetTypeAccessibilityMostStrict(
 				ps.Select(x => x.Type.Accessibility).ToArray());
 
 			return new ConstructorSignature(a,

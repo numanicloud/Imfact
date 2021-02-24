@@ -1,5 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
-using NacHelpers.Extensions;
+﻿using Deptorygen2.Core.Utilities;
+using Microsoft.CodeAnalysis;
 using System.Linq;
 
 namespace Deptorygen2.Core.Steps.Definitions.Methods

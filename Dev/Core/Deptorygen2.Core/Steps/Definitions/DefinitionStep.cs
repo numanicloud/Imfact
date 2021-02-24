@@ -3,7 +3,7 @@ using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Definitions.Methods;
 using Deptorygen2.Core.Steps.Expressions;
 using Deptorygen2.Core.Steps.Semanticses;
-using NacHelpers.Extensions;
+using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Definitions
 {
@@ -41,7 +41,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 		private ConstructorRecord BuildConstructorRecord(ConstructorSignature signature)
 		{
 			var ps = signature.BaseParameters
-				.AsEnumerable()
+				.WrapOrEmpty()
 				.SelectMany(x => x)
 				.Concat(signature.Parameters)
 				.Select(x => new ParameterRecord(x.Type.TypeName, x.Name))

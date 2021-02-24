@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Entities;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Deptorygen2.Core.Utilities
@@ -18,34 +17,39 @@ namespace Deptorygen2.Core.Utilities
 						  && x.GetFullNameSpace() == typeName.FullNamespace);
 		}
 
-		public static bool IsPartial(this MethodDeclarationSyntax method)
-		{
-			// partial情報の取り方：
-			// https://stackoverflow.com/questions/23026884/how-to-determine-that-a-partial-method-has-no-implementation
-			// https://github.com/dotnet/roslyn/issues/48
-
-			return method.Body != null
-				   && method.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
-		}
-
-		public static bool HasAttribute(this INamedTypeSymbol symbol, string attributeName)
-		{
-			return symbol.GetAttributes()
-				.Any(attr => attr.AttributeClass?.Name == attributeName);
-		}
-
 		public static bool HasAttribute(this IEnumerable<AttributeListSyntax> attributes, AttributeName attributeName)
 		{
 			return attributes.SelectMany(a => a.Attributes)
 				.Any(a => attributeName.MatchWithAnyName(a.Name.ToString()));
 		}
 
-		public static bool IsCollectionType(this TypeName type)
+		public static string GetFullNameSpace(this ITypeSymbol typeSymbol)
 		{
-			var enumerableType = TypeName.FromType(typeof(IEnumerable<>));
+			static IEnumerable<string> GetDescendingNameSpace(INamespaceSymbol nss)
+			{
+				if (nss.IsGlobalNamespace)
+				{
+					yield break;
+				}
 
-			return type.NameWithoutArguments == enumerableType.NameWithoutArguments
-			       && type.TypeArguments.Length == 1;
+				var ns = nss.ContainingNamespace;
+				foreach (var part in GetDescendingNameSpace(ns))
+				{
+					yield return part;
+				}
+
+				yield return nss.Name;
+			}
+
+			return GetDescendingNameSpace(typeSymbol.ContainingNamespace).Join(".");
+		}
+
+		public static Accessibility GetTypeAccessibilityMostStrict(
+			params Accessibility[] accessibilities)
+		{
+			return accessibilities.Contains(Accessibility.Internal)
+				? Accessibility.Internal
+				: Accessibility.Public;
 		}
 	}
 }

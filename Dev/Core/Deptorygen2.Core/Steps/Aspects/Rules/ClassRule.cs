@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using Deptorygen2.Annotations;
 using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
 using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Steps.Ranking;
+using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
-using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core.Steps.Aspects
 {

@@ -3,7 +3,7 @@ using System.Linq;
 using Deptorygen2.Core.Steps.Dependency.Components;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using NacHelpers.Extensions;
+using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Expressions
 {

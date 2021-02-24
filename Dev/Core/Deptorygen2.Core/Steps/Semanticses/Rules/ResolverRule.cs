@@ -3,8 +3,6 @@ using Deptorygen2.Annotations;
 using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Steps.Aspects;
 using Deptorygen2.Core.Utilities;
-using NacHelpers.Extensions;
-using Parameter = Deptorygen2.Core.Steps.Semanticses.Parameter;
 
 namespace Deptorygen2.Core.Steps.Semanticses.Rules
 {

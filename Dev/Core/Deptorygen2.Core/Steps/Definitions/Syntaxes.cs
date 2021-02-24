@@ -1,9 +1,6 @@
 ﻿using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Steps.Definitions.Methods;
-using Deptorygen2.Core.Steps.Dependency;
 using Deptorygen2.Core.Steps.Dependency.Components;
-using Deptorygen2.Core.Steps.Semanticses;
-using Deptorygen2.Core.Utilities;
 
 namespace Deptorygen2.Core.Steps.Definitions
 {

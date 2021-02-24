@@ -11,7 +11,6 @@ using Deptorygen2.Core.Steps.Writing;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Deptorygen2.Core.Utilities;
-using NacHelpers.Extensions;
 
 namespace Deptorygen2.Core
 {

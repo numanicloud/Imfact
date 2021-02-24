@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Steps.Semanticses;
 using Deptorygen2.Core.Steps.Semanticses.Interfaces;
 
