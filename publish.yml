@@ -1,0 +1,48 @@
+name: Publish to NuGet
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to build"
+        required: true
+        default: "main"
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    name: build, pack & publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@2
+        with:
+          ref: ${{github.event.inputs.branch}}
+      - uses: actions/setup-dotnet@v1
+        name: Setup dotnet
+        with:
+          dotnet-version: 5.0.102
+      - uses: dotnet/nbgv@v0.4.0
+        id: nbgv
+      - uses: rohith/publish-nuget@v2
+        name: publish Deptorygen2.Generator
+        with:
+          PROJECT_FILE_PATH: Dev/Publish/Deptorygen2.Generator/Deptorygen2.Generator.csproj
+          VERSION_STATIC: ${{steps.nbgv.outputs.NuGetPackageVersion}}
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+          INCLUDE_SYMBOLS: false
+      - uses: rohith/publish-nuget@v2
+        name: publish Deptorygen2.Annotations
+        with:
+          PROJECT_FILE_PATH: Dev/Publish/Deptorygen2.Annotations/Deptorygen2.Annotations.csproj
+          VERSION_STATIC: ${{steps.nbgv.outputs.NuGetPackageVersion}}
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+          INCLUDE_SYMBOLS: false
+      - uses: rohith/publish-nuget@v2
+        name: publish Deptorygen2.Core
+        with:
+          PROJECT_FILE_PATH: Dev/Core/Deptorygen2.Core/Deptorygen2.Core.csproj
+          VERSION_STATIC: ${{steps.nbgv.outputs.NuGetPackageVersion}}
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+          INCLUDE_SYMBOLS: false
+        
