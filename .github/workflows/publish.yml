@@ -30,21 +30,21 @@ jobs:
       - uses: rohith/publish-nuget@v2
         name: publish Deptorygen2.Generator
         with:
-          PROJECT_FILE_PATH: Dev/Publish/Deptorygen2.Generator/Deptorygen2.Generator.csproj
+          PROJECT_FILE_PATH: ./Dev/Publish/Deptorygen2.Generator/Deptorygen2.Generator.csproj
           VERSION_STATIC: ${{steps.nbgv.outputs.NuGetPackageVersion}}
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           INCLUDE_SYMBOLS: false
       - uses: rohith/publish-nuget@v2
         name: publish Deptorygen2.Annotations
         with:
-          PROJECT_FILE_PATH: Dev/Publish/Deptorygen2.Annotations/Deptorygen2.Annotations.csproj
+          PROJECT_FILE_PATH: ./Dev/Publish/Deptorygen2.Annotations/Deptorygen2.Annotations.csproj
           VERSION_STATIC: ${{steps.nbgv.outputs.NuGetPackageVersion}}
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           INCLUDE_SYMBOLS: false
       - uses: rohith/publish-nuget@v2
         name: publish Deptorygen2.Core
         with:
-          PROJECT_FILE_PATH: Dev/Core/Deptorygen2.Core/Deptorygen2.Core.csproj
+          PROJECT_FILE_PATH: ./Dev/Core/Deptorygen2.Core/Deptorygen2.Core.csproj
           VERSION_STATIC: ${{steps.nbgv.outputs.NuGetPackageVersion}}
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           INCLUDE_SYMBOLS: false
