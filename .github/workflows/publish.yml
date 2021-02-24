@@ -24,29 +24,44 @@ jobs:
         name: Setup dotnet
         with:
           dotnet-version: 5.0.102
-      - uses: dotnet/nbgv@v0.4.0
-        id: nbgv
+
+      - name: Get version of Deptorygen2.Generator
+        uses: dotnet/nbgv@v0.4.0
+        id: nbgv-generator
+        with:
+          path: Dev/Interfaces/Deptorygen2.Generator/
+      - name: Get version of Deptorygen2.Annotations
+        uses: dotnet/nbgv@v0.4.0
+        id: nbgv-annotations
+        with:
+          path: Dev/Interfaces/Deptorygen2.Annotations/
+      - name: Get version of Deptorygen2.Core
+        uses: dotnet/nbgv@v0.4.0
+        id: nbgv-core
+        with:
+          path: Dev/Core/Deptorygen2.Core/
+
       - name: Current Directory
         run: ls
       - uses: rohith/publish-nuget@v2
         name: publish Deptorygen2.Generator
         with:
           PROJECT_FILE_PATH: Dev/Interfaces/Deptorygen2.Generator/Deptorygen2.Generator.csproj
-          VERSION_STATIC: ${{steps.nbgv.outputs.NuGetPackageVersion}}
+          VERSION_STATIC: ${{steps.nbgv-generator.outputs.NuGetPackageVersion}}
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           INCLUDE_SYMBOLS: false
       - uses: rohith/publish-nuget@v2
         name: publish Deptorygen2.Annotations
         with:
           PROJECT_FILE_PATH: Dev/Interfaces/Deptorygen2.Annotations/Deptorygen2.Annotations.csproj
-          VERSION_STATIC: ${{steps.nbgv.outputs.NuGetPackageVersion}}
+          VERSION_STATIC: ${{steps.nbgv-annotations.outputs.NuGetPackageVersion}}
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           INCLUDE_SYMBOLS: false
       - uses: rohith/publish-nuget@v2
         name: publish Deptorygen2.Core
         with:
           PROJECT_FILE_PATH: Dev/Core/Deptorygen2.Core/Deptorygen2.Core.csproj
-          VERSION_STATIC: ${{steps.nbgv.outputs.NuGetPackageVersion}}
+          VERSION_STATIC: ${{steps.nbgv-core.outputs.NuGetPackageVersion}}
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           INCLUDE_SYMBOLS: false
         
