@@ -19,6 +19,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{github.event.inputs.branch}}
+          submodules: true
       - uses: actions/setup-dotnet@v1
         name: Setup dotnet
         with:
