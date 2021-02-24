@@ -17,6 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
+          fetch-depth: 0
           ref: ${{github.event.inputs.branch}}
       - uses: actions/setup-dotnet@v1
         name: Setup dotnet
