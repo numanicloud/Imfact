@@ -25,6 +25,8 @@ jobs:
           dotnet-version: 5.0.102
       - uses: dotnet/nbgv@v0.4.0
         id: nbgv
+      - name: Current Directory
+        run: ls
       - uses: rohith/publish-nuget@v2
         name: publish Deptorygen2.Generator
         with:
