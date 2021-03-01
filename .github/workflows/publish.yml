@@ -9,7 +9,6 @@ on:
   push:
     branches:
       - main
-
 jobs:
   publish:
     name: build, pack & publish
@@ -24,7 +23,6 @@ jobs:
         name: Setup dotnet
         with:
           dotnet-version: 5.0.102
-
       - name: Get version of Deptorygen2.Generator
         uses: dotnet/nbgv@v0.4.0
         id: nbgv-generator
@@ -40,10 +38,8 @@ jobs:
         id: nbgv-core
         with:
           path: Dev/Core/Deptorygen2.Core/
-
       - name: Current Directory
         run: ls
-
       - uses: ./.github/actions/publish-nuget
         name: publish Deptorygen2.Generator
         with:
