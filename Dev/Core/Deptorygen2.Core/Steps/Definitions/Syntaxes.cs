@@ -1,4 +1,5 @@
-﻿using Deptorygen2.Core.Entities;
+﻿using Deptorygen2.Annotations;
+using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Steps.Definitions.Methods;
 using Deptorygen2.Core.Steps.Dependency.Components;
 
@@ -17,7 +18,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 	internal record Field(Type Type, string Name, DisposableType Disposable);
 
-	internal record Parameter(Type Type, string Name);
+	internal record Parameter(Type Type, string Name, bool IsNullable);
 
 	internal record Type(TypeNode TypeName)
 	{

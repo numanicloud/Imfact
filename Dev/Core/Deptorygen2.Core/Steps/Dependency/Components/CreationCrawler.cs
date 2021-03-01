@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Deptorygen2.Core.Entities;
+using Deptorygen2.Core.Steps.Dependency.Strategies;
 using Deptorygen2.Core.Steps.Expressions;
 using Deptorygen2.Core.Steps.Expressions.Strategies;
 using Deptorygen2.Core.Steps.Semanticses;
@@ -49,6 +50,7 @@ namespace Deptorygen2.Core.Steps.Dependency.Components
 			var multiResolver = new MultiResolverSource();
 
 			// この順で評価されて、最初にマッチした解決方法が使われる
+			yield return new ResolutionContextStrategy();
 			yield return new ParameterStrategy();
 			yield return factory.GetStrategyExp();
 			yield return delegation.GetStrategyExp();

@@ -19,6 +19,6 @@
   </Target>
 
   <PropertyGroup>
-    <PackageId>Deptorygen2.Core</PackageId>
+    <PackageId>Deptorygen2</PackageId>
   </PropertyGroup>
 </Project>

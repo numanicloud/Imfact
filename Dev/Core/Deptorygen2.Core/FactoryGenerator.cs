@@ -2,6 +2,7 @@
 using System.Text;
 using Deptorygen2.Core.Annotations;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
@@ -26,7 +27,13 @@ namespace Deptorygen2.Core
 				return;
 			}
 
-			var semanticModel = context.Compilation.GetSemanticModel(receiver.SyntaxTree);
+			var options =
+				(CSharpParseOptions) ((CSharpCompilation) context.Compilation).SyntaxTrees[0]
+				.Options;
+			var compilation =
+				context.Compilation.AddSyntaxTrees(AnnotationGenerator.GetSyntaxTrees(options));
+
+			var semanticModel = compilation.GetSemanticModel(receiver.SyntaxTree);
 			var facade = new GenerationFacade(semanticModel);
 
 			var sourceFiles = facade.Run(receiver.CandidateClasses.ToArray());

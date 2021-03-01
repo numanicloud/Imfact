@@ -112,12 +112,12 @@ namespace Deptorygen2.Core.Steps.Definitions
 			var hooks = x.Hooks.Select(y => new Hook(new Type(y.HookType), y.FieldName))
 				.ToArray();
 
-			var signature = new OrdinalSignature(Accessibility.Internal,
+			var signature = new OrdinalSignature(x.Accessibility,
 				new Type(x.ReturnType), x.MethodName, ps, new string[0]);
 			var attribute = new Attribute("[EditorBrowsable(EditorBrowsableState.Never)]");
 			var impl = makeImpl(hooks);
 
-			return new MethodInfo(signature, attribute.WrapByArray(), impl);
+			return new MethodInfo(signature, new Attribute[0], impl);
 		}
 
 		public MethodInfo[] BuildEntryMethodInfo()
@@ -186,7 +186,7 @@ namespace Deptorygen2.Core.Steps.Definitions
 
 		private Parameter BuildParameterNode(TypeNode type, string name)
 		{
-			return new(new Type(type), name);
+			return new(new Type(type), name, false);
 		}
 	}
 }

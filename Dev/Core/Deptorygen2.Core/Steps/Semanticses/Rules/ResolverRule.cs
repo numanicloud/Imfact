@@ -40,7 +40,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Rules
 
 			return new ResolverCommon(method.Accessibility,
 				method.ReturnType.Type.Node,
-				"__" + method.Name,
+				method.Name,
 				parameters, resolutions, hooks);
 		}
 

@@ -11,7 +11,13 @@ namespace Deptorygen2.Core.Steps.Definitions.Methods
 	{
 		protected string GetParameterList(Parameter[] parameters)
 		{
-			return parameters.Select(x => $"{x.Type.Text} {x.Name}").Join(", ");
+			return parameters.Select(x =>
+				{
+					var nullable = x.IsNullable ? "?" : "";
+					var defaultValue = x.IsNullable ? " = null" : "";
+					return $"{x.Type.Text}{nullable} {x.Name}{defaultValue}";
+				})
+				.Join(", ");
 		}
 
 		public abstract string GetSignatureString();

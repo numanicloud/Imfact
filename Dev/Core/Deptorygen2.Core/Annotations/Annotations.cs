@@ -4,12 +4,12 @@ using System.Collections.Generic;
 namespace Deptorygen2.Annotations
 {
 	[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-	public sealed class FactoryAttribute : Attribute
+	internal sealed class FactoryAttribute : Attribute
 	{
 	}
 
 	[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
-	public sealed class ResolutionAttribute : Attribute
+	internal sealed class ResolutionAttribute : Attribute
 	{
 		public Type Type { get; }
 
@@ -20,7 +20,7 @@ namespace Deptorygen2.Annotations
 	}
 
 	[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
-	public sealed class HookAttribute : Attribute
+	internal sealed class HookAttribute : Attribute
 	{
 		public Type Type { get; }
 
@@ -30,13 +30,13 @@ namespace Deptorygen2.Annotations
 		}
 	}
 
-	public interface IHook<T> where T : class
+	internal interface IHook<T> where T : class
 	{
 		T? Before(ResolutionContext context);
 		T After(T created, ResolutionContext context);
 	}
 
-	public class ResolutionContext
+	internal class ResolutionContext
 	{
 		private static int _nextId = 0;
 

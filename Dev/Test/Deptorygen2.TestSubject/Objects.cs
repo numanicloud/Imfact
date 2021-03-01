@@ -16,7 +16,7 @@ namespace Deptorygen2.TestSubject
 {
 	class Client
 	{
-		public Client(Sub.Service service)
+		public Client(Sub.Service service, Sub.Service service2)
 		{
 			
 		}
@@ -62,7 +62,6 @@ namespace Deptorygen2.TestSubject
 	{
 		public Consumer(Resource r, ResourceAsync ra)
 		{
-			
 		}
 	}
 
@@ -94,7 +93,7 @@ namespace Deptorygen2.TestSubject
 	{
 		private CapturedFactory Captured { get; }
 
-		[Hook(typeof(Cache<Client>))]
+		[Hook(typeof(CachePerResolution<Client>))]
 		internal partial Client ResolveClient();
 
 		public partial ServiceGold ResolveServiceGold();

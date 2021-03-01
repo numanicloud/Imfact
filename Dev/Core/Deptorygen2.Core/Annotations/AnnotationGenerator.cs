@@ -1,4 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Deptorygen2.Core.Annotations
 {
@@ -109,8 +112,17 @@ namespace Deptorygen2.Annotations
 
 		public static void AddSource(in GeneratorExecutionContext context)
 		{
-			context.AddSource("Annotations", annotationText);
-			context.AddSource("Caches", cacheText);
+			context.AddSource("Annotations", SourceText.From(annotationText, Encoding.UTF8));
+			context.AddSource("Caches", SourceText.From(cacheText, Encoding.UTF8));
+		}
+
+		public static SyntaxTree[] GetSyntaxTrees(CSharpParseOptions options)
+		{
+			return new[]
+			{
+				CSharpSyntaxTree.ParseText(SourceText.From(annotationText, Encoding.UTF8), options),
+				CSharpSyntaxTree.ParseText(SourceText.From(cacheText, Encoding.UTF8), options),
+			};
 		}
 	}
 }

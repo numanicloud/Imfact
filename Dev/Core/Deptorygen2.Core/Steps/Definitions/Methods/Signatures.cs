@@ -13,9 +13,9 @@ namespace Deptorygen2.Core.Steps.Definitions.Methods
 			var ret = ReturnType.Text;
 			var parameter = GetParameterList(Parameters);
 
-			var mod = Modifiers.Any() ? Modifiers.Join(" ") : "";
+			var mod = Modifiers.Any() ? Modifiers.Join(" ") + " " : "";
 
-			return $"{access} {mod} {ret} {Name}({parameter})";
+			return $"{access} {mod}{ret} {Name}({parameter})";
 		}
 	}
 

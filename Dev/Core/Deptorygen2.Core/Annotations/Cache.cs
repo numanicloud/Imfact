@@ -2,14 +2,14 @@
 
 namespace Deptorygen2.Annotations
 {
-	public class Cache<T> : IHook<T> where T : class
+	internal class Cache<T> : IHook<T> where T : class
 	{
 		private T? _cache;
 		public T? Before(ResolutionContext context) => _cache;
 		public T After(T created, ResolutionContext context) => _cache = created;
 	}
 
-	public class CachePerResolution<T> : IHook<T> where T : class
+	internal class CachePerResolution<T> : IHook<T> where T : class
 	{
 		private T? _cache;
 		private int _resolutionId = ResolutionContext.InvalidId;
@@ -34,17 +34,17 @@ namespace Deptorygen2.Annotations
 	}
 
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-	public class CacheAttribute : Attribute
+	internal class CacheAttribute : Attribute
 	{
 	}
 
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-	public class CachePerResolutionAttribute : Attribute
+	internal class CachePerResolutionAttribute : Attribute
 	{
 	}
 
 	[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-	public sealed class TransientAttribute : Attribute
+	internal sealed class TransientAttribute : Attribute
 	{
 	}
 }

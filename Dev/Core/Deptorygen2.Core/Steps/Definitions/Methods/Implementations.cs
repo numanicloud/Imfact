@@ -39,7 +39,7 @@ namespace Deptorygen2.Core.Steps.Definitions.Methods
 				.Join(", ");
 
 			builder.AppendLine("var context = new ResolutionContext();");
-			builder.AppendLine($"return __{Name}({argList});");
+			builder.AppendLine($"return {Name}({argList});");
 		}
 	}
 
