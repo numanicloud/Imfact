@@ -10,8 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Interfaces\Deptorygen2.Annotations\Deptorygen2.Annotations.csproj" />
-    <ProjectReference Include="..\..\Interfaces\Deptorygen2.Generator\Deptorygen2.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\Core\Deptorygen2.Core\Deptorygen2.Core.csproj" OutputItemType="Analyzer"/>
   </ItemGroup>
 
 </Project>

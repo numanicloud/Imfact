@@ -2,19 +2,23 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Steps\Semanticses\DelegationSyntax.cs~RF156467d6.TMP" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.8.0" PrivateAssets="all" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.8.0" />
-  </ItemGroup>
+  <Target Name="_AddAnalyzersToOutput">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(OutputPath)\Deptorygen2.Core.dll" PackagePath="analyzers/dotnet/cs" />
+    </ItemGroup>
+  </Target>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Interfaces\Deptorygen2.Annotations\Deptorygen2.Annotations.csproj" />
-  </ItemGroup>
-
+  <PropertyGroup>
+    <PackageId>Deptorygen2.Core</PackageId>
+  </PropertyGroup>
 </Project>
