@@ -43,21 +43,22 @@ jobs:
 
       - name: Current Directory
         run: ls
-      - uses: rohith/publish-nuget@v2
+
+      - uses: ./.github/actions/publish-nuget
         name: publish Deptorygen2.Generator
         with:
           PROJECT_FILE_PATH: Dev/Interfaces/Deptorygen2.Generator/Deptorygen2.Generator.csproj
           VERSION_STATIC: ${{steps.nbgv-generator.outputs.NuGetPackageVersion}}
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           INCLUDE_SYMBOLS: false
-      - uses: rohith/publish-nuget@v2
+      - uses: ./.github/actions/publish-nuget
         name: publish Deptorygen2.Annotations
         with:
           PROJECT_FILE_PATH: Dev/Interfaces/Deptorygen2.Annotations/Deptorygen2.Annotations.csproj
           VERSION_STATIC: ${{steps.nbgv-annotations.outputs.NuGetPackageVersion}}
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           INCLUDE_SYMBOLS: false
-      - uses: rohith/publish-nuget@v2
+      - uses: ./.github/actions/publish-nuget
         name: publish Deptorygen2.Core
         with:
           PROJECT_FILE_PATH: Dev/Core/Deptorygen2.Core/Deptorygen2.Core.csproj
