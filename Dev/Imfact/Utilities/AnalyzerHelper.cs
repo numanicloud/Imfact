@@ -51,5 +51,20 @@ namespace Imfact.Utilities
 				? Accessibility.Internal
 				: Accessibility.Public;
 		}
+
+		public static string ToKeyword(this Accessibility accessibility)
+		{
+			return accessibility switch
+			{
+				Accessibility.NotApplicable => "",
+				Accessibility.Private => "private",
+				Accessibility.ProtectedAndInternal => "private protected",
+				Accessibility.Protected => "protected",
+				Accessibility.Internal => "internal",
+				Accessibility.ProtectedOrInternal => "protected internal",
+				Accessibility.Public => "public",
+				_ => throw new ArgumentOutOfRangeException(nameof(accessibility), accessibility, null)
+			};
+		}
 	}
 }

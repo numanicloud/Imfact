@@ -49,7 +49,6 @@ namespace Imfact.Steps.Dependency.Components
 			var multiResolver = new MultiResolverSource();
 
 			// この順で評価されて、最初にマッチした解決方法が使われる
-			yield return new ResolutionContextStrategy();
 			yield return new ParameterStrategy();
 			yield return factory.GetStrategyExp();
 			yield return delegation.GetStrategyExp();

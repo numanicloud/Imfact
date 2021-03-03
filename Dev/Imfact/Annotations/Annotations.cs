@@ -28,25 +28,4 @@ namespace Imfact.Annotations
 			Type = hookType;
 		}
 	}
-
-	internal interface IHook<T> where T : class
-	{
-		T? Before(ResolutionContext context);
-		T After(T created, ResolutionContext context);
-	}
-
-	internal class ResolutionContext
-	{
-		private static int _nextId = 0;
-
-		public static int InvalidId = -1;
-
-		public int Id { get; }
-
-		public ResolutionContext()
-		{
-			Id = _nextId;
-			_nextId++;
-		}
-	}
 }

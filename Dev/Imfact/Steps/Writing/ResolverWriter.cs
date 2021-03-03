@@ -32,6 +32,7 @@ namespace Imfact.Steps.Writing
 		{
 			public void Write(ICodeBuilder builder, IHookWriter[] rest)
 			{
+				builder.AppendLine("using var scope = __resolverService.Enter();");
 				builder.AppendLine($"{ReturnTypeName}? result;");
 				builder.AppendLine();
 
@@ -46,13 +47,13 @@ namespace Imfact.Steps.Writing
 		{
 			public void Write(ICodeBuilder builder, IHookWriter[] rest)
 			{
-				builder.AppendLine($"result = {Hook.FieldName}.Before(context);");
+				builder.AppendLine($"result = {Hook.FieldName}.Before();");
 				builder.AppendLine("if(result is null)");
 				builder.EnterBlock(block =>
 				{
 					rest[0].Write(block, rest.Skip(1).ToArray());
 				});
-				builder.AppendLine($"result = {Hook.FieldName}.After(result, context);");
+				builder.AppendLine($"result = {Hook.FieldName}.After(result);");
 			}
 		}
 

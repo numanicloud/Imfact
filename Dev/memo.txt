@@ -49,3 +49,19 @@ Writingステップ
 - SyntaxとSymbol、そしていろんな情報の取り方
 - Imfactの使い方と宣伝
 - Imfactの設計
+
+---
+
+文脈の共有方法を考える。
+
+- ResolverService クラスを追加する。
+- IHook.RegisterService(ResolverService) メソッドを追加する。
+- Factory.RegisterService(ResolverService) メソッドを追加する。
+	- すでに ResolverService が設定されている状態で呼ぶと例外を投げる。
+	- 最基底のクラスにのみ。
+- Factory._context フィールドを追加する。
+	- 最基底のクラスにのみ。
+- IHook.Before, IHook.After が context を引数に取らないようにする。
+- Resolverが context を引数に取らないようにする。
+- Resolverを呼び出す際に context を渡さないようにする。
+- EntryResolverを生成しないようにする。

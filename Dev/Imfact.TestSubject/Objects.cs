@@ -123,6 +123,8 @@ namespace Deptorygen2.TestSubject
 	{
 		[Hook(typeof(Cache<>))]
 		internal partial Client ResolveClient2(Service service);
+
+		internal Service ResolveService() => new Service();
 	}
 	
 	// Next: BaseType, Hook, CollectionResolver

@@ -5,29 +5,40 @@ namespace Imfact.Annotations
 	internal class Cache<T> : IHook<T> where T : class
 	{
 		private T? _cache;
-		public T? Before(ResolutionContext context) => _cache;
-		public T After(T created, ResolutionContext context) => _cache = created;
+
+		public void RegisterService(IResolverService service)
+		{
+		}
+
+		public T? Before() => _cache;
+		public T After(T created) => _cache = created;
 	}
 
 	internal class CachePerResolution<T> : IHook<T> where T : class
 	{
 		private T? _cache;
-		private int _resolutionId = ResolutionContext.InvalidId;
+		private IResolverService? _service;
+		private int? _resolutionId = null;
 
-		public T? Before(ResolutionContext context)
+		public void RegisterService(IResolverService service)
 		{
-			if (context.Id != _resolutionId)
+			_service = service;
+		}
+
+		public T? Before()
+		{
+			if (_service?.CurrentResolutionId != _resolutionId)
 			{
 				return _cache = null;
 			}
 			return _cache;
 		}
 
-		public T After(T created, ResolutionContext context)
+		public T After(T created)
 		{
 			if (_cache is null)
 			{
-				_resolutionId = context.Id;
+				_resolutionId = _service?.CurrentResolutionId;
 			}
 			return _cache = created;
 		}

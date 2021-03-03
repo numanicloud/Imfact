@@ -5,6 +5,14 @@ using Imfact.Utilities;
 
 namespace Imfact.Steps.Definitions.Methods
 {
+	internal record TextImplementation(string Text) : Implementation
+	{
+		public override void Render(ICodeBuilder builder, ResolverWriter writer)
+		{
+			builder.AppendLine(Text);
+		}
+	}
+
 	internal record InitializeImplementation(Assignment[] Assignments) : Implementation
 	{
 		public override void Render(ICodeBuilder builder, ResolverWriter writer)

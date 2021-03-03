@@ -9,7 +9,7 @@ namespace Imfact.Steps.Definitions.Methods
 	{
 		public override string GetSignatureString()
 		{
-			var access = Accessibility.ToString().ToLower();
+			var access = Accessibility.ToKeyword();
 			var ret = ReturnType.Text;
 			var parameter = GetParameterList(Parameters);
 
@@ -32,7 +32,7 @@ namespace Imfact.Steps.Definitions.Methods
 				ps = ps.Concat(BaseParameters).ToArray();
 			}
 
-			var access = Accessibility.ToString().ToLower();
+			var access = Accessibility.ToKeyword();
 			var parameterList = GetParameterList(ps);
 
 			if (BaseParameters is not null)

@@ -24,6 +24,7 @@ namespace Imfact.Steps.Dependency.Components
 			yield return semantics.Factory.Type.FullNamespace;
 			yield return "System.Collections.Generic";
 			yield return "System.ComponentModel";
+			yield return "Imfact.Annotations";
 
 			if (disposableInfo.HasDisposable)
 			{

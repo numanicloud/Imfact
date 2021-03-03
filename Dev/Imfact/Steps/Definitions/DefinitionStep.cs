@@ -1,9 +1,12 @@
 ﻿using System.Linq;
+using Imfact.Annotations;
+using Imfact.Entities;
 using Imfact.Interfaces;
 using Imfact.Steps.Definitions.Methods;
 using Imfact.Steps.Dependency;
 using Imfact.Steps.Semanticses;
 using Imfact.Utilities;
+using Microsoft.CodeAnalysis;
 
 namespace Imfact.Steps.Definitions
 {
@@ -62,7 +65,8 @@ namespace Imfact.Steps.Definitions
 		private MethodInfo[] BuildMethods()
 		{
 			return _methodBuilder.BuildConstructorInfo().WrapByArray()
-				.Concat(_methodBuilder.BuildEntryMethodInfo())
+				//.Concat(_methodBuilder.BuildEntryMethodInfo())
+				.Concat(_methodBuilder.BuildRegisterServiceMethodInfo().WrapOrEmpty())
 				.Concat(_methodBuilder.BuildResolverInfo())
 				.Concat(_methodBuilder.BuildEnumerableMethodInfo())
 				.Concat(_methodBuilder.BuildDisposeMethodInfo())
@@ -89,9 +93,18 @@ namespace Imfact.Steps.Definitions
 				.SelectMany(x => x.Hooks)
 				.Select(x => (t: x.HookType, f: x.FieldName));
 
-			return deps.Concat(hooks).Concat(hooks2)
-				.Select(x => new Field(new Type(x.t), x.f, x.t.DisposableType))
-				.ToArray();
+			var fields = deps.Concat(hooks).Concat(hooks2)
+				.Select(x => new Field(new Type(x.t), x.f, x.t.DisposableType));
+
+			if (!_semantics.Factory.Inheritances.Any())
+			{
+				fields = fields.Append(new Field(
+					new Type(TypeNode.FromRuntime(typeof(ResolverService))),
+					"__resolverService", DisposableType.NonDisposable, false,
+					Accessibility.ProtectedAndInternal));
+			}
+
+			return fields.ToArray();
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using Imfact.Entities;
 using Imfact.Steps.Definitions.Methods;
 using Imfact.Steps.Dependency.Components;
+using Microsoft.CodeAnalysis;
 
 namespace Imfact.Steps.Definitions
 {
@@ -15,7 +16,8 @@ namespace Imfact.Steps.Definitions
 
 	internal record Property(Type Type, string Name);
 
-	internal record Field(Type Type, string Name, DisposableType Disposable);
+	internal record Field(Type Type, string Name, DisposableType Disposable,
+		bool IsReadonly = true, Accessibility Accessibility = Accessibility.Private);
 
 	internal record Parameter(Type Type, string Name, bool IsNullable);
 

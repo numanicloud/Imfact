@@ -14,31 +14,29 @@ using Attribute = Imfact.Steps.Definitions.Methods.Attribute;
 
 namespace Imfact.Steps.Definitions
 {
+	internal record Initialization(TypeNode Type, string Name, string ParamName);
+
 	internal sealed class MethodBuilder
 	{
 		private readonly SemanticsRoot _semantics;
 		private readonly InjectionResult _injection;
-		private readonly TypeNode _ctxType;
-
-		private record Initialization(TypeNode Type, string Name, string ParamName);
 
 		public MethodBuilder(DependencyRoot semantics)
 		{
 			_semantics = semantics.Semantics;
 			_injection = semantics.Injection;
-			_ctxType = TypeNode.FromRuntime(typeof(ResolutionContext));
 		}
 
 		public MethodInfo BuildConstructorInfo()
 		{
 			var fs = _injection.Dependencies
 				.Select(x => new Initialization(x.TypeName, x.FieldName, x.FieldName))
-				.Select(x => x with {ParamName = x.ParamName.TrimStart("_".ToCharArray())})
+				.Select(x => x with { ParamName = x.ParamName.TrimStart("_".ToCharArray()) })
 				.ToArray();
 
 			var ps = _semantics.Factory.Delegations
 				.Select(x => new Initialization(x.Type, x.PropertyName, x.PropertyName))
-				.Select(x => x with {ParamName = x.ParamName.ToLowerCamelCase()})
+				.Select(x => x with { ParamName = x.ParamName.ToLowerCamelCase() })
 				.ToArray();
 
 			var signature = GetCtorSignature(fs, ps);
@@ -66,15 +64,43 @@ namespace Imfact.Steps.Definitions
 				baseParameters);
 		}
 
-		private InitializeImplementation GetCtorImpl(Initialization[] asignee)
+		private Implementation GetCtorImpl(Initialization[] asignee)
 		{
-			var assignments = asignee.Select(x => new Assignment(x.Name, x.ParamName));
-			var hooks = _semantics.Factory.Resolvers.Cast<IResolverSemantics>()
+			var h = _semantics.Factory.Resolvers.Cast<IResolverSemantics>()
 				.Concat(_semantics.Factory.MultiResolvers)
 				.SelectMany(x => x.Hooks)
-				.Select(x => new Assignment(x.FieldName, $"new {x.HookType.FullBoundName}()"));
+				.Select(x => new Hook(new Type(x.HookType), x.FieldName))
+				.ToArray();
 
-			return new InitializeImplementation(assignments.Concat(hooks).ToArray());
+			return new ConstructorImplementation(asignee, h);
+		}
+
+		public static readonly Type ResolverServiceType = new(TypeNode.FromRuntime(typeof(ResolverService)));
+
+		public MethodInfo? BuildRegisterServiceMethodInfo()
+		{
+			if (_semantics.Factory.Inheritances.Any())
+			{
+				return null;
+			}
+
+			var signature = new OrdinalSignature(Accessibility.Internal,
+				new Type(TypeNode.FromRuntime(typeof(void))),
+				"RegisterService",
+				new[] { new Parameter(ResolverServiceType, "service", false) },
+				new string[0]);
+
+			var p = _semantics.Factory.Delegations
+				.Select(x => new Property(new Type(x.Type), x.PropertyName))
+				.ToArray();
+			var h = _semantics.Factory.Resolvers
+				.Concat<IResolverSemantics>(_semantics.Factory.MultiResolvers)
+				.SelectMany(x => x.Hooks)
+				.Select(x => new Hook(new Type(x.HookType), x.FieldName))
+				.ToArray();
+
+			var impl = new RegisterServiceImplementation(p, h);
+			return new MethodInfo(signature, new Attribute[0], impl);
 		}
 
 		public MethodInfo[] BuildResolverInfo()
@@ -113,28 +139,11 @@ namespace Imfact.Steps.Definitions
 				.ToArray();
 
 			var signature = new OrdinalSignature(x.Accessibility,
-				new Type(x.ReturnType), x.MethodName, ps, new string[0]);
+				new Type(x.ReturnType), x.MethodName, ps, new string[]{ "partial" });
 			var attribute = new Attribute("[EditorBrowsable(EditorBrowsableState.Never)]");
 			var impl = makeImpl(hooks);
 
 			return new MethodInfo(signature, new Attribute[0], impl);
-		}
-
-		public MethodInfo[] BuildEntryMethodInfo()
-		{
-			return _semantics.Factory.EntryResolvers.Select(x =>
-			{
-				var ps = x.Parameters
-					.Where(y => !y.Type.Record.Equals(_ctxType.Record))
-					.Select(p => BuildParameterNode(p.Type, p.ParameterName))
-					.ToArray();
-
-				var signature = new OrdinalSignature(x.Accessibility, new Type(x.ReturnType),
-					x.MethodName, ps, new[] { "partial" });
-				var impl = new EntryImplementation(x.MethodName, ps);
-
-				return new MethodInfo(signature, new Attribute[0], impl);
-			}).ToArray();
 		}
 
 		public IEnumerable<MethodInfo> BuildDisposeMethodInfo()
@@ -170,7 +179,7 @@ namespace Imfact.Steps.Definitions
 			bool isAsync)
 		{
 			var methodName = isAsync ? "DisposeAsync" : "Dispose";
-			var modifiers = isAsync ? new[] {"async"} : new string[0];
+			var modifiers = isAsync ? new[] { "async" } : new string[0];
 			var returnType = isAsync ? typeof(ValueTask) : typeof(void);
 
 			var signature = new OrdinalSignature(Accessibility.Public,

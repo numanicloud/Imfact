@@ -59,7 +59,9 @@ namespace Imfact.Steps.Writing
 					{
 						foreach (var field in @class.Fields)
 						{
-							chunk.AppendLine($"private readonly {field.Type.Text} {field.Name};");
+							var ro = field.IsReadonly ? "readonly " : "";
+							var access = field.Accessibility.ToKeyword();
+							chunk.AppendLine($"{access} {ro}{field.Type.Text} {field.Name};");
 						}
 					});
 

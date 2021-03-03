@@ -24,10 +24,7 @@ namespace Imfact.Steps.Semanticses.Rules
 
 		private ResolverCommon GetMethodCommon(MethodAspect method)
 		{
-			var ctx = new Parameter(TypeNode.FromRuntime(typeof(ResolutionContext)), "context");
-
 			var parameters = method.Parameters.Select(x => new Parameter(x.Type, x.Name))
-				.Append(ctx)
 				.ToArray();
 
 			var resolutions = method.Attributes.Where(x => x.Kind == AnnotationKind.Resolution)

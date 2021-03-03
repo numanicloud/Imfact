@@ -37,58 +37,87 @@ namespace Imfact.Annotations
 		}
 	}
 
-	public interface IHook<T> where T : class
+	internal interface IHook<T> where T : class
 	{
-		T? Before(ResolutionContext context);
-		T After(T created, ResolutionContext context);
+		void RegisterService(IResolverService service);
+		T? Before();
+		T After(T created);
 	}
 
-	public class ResolutionContext
+	internal interface IResolverService
 	{
-		private static int _nextId = 0;
+		int CurrentResolutionId { get; }
+		int ResolutionDepth { get; }
+	}
 
-		public static int InvalidId = -1;
+	internal class ResolverService : IResolverService
+	{
+		public int CurrentResolutionId { get; private set; } = 0;
+		public int ResolutionDepth { get; private set; } = 0;
 
-		public int Id { get; }
-
-		public ResolutionContext()
+		public Scope Enter()
 		{
-			Id = _nextId;
-			_nextId++;
+			if (ResolutionDepth == 0)
+			{
+				CurrentResolutionId++;
+			}
+			ResolutionDepth++;
+			return new Scope(this);
+		}
+
+		public class Scope : IDisposable
+		{
+			private readonly ResolverService _owner;
+
+			public Scope(ResolverService owner)
+			{
+				_owner = owner;
+			}
+
+			public void Dispose()
+			{
+				_owner.ResolutionDepth--;
+			}
 		}
 	}
-}
-";
 
-		private const string cacheText = @"using System;
-namespace Imfact.Annotations
-{
-	public class Cache<T> : IHook<T> where T : class
+	internal class Cache<T> : IHook<T> where T : class
 	{
 		private T? _cache;
-		public T? Before(ResolutionContext context) => _cache;
-		public T After(T created, ResolutionContext context) => _cache = created;
+
+		public void RegisterService(IResolverService service)
+		{
+		}
+
+		public T? Before() => _cache;
+		public T After(T created) => _cache = created;
 	}
 
-	public class CachePerResolution<T> : IHook<T> where T : class
+	internal class CachePerResolution<T> : IHook<T> where T : class
 	{
 		private T? _cache;
-		private int _resolutionId = ResolutionContext.InvalidId;
+		private IResolverService? _service;
+		private int? _resolutionId = null;
 
-		public T? Before(ResolutionContext context)
+		public void RegisterService(IResolverService service)
 		{
-			if (context.Id != _resolutionId)
+			_service = service;
+		}
+
+		public T? Before()
+		{
+			if (_service?.CurrentResolutionId != _resolutionId)
 			{
 				return _cache = null;
 			}
 			return _cache;
 		}
 
-		public T After(T created, ResolutionContext context)
+		public T After(T created)
 		{
 			if (_cache is null)
 			{
-				_resolutionId = context.Id;
+				_resolutionId = _service?.CurrentResolutionId;
 			}
 			return _cache = created;
 		}
@@ -108,12 +137,12 @@ namespace Imfact.Annotations
 	public sealed class TransientAttribute : Attribute
 	{
 	}
-}";
+}
+";
 
 		public static void AddSource(in GeneratorExecutionContext context)
 		{
 			context.AddSource("Annotations", SourceText.From(annotationText, Encoding.UTF8));
-			context.AddSource("Caches", SourceText.From(cacheText, Encoding.UTF8));
 		}
 
 		public static SyntaxTree[] GetSyntaxTrees(CSharpParseOptions options)
@@ -121,7 +150,6 @@ namespace Imfact.Annotations
 			return new[]
 			{
 				CSharpSyntaxTree.ParseText(SourceText.From(annotationText, Encoding.UTF8), options),
-				CSharpSyntaxTree.ParseText(SourceText.From(cacheText, Encoding.UTF8), options),
 			};
 		}
 	}
