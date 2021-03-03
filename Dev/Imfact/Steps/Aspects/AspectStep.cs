@@ -1,21 +1,21 @@
-﻿using Imfact.Interfaces;
-using Imfact.Steps.Aspects.Rules;
+﻿using Imfact.Steps.Aspects.Rules;
 using Imfact.Steps.Ranking;
 
 namespace Imfact.Steps.Aspects
 {
 	internal sealed class AspectStep
 	{
-		private readonly ClassRule _classRule;
+		private readonly GenerationContext _genContext;
 
-		public AspectStep(IAnalysisContext context)
+		public AspectStep(GenerationContext genContext)
 		{
-			_classRule = new ClassRule(context);
+			_genContext = genContext;
 		}
 
 		public ClassAspect Run(RankedClass rankedClass)
 		{
-			return _classRule.Aggregate(rankedClass);
+			var classRule = new ClassRule(rankedClass.Context, _genContext);
+			return classRule.Aggregate(rankedClass);
 		}
 	}
 }

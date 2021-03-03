@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Imfact.Interfaces;
 using Imfact.Steps;
 using Imfact.Steps.Aspects;
 using Imfact.Steps.Definitions;
@@ -8,28 +7,25 @@ using Imfact.Steps.Ranking;
 using Imfact.Steps.Semanticses;
 using Imfact.Steps.Writing;
 using Imfact.Utilities;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Imfact
 {
-	public class GenerationFacade
+	internal class GenerationFacade
 	{
-		private readonly IAnalysisContext _context;
 		private readonly AspectStep _classAggregator;
 		private readonly SemanticsStep _semanticsAggregator;
+		private readonly GenerationContext _genContext = new ();
 
-		public GenerationFacade(SemanticModel semanticModel)
+		public GenerationFacade()
 		{
-			_context = new CompilationAnalysisContext(semanticModel);
-			_classAggregator = new AspectStep(_context);
+			_classAggregator = new AspectStep(_genContext);
 			_semanticsAggregator = new SemanticsStep();
 		}
 
-		public SourceFile[] Run(ClassDeclarationSyntax[] syntaxes)
+		public SourceFile[] Run(CandidateClass[] candidates)
 		{
 			var ranking = new RankingStep();
-			var ranked = ranking.Run(syntaxes, _context);
+			var ranked = ranking.Run(candidates);
 
 			return ranked.OrderBy(x => x.Rank)
 				.Select(RunGeneration)
@@ -47,7 +43,7 @@ namespace Imfact
 					var result = DefinitionStep(semantics);
 
 					var ctor = result.ConstructorRecord;
-					_context.Constructors[ctor.ClassType.Record] = ctor;
+					_genContext.Constructors[ctor.ClassType.Record] = ctor;
 
 					return result;
 				})

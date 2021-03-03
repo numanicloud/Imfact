@@ -13,23 +13,22 @@ namespace Imfact.Steps.Ranking
 {
 	internal class RankingStep
 	{
-		public RankedClass[] Run(ClassDeclarationSyntax[] classes,
-			IAnalysisContext context)
+		public RankedClass[] Run(CandidateClass[] classes)
 		{
 			// ファクトリーではないものを弾く
 			var factoryClasses = classes.Where(x =>
 			{
-				var hasAttr = x.AttributeLists
+				var hasAttr = x.Syntax.AttributeLists
 					.HasAttribute(new AttributeName(nameof(FactoryAttribute)));
-				var isPartial = x.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
+				var isPartial = x.Syntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
 
 				return hasAttr && isPartial;
 			}).ToArray();
 
 			// 継承関係を収集する
 			var relations = factoryClasses
-				.Select(x => context.GetNamedTypeSymbol(x) is {} symbol
-					? new Relation(x, symbol, symbol.BaseType)
+				.Select(x => x.Context.GetNamedTypeSymbol(x.Syntax) is {} symbol
+					? new Relation(x.Syntax, symbol, symbol.BaseType, x.Context)
 					: null)
 				.FilterNull()
 				.ToArray();
@@ -70,12 +69,12 @@ namespace Imfact.Steps.Ranking
 
 			// レコード型にまとめて出力する
 			return ranks.SelectMany(x => x.Value
-					.Select(y => new RankedClass(y.Syntax, y.Symbol, y.BaseSymbol, x.Key)))
+					.Select(y => new RankedClass(y.Syntax, y.Symbol, y.BaseSymbol, x.Key, y.Context)))
 				.ToArray();
 		}
 
 		private record Relation(ClassDeclarationSyntax Syntax, INamedTypeSymbol Symbol,
-			INamedTypeSymbol? BaseSymbol)
+			INamedTypeSymbol? BaseSymbol, IAnalysisContext Context)
 		{
 			public bool IsDerivedBy(Relation inheritor)
 			{

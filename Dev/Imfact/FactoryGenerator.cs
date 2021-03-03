@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Imfact.Annotations;
 using Microsoft.CodeAnalysis;
@@ -19,15 +19,8 @@ namespace Imfact
 
 		public void Execute(GeneratorExecutionContext context)
 		{
-			System.Diagnostics.Debugger.Launch();
+			//System.Diagnostics.Debugger.Launch();
 			AnnotationGenerator.AddSource(in context);
-
-			var csCompilation = (CSharpCompilation) context.Compilation;
-			var options = csCompilation.SyntaxTrees.Length > 0
-				? (CSharpParseOptions) csCompilation.SyntaxTrees[0].Options
-				: CSharpParseOptions.Default;
-			var compilation =
-				context.Compilation.AddSyntaxTrees(AnnotationGenerator.GetSyntaxTrees(options));
 
 			if (context.SyntaxReceiver is not FactorySyntaxReceiver receiver
 			    || receiver.SyntaxTree is null)
@@ -35,20 +28,26 @@ namespace Imfact
 				return;
 			}
 
-			var semanticModel = compilation.GetSemanticModel(receiver.SyntaxTree);
-			var facade = new GenerationFacade(semanticModel);
+			var csCompilation = (CSharpCompilation)context.Compilation;
+			var options = (CSharpParseOptions)csCompilation.SyntaxTrees[0].Options;
+			var compilation =
+				context.Compilation.AddSyntaxTrees(AnnotationGenerator.GetSyntaxTrees(options));
 
-			var sourceFiles = facade.Run(receiver.CandidateClasses.ToArray());
+			var candidates = receiver.CandidateClasses
+				.Select(x =>
+				{
+					var sm = compilation.GetSemanticModel(x.SyntaxTree);
+					return new CandidateClass(x, new CompilationAnalysisContext(sm));
+				})
+				.ToArray();
+			var facade = new GenerationFacade();
+
+			var sourceFiles = facade.Run(candidates);
 			foreach (var file in sourceFiles)
 			{
 				var sourceText = SourceText.From(file.Contents, Encoding.UTF8);
 				context.AddSource(file.FileName, sourceText);
 			}
-		}
-
-		private Exception GetException(Exception ex)
-		{
-			return new AggregateException($"Exception in source generator. {ex.Message} {ex.StackTrace}", ex);
 		}
 	}
 

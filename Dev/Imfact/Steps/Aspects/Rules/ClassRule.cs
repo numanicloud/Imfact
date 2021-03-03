@@ -13,13 +13,15 @@ namespace Imfact.Steps.Aspects.Rules
 	internal class ClassRule
 	{
 		private readonly IAnalysisContext _context;
+		private readonly GenerationContext _genContext;
 		private readonly MethodRule _methodRule;
 
-		public ClassRule(IAnalysisContext context)
+		public ClassRule(IAnalysisContext context, GenerationContext genContext)
 		{
 			var typeRule = new TypeRule();
 
 			_context = context;
+			_genContext = genContext;
 
 			_methodRule = new MethodRule(context,
 				new AttributeRule(typeRule),
@@ -61,7 +63,7 @@ namespace Imfact.Steps.Aspects.Rules
 		private ConstructorAspect GetConstructor(INamedTypeSymbol symbol)
 		{
 			var classType = TypeNode.FromSymbol(symbol);
-			var ctor = _context.Constructors[classType.Record];
+			var ctor = _genContext.Constructors[classType.Record];
 			var parameters = ctor.Parameters
 				.Select(x => new ParameterAspect(x.Type, x.Name))
 				.ToArray();
