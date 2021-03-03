@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Steps.Aspects;
+using Imfact.Entities;
+using Imfact.Steps.Aspects;
 
-namespace Deptorygen2.Core.Steps.Semanticses.Rules
+namespace Imfact.Steps.Semanticses.Rules
 {
 	internal sealed class FactoryRule
 	{

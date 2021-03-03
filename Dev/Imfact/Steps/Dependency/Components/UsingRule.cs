@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Steps.Expressions;
-using Deptorygen2.Core.Steps.Semanticses;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using Deptorygen2.Core.Utilities;
+using Imfact.Steps.Semanticses;
+using Imfact.Steps.Semanticses.Interfaces;
+using Imfact.Utilities;
 
-namespace Deptorygen2.Core.Steps.Dependency.Components
+namespace Imfact.Steps.Dependency.Components
 {
 	internal sealed class UsingRule
 	{

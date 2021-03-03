@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Entities;
+using Imfact.Entities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Deptorygen2.Core.Utilities
+namespace Imfact.Utilities
 {
 	internal static class AnalyzerHelper
 	{

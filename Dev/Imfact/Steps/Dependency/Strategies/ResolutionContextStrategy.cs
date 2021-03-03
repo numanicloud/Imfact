@@ -1,9 +1,9 @@
-﻿using Deptorygen2.Annotations;
-using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Steps.Dependency.Components;
-using Deptorygen2.Core.Steps.Expressions;
+﻿using Imfact.Annotations;
+using Imfact.Entities;
+using Imfact.Steps.Dependency.Components;
+using Imfact.Steps.Dependency.Interfaces;
 
-namespace Deptorygen2.Core.Steps.Dependency.Strategies
+namespace Imfact.Steps.Dependency.Strategies
 {
 	internal class ResolutionContextStrategy : IExpressionStrategy
 	{

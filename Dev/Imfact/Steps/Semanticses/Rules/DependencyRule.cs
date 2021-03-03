@@ -1,8 +1,9 @@
 ﻿using System.Linq;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using Deptorygen2.Core.Utilities;
+using Imfact.Entities;
+using Imfact.Steps.Semanticses.Interfaces;
+using Imfact.Utilities;
 
-namespace Deptorygen2.Core.Steps.Semanticses.Rules
+namespace Imfact.Steps.Semanticses.Rules
 {
 	internal sealed class DependencyRule
 	{
@@ -12,7 +13,7 @@ namespace Deptorygen2.Core.Steps.Semanticses.Rules
 			var cannotReturn = factory.Resolvers
 				.Concat<IResolverSemantics>(factory.MultiResolvers)
 				.Select(x => x.ReturnType)
-				.ToDictionaryWithDistinct(x => x.Record, x => x, g => g.First());
+				.ToDictionaryWithDistinct(x => x.Record, x => x, g => Enumerable.First<TypeNode>(g));
 
 			// 戻り値そのものは委譲または継承されたリゾルバーのみを使って解決できる
 			var canReturn = factory.Delegations

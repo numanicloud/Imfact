@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Utilities;
+using Imfact.Entities;
+using Imfact.Interfaces;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Deptorygen2.Core.Steps.Aspects
+namespace Imfact.Steps.Aspects.Rules
 {
 	class MethodRule
 	{

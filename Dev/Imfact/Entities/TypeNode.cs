@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using Deptorygen2.Core.Utilities;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
-using static Deptorygen2.Core.Entities.DisposableType;
+using static Imfact.Entities.DisposableType;
 
-namespace Deptorygen2.Core.Entities
+namespace Imfact.Entities
 {
 	internal record TypeNode(TypeRecord Record,
 		Accessibility Accessibility,

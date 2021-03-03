@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Utilities;
+using Imfact.Entities;
+using Imfact.Utilities;
 
-namespace Deptorygen2.Core.Steps.Dependency.Components
+namespace Imfact.Steps.Dependency.Components
 {
 	internal record CreationExpTree(ICreationNode Root);
 

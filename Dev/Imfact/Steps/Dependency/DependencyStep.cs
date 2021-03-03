@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Steps.Dependency.Components;
-using Deptorygen2.Core.Steps.Semanticses;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using Deptorygen2.Core.Utilities;
+using Imfact.Steps.Dependency.Components;
+using Imfact.Steps.Semanticses;
+using Imfact.Steps.Semanticses.Interfaces;
+using Imfact.Utilities;
 
-namespace Deptorygen2.Core.Steps.Expressions
+namespace Imfact.Steps.Dependency
 {
 	internal class DependencyStep
 	{

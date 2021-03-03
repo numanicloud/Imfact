@@ -1,10 +1,10 @@
 ﻿using System;
-using Deptorygen2.Annotations;
-using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Utilities;
+using Imfact.Annotations;
+using Imfact.Entities;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Steps.Aspects
+namespace Imfact.Steps.Aspects.Rules
 {
 	internal class AttributeRule
 	{

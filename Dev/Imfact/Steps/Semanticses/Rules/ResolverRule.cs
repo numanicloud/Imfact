@@ -1,10 +1,10 @@
 ﻿using System.Linq;
-using Deptorygen2.Annotations;
-using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Steps.Aspects;
-using Deptorygen2.Core.Utilities;
+using Imfact.Annotations;
+using Imfact.Entities;
+using Imfact.Steps.Aspects;
+using Imfact.Utilities;
 
-namespace Deptorygen2.Core.Steps.Semanticses.Rules
+namespace Imfact.Steps.Semanticses.Rules
 {
 	internal sealed class ResolverRule
 	{

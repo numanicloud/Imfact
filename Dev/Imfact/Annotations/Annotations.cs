@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace Deptorygen2.Annotations
+namespace Imfact.Annotations
 {
 	[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 	internal sealed class FactoryAttribute : Attribute

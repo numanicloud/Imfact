@@ -1,4 +1,4 @@
-﻿namespace Deptorygen2.Core.Steps.Semanticses
+﻿namespace Imfact.Steps.Semanticses
 {
 	internal record SemanticsRoot(Factory Factory);
 }

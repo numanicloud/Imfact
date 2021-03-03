@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Deptorygen2.Core.Steps.Semanticses;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using Deptorygen2.Core.Utilities;
+﻿using System.Linq;
+using Imfact.Steps.Semanticses;
+using Imfact.Steps.Semanticses.Interfaces;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Steps.Expressions.Strategies
+namespace Imfact.Steps.Dependency.Interfaces
 {
 	interface IFactorySource<T> where T : IFactorySemantics
 	{

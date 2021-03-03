@@ -1,9 +1,9 @@
 ﻿using System.Linq;
-using Deptorygen2.Core.Steps.Writing;
-using Deptorygen2.Core.Steps.Writing.Coding;
-using Deptorygen2.Core.Utilities;
+using Imfact.Steps.Writing;
+using Imfact.Steps.Writing.Coding;
+using Imfact.Utilities;
 
-namespace Deptorygen2.Core.Steps.Definitions.Methods
+namespace Imfact.Steps.Definitions.Methods
 {
 	internal record InitializeImplementation(Assignment[] Assignments) : Implementation
 	{

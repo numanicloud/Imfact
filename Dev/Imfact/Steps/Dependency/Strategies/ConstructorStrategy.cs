@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Steps.Dependency.Components;
-using Deptorygen2.Core.Steps.Semanticses;
+using Imfact.Steps.Dependency.Components;
+using Imfact.Steps.Dependency.Interfaces;
+using Imfact.Steps.Semanticses;
 
-namespace Deptorygen2.Core.Steps.Expressions.Strategies
+namespace Imfact.Steps.Dependency.Strategies
 {
 	class ConstructorStrategy : IExpressionStrategy
 	{

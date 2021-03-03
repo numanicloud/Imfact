@@ -1,6 +1,6 @@
-﻿using Deptorygen2.Core.Interfaces;
+﻿using Imfact.Interfaces;
 
-namespace Deptorygen2.Core.Steps.Definitions
+namespace Imfact.Steps.Definitions
 {
 	internal class DefinitionStepResult
 	{

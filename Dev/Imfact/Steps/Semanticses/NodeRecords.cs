@@ -1,11 +1,11 @@
 ﻿using System.Linq;
 using System.Text;
-using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using Deptorygen2.Core.Utilities;
+using Imfact.Entities;
+using Imfact.Steps.Semanticses.Interfaces;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Steps.Semanticses
+namespace Imfact.Steps.Semanticses
 {
 	internal record Factory(FactoryCommon Common,
 		Delegation[] Delegations, Inheritance[] Inheritances, EntryResolver[] EntryResolvers)

@@ -1,9 +1,9 @@
 ﻿using System.Linq;
-using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Steps.Semanticses;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
+using Imfact.Entities;
+using Imfact.Steps.Semanticses;
+using Imfact.Steps.Semanticses.Interfaces;
 
-namespace Deptorygen2.Core.Steps.Dependency.Components
+namespace Imfact.Steps.Dependency.Components
 {
 	internal record DisposableInfo(bool HasDisposable, bool HasAsyncDisposable)
 	{

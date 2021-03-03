@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Deptorygen2.Core.Entities;
+using Imfact.Entities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Deptorygen2.Core.Interfaces
+namespace Imfact.Interfaces
 {
 	internal interface IAnalysisContext
 	{

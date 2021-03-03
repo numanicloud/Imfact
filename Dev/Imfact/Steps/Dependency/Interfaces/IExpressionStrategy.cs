@@ -1,6 +1,6 @@
-﻿using Deptorygen2.Core.Steps.Dependency.Components;
+﻿using Imfact.Steps.Dependency.Components;
 
-namespace Deptorygen2.Core.Steps.Expressions
+namespace Imfact.Steps.Dependency.Interfaces
 {
 	internal interface IExpressionStrategy
 	{

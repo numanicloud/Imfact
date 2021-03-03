@@ -1,7 +1,8 @@
 ﻿using System.Linq;
-using Deptorygen2.Core.Steps.Dependency.Components;
+using Imfact.Steps.Dependency.Components;
+using Imfact.Steps.Dependency.Interfaces;
 
-namespace Deptorygen2.Core.Steps.Expressions.Strategies
+namespace Imfact.Steps.Dependency.Strategies
 {
 	class ParameterStrategy : IExpressionStrategy
 	{

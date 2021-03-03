@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Steps.Definitions;
-using Deptorygen2.Core.Steps.Definitions.Methods;
-using Deptorygen2.Core.Steps.Writing.Coding;
-using Deptorygen2.Core.Utilities;
+using Imfact.Steps.Definitions;
+using Imfact.Steps.Definitions.Methods;
+using Imfact.Steps.Writing.Coding;
+using Imfact.Utilities;
 
-namespace Deptorygen2.Core.Steps.Writing
+namespace Imfact.Steps.Writing
 {
 	internal class SourceCodeBuilder
 	{

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Steps.Definitions;
-using Deptorygen2.Core.Steps.Writing.Coding;
+using Imfact.Steps.Definitions;
+using Imfact.Steps.Writing.Coding;
 
-namespace Deptorygen2.Core.Steps.Writing
+namespace Imfact.Steps.Writing
 {
 	internal class ResolverWriter
 	{

@@ -1,9 +1,8 @@
-﻿using Deptorygen2.Annotations;
-using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Steps.Definitions.Methods;
-using Deptorygen2.Core.Steps.Dependency.Components;
+﻿using Imfact.Entities;
+using Imfact.Steps.Definitions.Methods;
+using Imfact.Steps.Dependency.Components;
 
-namespace Deptorygen2.Core.Steps.Definitions
+namespace Imfact.Steps.Definitions
 {
 	internal record DefinitionRoot(Using[] Usings, Namespace Namespace);
 

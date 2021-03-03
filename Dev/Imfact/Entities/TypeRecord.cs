@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using Deptorygen2.Core.Utilities;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Entities
+namespace Imfact.Entities
 {
 	// 等値性判定にはこちらを使う。追加の情報はTypeNodeに持たせる
 	internal record TypeRecord(string FullNamespace, string Name)

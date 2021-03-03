@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using Deptorygen2.Core.Entities;
+using Imfact.Entities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Steps.Aspects
+namespace Imfact.Steps.Aspects.Rules
 {
 	internal sealed class TypeRule
 	{

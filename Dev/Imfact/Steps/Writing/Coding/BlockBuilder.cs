@@ -1,7 +1,7 @@
 ﻿using System;
-using Deptorygen2.Core.Utilities;
+using Imfact.Utilities;
 
-namespace Deptorygen2.Core.Steps.Writing.Coding
+namespace Imfact.Steps.Writing.Coding
 {
 	internal class BlockBuilder : ICodeBuilder, IDisposable
 	{

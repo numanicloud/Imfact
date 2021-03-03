@@ -1,18 +1,17 @@
 ﻿using System.Linq;
-using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps;
-using Deptorygen2.Core.Steps.Aspects;
-using Deptorygen2.Core.Steps.Definitions;
-using Deptorygen2.Core.Steps.Expressions;
-using Deptorygen2.Core.Steps.Ranking;
-using Deptorygen2.Core.Steps.Semanticses;
-using Deptorygen2.Core.Steps.Semanticses.Rules;
-using Deptorygen2.Core.Steps.Writing;
+using Imfact.Interfaces;
+using Imfact.Steps;
+using Imfact.Steps.Aspects;
+using Imfact.Steps.Definitions;
+using Imfact.Steps.Dependency;
+using Imfact.Steps.Ranking;
+using Imfact.Steps.Semanticses;
+using Imfact.Steps.Writing;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Deptorygen2.Core.Utilities;
 
-namespace Deptorygen2.Core
+namespace Imfact
 {
 	public class GenerationFacade
 	{

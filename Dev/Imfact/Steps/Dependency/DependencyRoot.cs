@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Deptorygen2.Core.Steps.Dependency.Components;
-using Deptorygen2.Core.Steps.Semanticses;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
+using Imfact.Steps.Dependency.Components;
+using Imfact.Steps.Semanticses;
+using Imfact.Steps.Semanticses.Interfaces;
 
-namespace Deptorygen2.Core.Steps.Expressions
+namespace Imfact.Steps.Dependency
 {
 	internal record DependencyRoot(SemanticsRoot Semantics,
 		InjectionResult Injection,

@@ -1,7 +1,7 @@
-﻿using Deptorygen2.Core.Entities;
+﻿using Imfact.Entities;
 using Microsoft.CodeAnalysis;
 
-namespace Deptorygen2.Core.Steps.Semanticses.Interfaces
+namespace Imfact.Steps.Semanticses.Interfaces
 {
 	internal interface IResolverSemantics
 	{

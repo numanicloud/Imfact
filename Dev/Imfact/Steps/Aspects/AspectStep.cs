@@ -1,7 +1,8 @@
-﻿using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Ranking;
+﻿using Imfact.Interfaces;
+using Imfact.Steps.Aspects.Rules;
+using Imfact.Steps.Ranking;
 
-namespace Deptorygen2.Core.Steps.Aspects
+namespace Imfact.Steps.Aspects
 {
 	internal sealed class AspectStep
 	{

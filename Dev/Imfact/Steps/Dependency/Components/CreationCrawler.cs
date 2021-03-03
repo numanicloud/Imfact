@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Steps.Dependency.Strategies;
-using Deptorygen2.Core.Steps.Expressions;
-using Deptorygen2.Core.Steps.Expressions.Strategies;
-using Deptorygen2.Core.Steps.Semanticses;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using Deptorygen2.Core.Utilities;
+using Imfact.Entities;
+using Imfact.Steps.Dependency.Interfaces;
+using Imfact.Steps.Dependency.Strategies;
+using Imfact.Steps.Semanticses;
+using Imfact.Steps.Semanticses.Interfaces;
+using Imfact.Utilities;
 
-namespace Deptorygen2.Core.Steps.Dependency.Components
+namespace Imfact.Steps.Dependency.Components
 {
 	internal class CreationCrawler
 	{

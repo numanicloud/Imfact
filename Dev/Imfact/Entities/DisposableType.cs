@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Deptorygen2.Core.Entities
+namespace Imfact.Entities
 {
 	[Flags]
 	internal enum DisposableType

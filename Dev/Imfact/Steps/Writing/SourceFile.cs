@@ -1,4 +1,4 @@
-﻿namespace Deptorygen2.Core.Steps.Writing
+﻿namespace Imfact.Steps.Writing
 {
 	public record SourceFile(string FileName, string Contents);
 }

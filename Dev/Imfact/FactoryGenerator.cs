@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using Deptorygen2.Core.Annotations;
+using Imfact.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Deptorygen2.Core
+namespace Imfact
 {
 	[Generator]
 	public class FactoryGenerator : ISourceGenerator

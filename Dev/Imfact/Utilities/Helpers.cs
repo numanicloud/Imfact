@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Deptorygen2.Core.Utilities
+namespace Imfact.Utilities
 {
 	public static class Helpers
 	{

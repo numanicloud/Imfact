@@ -1,6 +1,7 @@
-﻿using Deptorygen2.Core.Steps.Aspects;
+﻿using Imfact.Steps.Aspects;
+using Imfact.Steps.Semanticses.Rules;
 
-namespace Deptorygen2.Core.Steps.Semanticses.Rules
+namespace Imfact.Steps.Semanticses
 {
 	internal sealed class SemanticsStep
 	{

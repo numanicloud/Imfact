@@ -1,8 +1,9 @@
 ﻿using System.Linq;
-using Deptorygen2.Core.Steps.Semanticses;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
+using Imfact.Steps.Dependency.Interfaces;
+using Imfact.Steps.Semanticses;
+using Imfact.Steps.Semanticses.Interfaces;
 
-namespace Deptorygen2.Core.Steps.Expressions.Strategies
+namespace Imfact.Steps.Dependency.Strategies
 {
 	internal class RootResolverStrategy : FactoryExpressionStrategy<Factory, Resolver>
 	{

@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Steps.Dependency.Components;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using Deptorygen2.Core.Utilities;
+using Imfact.Entities;
+using Imfact.Steps.Dependency.Components;
+using Imfact.Steps.Dependency.Interfaces;
+using Imfact.Steps.Semanticses.Interfaces;
+using Imfact.Utilities;
 
-namespace Deptorygen2.Core.Steps.Expressions.Strategies
+namespace Imfact.Steps.Dependency.Strategies
 {
 	internal class FactoryExpressionStrategy<TFactory, TResolver> : IExpressionStrategy
 		where TFactory : IFactorySemantics

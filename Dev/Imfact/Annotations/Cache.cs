@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Deptorygen2.Annotations
+namespace Imfact.Annotations
 {
 	internal class Cache<T> : IHook<T> where T : class
 	{

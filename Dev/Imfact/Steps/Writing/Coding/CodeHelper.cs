@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Deptorygen2.Core.Steps.Writing.Coding
+namespace Imfact.Steps.Writing.Coding
 {
 	internal static class CodeHelper
 	{

@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Deptorygen2.Core.Annotations
+namespace Imfact.Annotations
 {
 	internal class AnnotationGenerator
 	{

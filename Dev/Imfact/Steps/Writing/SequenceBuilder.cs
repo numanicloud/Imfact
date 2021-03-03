@@ -1,6 +1,6 @@
-﻿using Deptorygen2.Core.Steps.Writing.Coding;
+﻿using Imfact.Steps.Writing.Coding;
 
-namespace Deptorygen2.Core.Steps.Writing
+namespace Imfact.Steps.Writing
 {
 	internal class SequenceBuilder : ICodeBuilder
 	{

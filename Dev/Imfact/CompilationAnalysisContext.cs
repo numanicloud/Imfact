@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Interfaces;
+using Imfact.Entities;
+using Imfact.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Deptorygen2.Core
+namespace Imfact
 {
 	internal class CompilationAnalysisContext : IAnalysisContext
 	{

@@ -1,8 +1,8 @@
-﻿using Deptorygen2.Core.Utilities;
+﻿using System.Linq;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
-using System.Linq;
 
-namespace Deptorygen2.Core.Steps.Definitions.Methods
+namespace Imfact.Steps.Definitions.Methods
 {
 	internal record OrdinalSignature(Accessibility Accessibility, Type ReturnType,
 		string Name, Parameter[] Parameters, string[] Modifiers) : Signature

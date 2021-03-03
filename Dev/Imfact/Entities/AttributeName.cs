@@ -1,4 +1,4 @@
-﻿namespace Deptorygen2.Core.Entities
+﻿namespace Imfact.Entities
 {
 	internal record AttributeName(string NameWithAttributeSuffix)
 	{

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Deptorygen2.Core.Steps.Writing.Coding
+namespace Imfact.Steps.Writing.Coding
 {
 	internal class CodeBuilder : ICodeBuilder
 	{

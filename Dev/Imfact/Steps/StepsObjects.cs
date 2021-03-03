@@ -1,7 +1,7 @@
-﻿using Deptorygen2.Core.Steps.Aspects;
-using Deptorygen2.Core.Steps.Semanticses;
+﻿using Imfact.Steps.Aspects;
+using Imfact.Steps.Semanticses;
 
-namespace Deptorygen2.Core.Steps
+namespace Imfact.Steps
 {
 	public class SyntaxOnAspect
 	{

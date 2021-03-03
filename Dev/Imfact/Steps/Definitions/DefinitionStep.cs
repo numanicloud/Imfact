@@ -1,11 +1,11 @@
 ﻿using System.Linq;
-using Deptorygen2.Core.Interfaces;
-using Deptorygen2.Core.Steps.Definitions.Methods;
-using Deptorygen2.Core.Steps.Expressions;
-using Deptorygen2.Core.Steps.Semanticses;
-using Deptorygen2.Core.Utilities;
+using Imfact.Interfaces;
+using Imfact.Steps.Definitions.Methods;
+using Imfact.Steps.Dependency;
+using Imfact.Steps.Semanticses;
+using Imfact.Utilities;
 
-namespace Deptorygen2.Core.Steps.Definitions
+namespace Imfact.Steps.Definitions
 {
 	internal class DefinitionStep
 	{

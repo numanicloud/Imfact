@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Deptorygen2.Annotations;
-using Deptorygen2.Core.Entities;
-using Deptorygen2.Core.Steps.Definitions.Methods;
-using Deptorygen2.Core.Steps.Expressions;
-using Deptorygen2.Core.Steps.Semanticses;
-using Deptorygen2.Core.Steps.Semanticses.Interfaces;
-using Deptorygen2.Core.Utilities;
+using Imfact.Annotations;
+using Imfact.Entities;
+using Imfact.Steps.Definitions.Methods;
+using Imfact.Steps.Dependency;
+using Imfact.Steps.Semanticses;
+using Imfact.Steps.Semanticses.Interfaces;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
-using Attribute = Deptorygen2.Core.Steps.Definitions.Methods.Attribute;
+using Attribute = Imfact.Steps.Definitions.Methods.Attribute;
 
-namespace Deptorygen2.Core.Steps.Definitions
+namespace Imfact.Steps.Definitions
 {
 	internal sealed class MethodBuilder
 	{
