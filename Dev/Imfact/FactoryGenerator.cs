@@ -19,37 +19,30 @@ namespace Imfact
 
 		public void Execute(GeneratorExecutionContext context)
 		{
-			try
+			System.Diagnostics.Debugger.Launch();
+			AnnotationGenerator.AddSource(in context);
+
+			var csCompilation = (CSharpCompilation) context.Compilation;
+			var options = csCompilation.SyntaxTrees.Length > 0
+				? (CSharpParseOptions) csCompilation.SyntaxTrees[0].Options
+				: CSharpParseOptions.Default;
+			var compilation =
+				context.Compilation.AddSyntaxTrees(AnnotationGenerator.GetSyntaxTrees(options));
+
+			if (context.SyntaxReceiver is not FactorySyntaxReceiver receiver
+			    || receiver.SyntaxTree is null)
 			{
-				System.Diagnostics.Debugger.Launch();
-				AnnotationGenerator.AddSource(in context);
-
-				var csCompilation = (CSharpCompilation) context.Compilation;
-				var options = csCompilation.SyntaxTrees.Length > 0
-					? (CSharpParseOptions) csCompilation.SyntaxTrees[0].Options
-					: CSharpParseOptions.Default;
-				var compilation =
-					context.Compilation.AddSyntaxTrees(AnnotationGenerator.GetSyntaxTrees(options));
-
-				if (context.SyntaxReceiver is not FactorySyntaxReceiver receiver
-				    || receiver.SyntaxTree is null)
-				{
-					return;
-				}
-
-				var semanticModel = compilation.GetSemanticModel(receiver.SyntaxTree);
-				var facade = new GenerationFacade(semanticModel);
-
-				var sourceFiles = facade.Run(receiver.CandidateClasses.ToArray());
-				foreach (var file in sourceFiles)
-				{
-					var sourceText = SourceText.From(file.Contents, Encoding.UTF8);
-					context.AddSource(file.FileName, sourceText);
-				}
+				return;
 			}
-			catch (Exception ex)
+
+			var semanticModel = compilation.GetSemanticModel(receiver.SyntaxTree);
+			var facade = new GenerationFacade(semanticModel);
+
+			var sourceFiles = facade.Run(receiver.CandidateClasses.ToArray());
+			foreach (var file in sourceFiles)
 			{
-				throw GetException(ex);
+				var sourceText = SourceText.From(file.Contents, Encoding.UTF8);
+				context.AddSource(file.FileName, sourceText);
 			}
 		}
 
