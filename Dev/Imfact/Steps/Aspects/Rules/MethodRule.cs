@@ -24,9 +24,9 @@ namespace Imfact.Steps.Aspects.Rules
 			_typeRule = typeRule;
 		}
 
-		public MethodAspect? ExtractAspect(MethodDeclarationSyntax syntax)
+		public MethodAspect? ExtractAspect(MethodDeclarationSyntax syntax, bool partialOnly = false)
 		{
-			if (!syntax.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword)))
+			if (partialOnly && !syntax.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword)))
 			{
 				return null;
 			}

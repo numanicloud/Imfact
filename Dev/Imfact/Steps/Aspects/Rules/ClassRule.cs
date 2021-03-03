@@ -45,7 +45,7 @@ namespace Imfact.Steps.Aspects.Rules
 				return ExtractAspect(syntax, x, constructor: GetConstructor(x));
 			}).FilterNull().ToArray();
 
-			return ExtractAspect(root.Syntax, root.Symbol, baseClasses);
+			return ExtractAspect(root.Syntax, root.Symbol, baseClasses, partialOnly:true);
 
 			static IEnumerable<INamedTypeSymbol> TraverseBase(INamedTypeSymbol pivot)
 			{
@@ -74,11 +74,12 @@ namespace Imfact.Steps.Aspects.Rules
 		private ClassAspect ExtractAspect(ClassDeclarationSyntax syntax,
 			INamedTypeSymbol symbol,
 			ClassAspect[]? baseClasses = null,
-			ConstructorAspect? constructor = null)
+			ConstructorAspect? constructor = null,
+			bool partialOnly = false)
 		{
 			var methods = syntax.Members
 				.OfType<MethodDeclarationSyntax>()
-				.Select(syntax1 => _methodRule.ExtractAspect(syntax1))
+				.Select(syntax1 => _methodRule.ExtractAspect(syntax1, partialOnly))
 				.FilterNull()
 				.ToArray();
 
