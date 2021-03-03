@@ -14,11 +14,11 @@
 
   <Target Name="_AddAnalyzersToOutput">
     <ItemGroup>
-      <TfmSpecificPackageFile Include="$(OutputPath)\Deptorygen2.Core.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\$(AssemblyName).dll" PackagePath="analyzers/dotnet/cs" />
     </ItemGroup>
   </Target>
 
   <PropertyGroup>
-    <PackageId>Deptorygen2</PackageId>
+    <PackageId>Imfact</PackageId>
   </PropertyGroup>
 </Project>
