@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Imfact.Entities;
 using Imfact.Steps.Semanticses;
 using Imfact.Steps.Semanticses.Interfaces;
 using Imfact.Utilities;
@@ -38,16 +40,31 @@ namespace Imfact.Steps.Dependency.Components
 
 		private IEnumerable<IEnumerable<string>> Stage2(SemanticsRoot semantics, InjectionResult injection)
 		{
+			static IEnumerable<TypeNode> GetNestedTypes(TypeNode root)
+			{
+				yield return root;
+
+				foreach (var argument in root.TypeArguments)
+				{
+					foreach (var type in GetNestedTypes(argument))
+					{
+						yield return type;
+					}
+				}
+			}
+
 			var factory = semantics.Factory;
 			yield return factory.Delegations.Select(x => x.Type.FullNamespace);
 			yield return factory.Resolvers
 				.Concat<IResolverSemantics>(factory.MultiResolvers)
 				.SelectMany(m =>
 				{
-					var p = m.Parameters.Select(x => x.Type.FullNamespace);
-					var h = m.Hooks.Select(x => x.HookType.FullNamespace);
-					var r = m.Resolutions.Select(x => x.TypeName.FullNamespace);
-					return p.Concat(h).Concat(r);
+					var pp = m.Parameters.SelectMany(x => GetNestedTypes(x.Type));
+					var hh = m.Hooks.SelectMany(x => GetNestedTypes(x.HookType));
+					var rr = m.Resolutions.SelectMany(x => GetNestedTypes(x.TypeName));
+					var rt = GetNestedTypes(m.ReturnType);
+					return pp.Concat(hh).Concat(rr).Concat(rt)
+						.Select(x => x.FullNamespace);
 				});
 			yield return factory.Resolvers.Select(x => x.ReturnTypeResolution)
 				.FilterNull()
