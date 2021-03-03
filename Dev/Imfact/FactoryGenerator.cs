@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using Imfact.Annotations;
 using Microsoft.CodeAnalysis;
@@ -18,30 +19,43 @@ namespace Imfact
 
 		public void Execute(GeneratorExecutionContext context)
 		{
-			//System.Diagnostics.Debugger.Launch();
-			AnnotationGenerator.AddSource(in context);
-
-			var options =
-				(CSharpParseOptions)((CSharpCompilation)context.Compilation).SyntaxTrees[0]
-				.Options;
-			var compilation =
-				context.Compilation.AddSyntaxTrees(AnnotationGenerator.GetSyntaxTrees(options));
-
-			if (context.SyntaxReceiver is not FactorySyntaxReceiver receiver
-				|| receiver.SyntaxTree is null)
+			try
 			{
-				return;
+				//System.Diagnostics.Debugger.Launch();
+				AnnotationGenerator.AddSource(in context);
+
+				var csCompilation = (CSharpCompilation) context.Compilation;
+				var options = csCompilation.SyntaxTrees.Length > 0
+					? (CSharpParseOptions) csCompilation.SyntaxTrees[0].Options
+					: CSharpParseOptions.Default;
+				var compilation =
+					context.Compilation.AddSyntaxTrees(AnnotationGenerator.GetSyntaxTrees(options));
+
+				if (context.SyntaxReceiver is not FactorySyntaxReceiver receiver
+				    || receiver.SyntaxTree is null)
+				{
+					return;
+				}
+
+				var semanticModel = compilation.GetSemanticModel(receiver.SyntaxTree);
+				var facade = new GenerationFacade(semanticModel);
+
+				var sourceFiles = facade.Run(receiver.CandidateClasses.ToArray());
+				foreach (var file in sourceFiles)
+				{
+					var sourceText = SourceText.From(file.Contents, Encoding.UTF8);
+					context.AddSource(file.FileName, sourceText);
+				}
 			}
-
-			var semanticModel = compilation.GetSemanticModel(receiver.SyntaxTree);
-			var facade = new GenerationFacade(semanticModel);
-
-			var sourceFiles = facade.Run(receiver.CandidateClasses.ToArray());
-			foreach (var file in sourceFiles)
+			catch (Exception ex)
 			{
-				var sourceText = SourceText.From(file.Contents, Encoding.UTF8);
-				context.AddSource(file.FileName, sourceText);
+				throw GetException(ex);
 			}
+		}
+
+		private Exception GetException(Exception ex)
+		{
+			return new AggregateException($"Exception in source generator.\n{ex.Message}\n{ex.StackTrace}", ex);
 		}
 	}
 
