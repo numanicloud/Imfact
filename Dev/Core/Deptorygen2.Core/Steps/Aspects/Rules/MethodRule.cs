@@ -4,6 +4,7 @@ using Deptorygen2.Core.Entities;
 using Deptorygen2.Core.Interfaces;
 using Deptorygen2.Core.Utilities;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Deptorygen2.Core.Steps.Aspects
@@ -25,6 +26,11 @@ namespace Deptorygen2.Core.Steps.Aspects
 
 		public MethodAspect? ExtractAspect(MethodDeclarationSyntax syntax)
 		{
+			if (!syntax.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword)))
+			{
+				return null;
+			}
+
 			if (_context.GetMethodSymbol(syntax) is not { } symbol)
 			{
 				return null;

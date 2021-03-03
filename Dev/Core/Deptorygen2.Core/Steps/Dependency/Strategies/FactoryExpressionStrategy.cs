@@ -21,6 +21,7 @@ namespace Deptorygen2.Core.Steps.Expressions.Strategies
 
 			var grouped = from factory in _factorySource.GetDelegationSource()
 						  from resolver in resolverSource.GetResolverSource(factory)
+						  where _factorySource.IsAvailable(resolver)
 						  select new Source(factory, resolver) into source
 						  group source by source.Resolver.ReturnType.Record;
 			_map = grouped.ToDictionary(x => x.Key, x => x.ToArray());

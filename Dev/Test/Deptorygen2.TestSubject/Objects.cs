@@ -14,6 +14,43 @@ namespace Deptorygen
 
 namespace Deptorygen2.TestSubject
 {
+	/* Deptorygen2 機能一覧
+	 * リゾルバー生成
+	 * コレクションリゾルバー生成
+	 * 委譲ファクトリー
+	 * 基底ファクトリー
+	 * パラメータつき解決
+	 * フック
+	 *		キャッシュ
+	 *		解決単位のキャッシュ
+	 * Disposable対応
+	 * AsyncDisposable対応
+	 * アクセシビリティ制御
+	 * Resolution属性によるバインド
+	 */
+
+	/*
+	 * Factory属性のついたクラスはファクトリークラスとなる。
+	 * ファクトリークラス内のpartialなメソッドはリゾルバーメソッドとなる。
+	 *		そのうち、IEnumerableを返すものはコレクションリゾルバーである。
+	 * ファクトリークラス内のプロパティで、その型がファクトリークラスである場合、委譲ファクトリーとなる。
+	 * ファクトリークラスの基底クラスで、その型がファクトリークラスである場合、基底ファクトリーとなる。
+	 * IHook<T>を実装するクラスはフッククラスである。
+	 * キャッシュ属性はフッククラスの糖衣構文。
+	 * 
+	 */
+
+	/*
+	 * 基本的なルール
+	 * partialメソッドはリゾルバーとなる。
+	 * 基底、委譲であるファクトリーからも、普通の方法でアクセスできるリゾルバーを利用する。
+	 * フッククラスの処理を属性で差し込むことができる。
+	 * 不足している依存関係はコンストラクタで要求される。
+	 * 生成の都合で保持しているIDisposableなものは、Disposeメソッドで破棄できる。
+	 * Resolution属性で実際に生成するクラスをバインドできる。
+	 */
+
+
 	class Client
 	{
 		public Client(Sub.Service service, Sub.Service service2)
@@ -69,7 +106,7 @@ namespace Deptorygen2.TestSubject
 	[Factory]
 	public partial class PinkFactory
 	{
-		internal partial Service ResolveService();
+		protected partial Service ResolveService();
 		public partial Consumer ResolveConsumer();
 	}
 
@@ -78,6 +115,8 @@ namespace Deptorygen2.TestSubject
 	public partial class YellowFactory : PinkFactory
 	{
 		internal partial Client ResolveClient();
+
+		internal Client GetClient() => ResolveClient();
 	}
 
 	[Factory]
@@ -112,7 +151,7 @@ namespace Deptorygen2.TestSubject
 
 namespace Deptorygen2.TestSubject.Sub
 {
-	class Service
+	public class Service
 	{
 		
 	}
