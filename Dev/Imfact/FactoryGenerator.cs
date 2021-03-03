@@ -55,7 +55,7 @@ namespace Imfact
 
 		private Exception GetException(Exception ex)
 		{
-			return new AggregateException($"Exception in source generator.\n{ex.Message}\n{ex.StackTrace}", ex);
+			return new AggregateException($"Exception in source generator. {ex.Message} {ex.StackTrace}", ex);
 		}
 	}
 
