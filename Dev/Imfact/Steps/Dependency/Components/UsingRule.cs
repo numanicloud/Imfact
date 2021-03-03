@@ -12,7 +12,10 @@ namespace Imfact.Steps.Dependency.Components
 	{
 		public string[] Extract(SemanticsRoot semantics, InjectionResult injection, DisposableInfo disposableInfo)
 		{
-			return Stage1(semantics, injection, disposableInfo).Distinct().ToArray();
+			return Stage1(semantics, injection, disposableInfo)
+				.Distinct()
+				.OrderBy(x => x)
+				.ToArray();
 		}
 
 		private IEnumerable<string> Stage1(SemanticsRoot semantics, InjectionResult injection,
