@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Deptorygen;
-using Deptorygen2.Annotations;
 using Deptorygen2.TestSubject.Sub;
+using Imfact.Annotations;
 
 namespace Deptorygen
 {

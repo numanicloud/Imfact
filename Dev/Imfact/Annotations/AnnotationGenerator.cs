@@ -8,7 +8,7 @@ namespace Imfact.Annotations
 	internal class AnnotationGenerator
 	{
 		private const string annotationText = @"using System;
-namespace Deptorygen2.Annotations
+namespace Imfact.Annotations
 {
 	[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 	public sealed class FactoryAttribute : Attribute
@@ -61,7 +61,7 @@ namespace Deptorygen2.Annotations
 ";
 
 		private const string cacheText = @"using System;
-namespace Deptorygen2.Annotations
+namespace Imfact.Annotations
 {
 	public class Cache<T> : IHook<T> where T : class
 	{

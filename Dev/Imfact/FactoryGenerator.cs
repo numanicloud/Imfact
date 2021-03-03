@@ -21,17 +21,17 @@ namespace Imfact
 			//System.Diagnostics.Debugger.Launch();
 			AnnotationGenerator.AddSource(in context);
 
+			var options =
+				(CSharpParseOptions)((CSharpCompilation)context.Compilation).SyntaxTrees[0]
+				.Options;
+			var compilation =
+				context.Compilation.AddSyntaxTrees(AnnotationGenerator.GetSyntaxTrees(options));
+
 			if (context.SyntaxReceiver is not FactorySyntaxReceiver receiver
 				|| receiver.SyntaxTree is null)
 			{
 				return;
 			}
-
-			var options =
-				(CSharpParseOptions) ((CSharpCompilation) context.Compilation).SyntaxTrees[0]
-				.Options;
-			var compilation =
-				context.Compilation.AddSyntaxTrees(AnnotationGenerator.GetSyntaxTrees(options));
 
 			var semanticModel = compilation.GetSemanticModel(receiver.SyntaxTree);
 			var facade = new GenerationFacade(semanticModel);

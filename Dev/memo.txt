@@ -40,3 +40,12 @@ Semanticsステップ
 Dependencyステップ
 Definitionステップ
 Writingステップ
+
+---
+
+記事化できる知識が溜まってきた。
+
+- NerdBank.GitVersioningでバージョン管理
+- SyntaxとSymbol、そしていろんな情報の取り方
+- Imfactの使い方と宣伝
+- Imfactの設計
