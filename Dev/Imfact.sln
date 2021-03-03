@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{26B7E7DB-A0EC-4DC1-816A-28FCDD1D34AF}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		memo.txt = memo.txt
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imfact", "Imfact\Imfact.csproj", "{7C0B1AA6-6F3E-43C6-AAA8-7D58A0AE389A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imfact.TestSubject", "Imfact.TestSubject\Imfact.TestSubject.csproj", "{65E00654-4A65-44EB-BCDA-DD9C2CA3ABE2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7C0B1AA6-6F3E-43C6-AAA8-7D58A0AE389A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C0B1AA6-6F3E-43C6-AAA8-7D58A0AE389A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C0B1AA6-6F3E-43C6-AAA8-7D58A0AE389A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C0B1AA6-6F3E-43C6-AAA8-7D58A0AE389A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65E00654-4A65-44EB-BCDA-DD9C2CA3ABE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65E00654-4A65-44EB-BCDA-DD9C2CA3ABE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65E00654-4A65-44EB-BCDA-DD9C2CA3ABE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65E00654-4A65-44EB-BCDA-DD9C2CA3ABE2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2B35888E-D7BD-4F06-BB52-E53B4BC7E766}
+	EndGlobalSection
+EndGlobal
