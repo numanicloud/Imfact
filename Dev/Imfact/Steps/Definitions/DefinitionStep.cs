@@ -20,7 +20,7 @@ namespace Imfact.Steps.Definitions
 		{
 			_semantics = dependency.Semantics;
 			_dependency = dependency;
-			_methodBuilder = new MethodBuilder(dependency);
+			_methodBuilder = new MethodBuilder(dependency, new MethodService(dependency));
 		}
 
 		public DefinitionStepResult Build()
@@ -64,12 +64,12 @@ namespace Imfact.Steps.Definitions
 
 		private MethodInfo[] BuildMethods()
 		{
-			return _methodBuilder.BuildConstructorInfo().WrapByArray()
+			return _methodBuilder.ConstructorBuilder.BuildConstructorInfo().WrapByArray()
 				//.Concat(_methodBuilder.BuildEntryMethodInfo())
 				.Concat(_methodBuilder.BuildRegisterServiceMethodInfo().WrapOrEmpty())
 				.Concat(_methodBuilder.BuildResolverInfo())
 				.Concat(_methodBuilder.BuildEnumerableMethodInfo())
-				.Concat(_methodBuilder.BuildDisposeMethodInfo())
+				.Concat(_methodBuilder.DisposeMethodBuilder.BuildDisposeMethodInfo())
 				.ToArray();
 		}
 
