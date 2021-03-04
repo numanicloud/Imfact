@@ -6,6 +6,6 @@ namespace Imfact
 {
 	internal class GenerationContext
 	{
-		public Dictionary<TypeRecord, ConstructorRecord> Constructors { get; } = new();
+		public Dictionary<TypeId, ConstructorRecord> Constructors { get; } = new();
 	}
 }

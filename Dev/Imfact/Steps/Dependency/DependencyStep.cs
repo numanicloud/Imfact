@@ -37,7 +37,7 @@ namespace Imfact.Steps.Dependency
 			var deps = resultMulti.Values.SelectMany(x => x.Roots)
 				.Concat(result.Values.Select(x => x.Root))
 				.SelectMany(FindFields)
-				.GroupBy(x => x.Type.Record)
+				.GroupBy(x => x.Type.Id)
 				.Select(x => x.First())
 				.Select(x => new Semanticses.Dependency(x.Type, x.Name))
 				.ToArray();

@@ -10,7 +10,7 @@ namespace Imfact
 	{
 		private readonly SemanticModel _semanticModel;
 
-		public Dictionary<TypeRecord, ConstructorRecord> Constructors { get; } = new();
+		public Dictionary<TypeId, ConstructorRecord> Constructors { get; } = new();
 
 		public CompilationAnalysisContext(SemanticModel semanticModel)
 		{

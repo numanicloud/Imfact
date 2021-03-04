@@ -63,7 +63,7 @@ namespace Imfact.Steps.Aspects.Rules
 		private ConstructorAspect GetConstructor(INamedTypeSymbol symbol)
 		{
 			var classType = TypeNode.FromSymbol(symbol);
-			var ctor = _genContext.Constructors[classType.Record];
+			var ctor = _genContext.Constructors[classType.Id];
 			var parameters = ctor.Parameters
 				.Select(x => new ParameterAspect(x.Type, x.Name))
 				.ToArray();

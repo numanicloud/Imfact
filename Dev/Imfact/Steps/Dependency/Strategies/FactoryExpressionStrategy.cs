@@ -13,7 +13,7 @@ namespace Imfact.Steps.Dependency.Strategies
 		where TResolver : IResolverSemantics
 	{
 		private readonly IFactorySource<TFactory> _factorySource;
-		private readonly Dictionary<TypeRecord, Source[]> _map;
+		private readonly Dictionary<TypeId, Source[]> _map;
 
 		public FactoryExpressionStrategy(IFactorySource<TFactory> factorySource,
 			IResolverSource<TResolver> resolverSource)
@@ -24,15 +24,13 @@ namespace Imfact.Steps.Dependency.Strategies
 						  from resolver in resolverSource.GetResolverSource(factory)
 						  where _factorySource.IsAvailable(resolver)
 						  select new Source(factory, resolver) into source
-						  group source by source.Resolver.ReturnType.Record;
+						  group source by source.Resolver.ReturnType.Id;
 			_map = grouped.ToDictionary(x => x.Key, x => x.ToArray());
 		}
 
 		public ICreationNode? GetExpression(CreationContext context)
 		{
-			// TODO: Resolverの等値性判定。
-
-			if (_map.GetValueOrDefault(context.TypeToResolve[0].Record) is not {} resolutions
+			if (_map.GetValueOrDefault(context.TypeToResolve[0].Id) is not {} resolutions
 				|| Filter(resolutions, context.Caller).FirstOrDefault() is not { } source)
 			{
 				return null;

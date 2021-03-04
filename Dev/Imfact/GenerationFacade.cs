@@ -43,7 +43,7 @@ namespace Imfact
 					var result = DefinitionStep(semantics);
 
 					var ctor = result.ConstructorRecord;
-					_genContext.Constructors[ctor.ClassType.Record] = ctor;
+					_genContext.Constructors[ctor.ClassType.Id] = ctor;
 
 					return result;
 				})

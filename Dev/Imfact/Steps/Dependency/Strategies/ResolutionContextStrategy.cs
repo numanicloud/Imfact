@@ -9,7 +9,7 @@ namespace Imfact.Steps.Dependency.Strategies
 	{
 		public ICreationNode? GetExpression(CreationContext context)
 		{
-			if (context.TypeToResolve[0].Record == TypeRecord.FromRuntime(typeof(ResolutionContext)))
+			if (context.TypeToResolve[0].Id == TypeId.FromRuntime(typeof(ResolutionContext)))
 			{
 				return new Variable("context");
 			}

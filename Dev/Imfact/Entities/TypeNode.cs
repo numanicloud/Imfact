@@ -7,17 +7,23 @@ using static Imfact.Entities.DisposableType;
 
 namespace Imfact.Entities
 {
-	internal record TypeNode(TypeRecord Record,
+	internal record TypeNode(TypeId Id,
 		Accessibility Accessibility,
 		DisposableType DisposableType)
 	{
-		public string FullNamespace => Record.FullNamespace;
-		public string Name => Record.Name;
+		public string FullNamespace => Id.FullNamespace;
+		public string Name => Id.Name;
 		public TypeNode[] TypeArguments { get; init; } = new TypeNode[0];
 
 		public string FullBoundName => TypeArguments.Any()
 			? $"{Name}<{TypeArguments.Select(x => x.FullBoundName).Join(", ")}>"
 			: Name;
+
+		protected virtual bool PrintMembers(StringBuilder builder)
+		{
+			builder.Append($"{Accessibility} {FullNamespace}.{FullBoundName}");
+			return true;
+		}
 
 		public static TypeNode FromSymbol(INamedTypeSymbol symbol)
 		{
@@ -30,18 +36,12 @@ namespace Imfact.Entities
 				.Select(FromSymbol)
 				.ToArray();
 
-			return new TypeNode(TypeRecord.FromSymbol(symbol),
+			return new TypeNode(TypeId.FromSymbol(symbol),
 				symbol.DeclaredAccessibility,
 				dispose)
 			{
 				TypeArguments = typeArguments
 			};
-		}
-
-		private static bool IsImplementing(INamedTypeSymbol symbol, string interfaceName)
-		{
-			return symbol.AllInterfaces.Any(x =>
-				$"{x.GetFullNameSpace()}.{x.Name}" == interfaceName);
 		}
 
 		public static TypeNode FromSymbol(ITypeSymbol symbol)
@@ -57,9 +57,9 @@ namespace Imfact.Entities
 				: type.GetInterface("IAsyncDisposable") is not null ? AsyncDisposable
 				: NonDisposable;
 
-			var args = typeArguments?.Select(x => x.Record).ToArray();
+			var args = typeArguments?.Select(x => x.Id).ToArray();
 
-			return new TypeNode(TypeRecord.FromRuntime(type, args),
+			return new TypeNode(TypeId.FromRuntime(type, args),
 				type.IsPublic ? Accessibility.Public : Accessibility.Internal,
 				dispose)
 			{
@@ -67,10 +67,10 @@ namespace Imfact.Entities
 			};
 		}
 
-		protected virtual bool PrintMembers(StringBuilder builder)
+		private static bool IsImplementing(INamedTypeSymbol symbol, string interfaceName)
 		{
-			builder.Append($"{Accessibility} {FullNamespace}.{FullBoundName}");
-			return true;
+			return symbol.AllInterfaces.Any(x =>
+				$"{x.GetFullNameSpace()}.{x.Name}" == interfaceName);
 		}
 	}
 }

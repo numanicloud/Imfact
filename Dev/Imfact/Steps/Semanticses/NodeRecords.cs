@@ -57,7 +57,7 @@ namespace Imfact.Steps.Semanticses
 		{
 			var value = 1;
 			value += (int) Accessibility * 3;
-			value += ReturnType.Record.GetHashCode() * 7;
+			value += ReturnType.Id.GetHashCode() * 7;
 			value += MethodName.GetHashCode() * 19;
 			value += Parameters.Length * 11;
 			value += Resolutions.Length * 23;

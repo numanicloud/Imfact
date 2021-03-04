@@ -8,10 +8,10 @@ namespace Imfact.Steps.Dependency.Strategies
 	{
 		public ICreationNode? GetExpression(CreationContext context)
 		{
-			var ttr = context.TypeToResolve[0].Record;
+			var ttr = context.TypeToResolve[0].Id;
 			var resolution = context.Caller.Parameters
 				.Except(context.ConsumedParameters)
-				.FirstOrDefault(x => x.Type.Record == ttr);
+				.FirstOrDefault(x => x.Type.Id == ttr);
 
 			if (resolution is null)
 			{

@@ -10,13 +10,13 @@ namespace Imfact.Steps.Dependency.Strategies
 	{
 		public ICreationNode? GetExpression(CreationContext context)
 		{
-			var ttr = context.TypeToResolve[0].Record;
+			var ttr = context.TypeToResolve[0].Id;
 
 			var resolution = context.Caller.Resolutions
-				.FirstOrDefault(x => x.TypeName.Record == ttr);
+				.FirstOrDefault(x => x.TypeName.Id == ttr);
 
 			if (resolution is null && context.Caller is Resolver single
-				&& single.ActualResolution.TypeName.Record == ttr)
+				&& single.ActualResolution.TypeName.Id == ttr)
 			{
 				resolution = single.ActualResolution;
 			}

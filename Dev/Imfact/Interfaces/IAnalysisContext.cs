@@ -7,7 +7,7 @@ namespace Imfact.Interfaces
 {
 	internal interface IAnalysisContext
 	{
-		Dictionary<TypeRecord, ConstructorRecord> Constructors { get; }
+		Dictionary<TypeId, ConstructorRecord> Constructors { get; }
 		ITypeSymbol? GetTypeSymbol(TypeSyntax syntax);
 		IMethodSymbol? GetMethodSymbol(MethodDeclarationSyntax syntax);
 		INamedTypeSymbol? GetNamedTypeSymbol(TypeDeclarationSyntax syntax);

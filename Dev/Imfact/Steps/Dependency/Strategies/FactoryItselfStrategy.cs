@@ -12,19 +12,19 @@ namespace Imfact.Steps.Dependency.Strategies
 		where TFactory : IFactorySemantics
 	{
 		private readonly IFactorySource<TFactory> _factorySource;
-		private readonly Dictionary<TypeRecord, TFactory[]> _map;
+		private readonly Dictionary<TypeId, TFactory[]> _map;
 
 		public FactoryItselfStrategy(IFactorySource<TFactory> factorySource)
 		{
 			_factorySource = factorySource;
 			var grouped = from p in _factorySource.GetDelegationSource()
-						  group p by p.Type.Record;
+						  group p by p.Type.Id;
 			_map = grouped.ToDictionary(x => x.Key, x => x.ToArray());
 		}
 
 		public ICreationNode? GetExpression(CreationContext context)
 		{
-			if (_map.GetValueOrDefault(context.TypeToResolve[0].Record) is not {} resolution)
+			if (_map.GetValueOrDefault(context.TypeToResolve[0].Id) is not {} resolution)
 			{
 				return null;
 			}
