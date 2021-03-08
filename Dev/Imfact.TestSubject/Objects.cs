@@ -54,7 +54,6 @@ namespace Deptorygen2.TestSubject
 	{
 		public Client(Sub.Service service, Sub.Service service2)
 		{
-			
 		}
 	}
 
@@ -98,6 +97,7 @@ namespace Deptorygen2.TestSubject
 	{
 		public Consumer(Resource r, ResourceAsync ra)
 		{
+
 		}
 	}
 
