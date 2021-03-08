@@ -5,9 +5,9 @@
 
 Imfactの使い方を丁寧に解説した資料です。
 
-- [基本的な使い方](./Basics.md)
-- [キャッシュ](./Cache.md)
-- [Resolution属性](./Resolution.md)
+- [基本的な使い方](./Manuals/Basics.md)
+- [キャッシュ](./Manuals/Cache.md)
+- [Resolution属性](./Manuals/Resolution.md)
 
 ## リファレンス
 
