@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Imfact.Steps.Writing;
+﻿using Imfact.Steps.Writing;
 using Imfact.Steps.Writing.Coding;
 
 namespace Imfact.Steps.Definitions.Methods

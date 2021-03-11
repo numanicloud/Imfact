@@ -27,5 +27,11 @@ namespace Imfact.Steps.Writing.Coding
 			using var chunk = new ChunkBuilder(baseBuilder);
 			build.Invoke(chunk);
 		}
+
+		public static void EnterCsv(this ICodeBuilder baseBuilder, Action<ICodeBuilder> build)
+		{
+			var csv = new CsvBuilder(baseBuilder);
+			build.Invoke(csv);
+		}
 	}
 }

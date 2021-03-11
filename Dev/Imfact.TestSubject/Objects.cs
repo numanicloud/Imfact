@@ -148,6 +148,16 @@ namespace Deptorygen2.TestSubject
 		[Resolution(typeof(Hoge2))]
 		public partial IEnumerable<IHoge> ResolveMultiHoge();
 	}
+
+	[Factory]
+	internal partial class FooFactory
+	{
+		[Cache]
+		private partial Service ResolveService();
+		private partial Client ResolveClient();
+		[Resolution(typeof(Hoge2))]
+		private partial IHoge ResolveHoge();
+	}
 }
 
 namespace Deptorygen2.TestSubject.Sub
