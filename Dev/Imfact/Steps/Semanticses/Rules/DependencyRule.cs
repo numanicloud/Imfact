@@ -13,7 +13,7 @@ namespace Imfact.Steps.Semanticses.Rules
 			var cannotReturn = factory.Resolvers
 				.Concat<IResolverSemantics>(factory.MultiResolvers)
 				.Select(x => x.ReturnType)
-				.ToDictionaryWithDistinct(x => x.Id, x => x, g => Enumerable.First<TypeNode>(g));
+				.ToDictionaryWithDistinct(x => x.Id, x => x, g => Enumerable.First<TypeAnalysis>(g));
 
 			// 戻り値そのものは委譲または継承されたリゾルバーのみを使って解決できる
 			var canReturn = factory.Delegations

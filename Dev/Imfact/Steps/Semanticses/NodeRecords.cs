@@ -20,7 +20,7 @@ namespace Imfact.Steps.Semanticses
 	internal record Inheritance(FactoryCommon Common, Parameter[] Parameters)
 		: FactoryCommon(Common);
 
-	internal record FactoryCommon(TypeNode Type,
+	internal record FactoryCommon(TypeAnalysis Type,
 		Resolver[] Resolvers,
 		MultiResolver[] MultiResolvers) : IFactorySemantics;
 
@@ -42,12 +42,12 @@ namespace Imfact.Steps.Semanticses
 	internal record MultiResolver(ResolverCommon Common)
 		: ResolverCommon(Common)
 	{
-		public TypeNode ElementType => ReturnType.TypeArguments[0];
+		public TypeAnalysis ElementType => ReturnType.TypeArguments[0];
 	}
 
 	internal record ResolverCommon(
 		Accessibility Accessibility,
-		TypeNode ReturnType,
+		TypeAnalysis ReturnType,
 		string MethodName,
 		Parameter[] Parameters,
 		Resolution[] Resolutions,
@@ -66,33 +66,33 @@ namespace Imfact.Steps.Semanticses
 		}
 	}
 
-	internal record Dependency(TypeNode TypeName, string FieldName) : IProbablyDisposable
+	internal record Dependency(TypeAnalysis TypeName, string FieldName) : IProbablyDisposable
 	{
-		public TypeNode Type => TypeName;
+		public TypeAnalysis Type => TypeName;
 		public string MemberName => FieldName;
 		public string ParameterName => FieldName.TrimStart("_".ToCharArray());
 	}
 
-	internal record Hook(TypeNode HookType, string FieldName) : IProbablyDisposable
+	internal record Hook(TypeAnalysis HookType, string FieldName) : IProbablyDisposable
 	{
-		public TypeNode Type => HookType;
+		public TypeAnalysis Type => HookType;
 		public string MemberName => FieldName;
 	}
 
-	internal record Parameter(TypeNode Type, string ParameterName);
+	internal record Parameter(TypeAnalysis Type, string ParameterName);
 
-	internal record Resolution(TypeNode TypeName,
-		TypeNode[] Dependencies,
+	internal record Resolution(TypeAnalysis TypeName,
+		TypeAnalysis[] Dependencies,
 		DisposableType DisposableType);
 
 	internal record EntryResolver(string MethodName,
-		TypeNode ReturnType,
+		TypeAnalysis ReturnType,
 		Parameter[] Parameters,
 		Accessibility Accessibility);
 
 	internal interface IProbablyDisposable
 	{
-		TypeNode Type { get; }
+		TypeAnalysis Type { get; }
 		string MemberName { get; }
 	}
 }

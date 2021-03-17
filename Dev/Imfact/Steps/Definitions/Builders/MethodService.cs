@@ -20,13 +20,13 @@ namespace Imfact.Steps.Definitions
 			return _cache ??= _dependency.Resolvers
 				.Concat<IResolverSemantics>(_dependency.MultiResolvers)
 				.SelectMany(x => x.Hooks)
-				.Select(x => new Hook(new Type(x.HookType), x.FieldName))
+				.Select(x => new Hook(x.HookType, x.FieldName))
 				.ToArray();
 		}
 
-		public Parameter BuildParameter(TypeNode type, string name)
+		public Parameter BuildParameter(TypeAnalysis type, string name)
 		{
-			return new(new Type(type), name, false);
+			return new(type, name, false);
 		}
 	}
 }

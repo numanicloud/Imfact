@@ -5,7 +5,7 @@ using Imfact.Utilities;
 
 namespace Imfact.Steps.Definitions.Methods
 {
-	internal record MethodInfo(Signature Signature, Attribute[] Attributes, Implementation Implementation);
+	internal record MethodInfo(Signature Signature, Implementation Implementation);
 
 	internal abstract record Signature
 	{
@@ -15,15 +15,13 @@ namespace Imfact.Steps.Definitions.Methods
 				{
 					var nullable = x.IsNullable ? "?" : "";
 					var defaultValue = x.IsNullable ? " = null" : "";
-					return $"{x.Type.Text}{nullable} {x.Name}{defaultValue}";
+					return $"{x.TypeAnalysis.GetCode()}{nullable} {x.Name}{defaultValue}";
 				})
 				.Join(", ");
 		}
 
 		public abstract string GetSignatureString();
 	}
-
-	internal record Attribute(string Text);
 
 	internal abstract record Implementation
 	{

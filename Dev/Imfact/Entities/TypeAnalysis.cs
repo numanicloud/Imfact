@@ -7,13 +7,13 @@ using static Imfact.Entities.DisposableType;
 
 namespace Imfact.Entities
 {
-	internal record TypeNode(TypeId Id,
+	internal record TypeAnalysis(TypeId Id,
 		Accessibility Accessibility,
 		DisposableType DisposableType)
 	{
 		public string FullNamespace => Id.FullNamespace;
 		public string Name => Id.Name;
-		public TypeNode[] TypeArguments { get; init; } = new TypeNode[0];
+		public TypeAnalysis[] TypeArguments { get; init; } = new TypeAnalysis[0];
 
 		public string FullBoundName => TypeArguments.Any()
 			? $"{Name}<{TypeArguments.Select(x => x.FullBoundName).Join(", ")}>"
@@ -25,10 +25,10 @@ namespace Imfact.Entities
 			return true;
 		}
 
-		public static TypeNode FromSymbol(INamedTypeSymbol symbol)
+		public static TypeAnalysis FromSymbol(INamedTypeSymbol symbol)
 		{
 			var type = symbol.ConstructedFrom;
-			var dispose = type.IsImplementing(typeof(IDisposable)) ? Disposable
+			var dispose = IsImplementing(type, "System.IDisposable") ? Disposable
 				: IsImplementing(type, "System.IAsyncDisposable") ? AsyncDisposable
 				: NonDisposable;
 
@@ -36,7 +36,7 @@ namespace Imfact.Entities
 				.Select(FromSymbol)
 				.ToArray();
 
-			return new TypeNode(TypeId.FromSymbol(symbol),
+			return new TypeAnalysis(TypeId.FromSymbol(symbol),
 				symbol.DeclaredAccessibility,
 				dispose)
 			{
@@ -44,14 +44,14 @@ namespace Imfact.Entities
 			};
 		}
 
-		public static TypeNode FromSymbol(ITypeSymbol symbol)
+		public static TypeAnalysis FromSymbol(ITypeSymbol symbol)
 		{
 			return symbol is INamedTypeSymbol nts
 				? FromSymbol(nts)
 				: throw new ArgumentException(nameof(symbol));
 		}
 
-		public static TypeNode FromRuntime(Type type, TypeNode[]? typeArguments = null)
+		public static TypeAnalysis FromRuntime(Type type, TypeAnalysis[]? typeArguments = null)
 		{
 			var dispose = type.GetInterface(nameof(IDisposable)) is not null ? Disposable
 				: type.GetInterface("IAsyncDisposable") is not null ? AsyncDisposable
@@ -59,15 +59,15 @@ namespace Imfact.Entities
 
 			var args = typeArguments?.Select(x => x.Id).ToArray();
 
-			return new TypeNode(TypeId.FromRuntime(type, args),
+			return new TypeAnalysis(TypeId.FromRuntime(type, args),
 				type.IsPublic ? Accessibility.Public : Accessibility.Internal,
 				dispose)
 			{
-				TypeArguments = typeArguments ?? new TypeNode[0]
+				TypeArguments = typeArguments ?? new TypeAnalysis[0]
 			};
 		}
 
-		private static bool IsImplementing(INamedTypeSymbol symbol, string interfaceName)
+		public static bool IsImplementing(INamedTypeSymbol symbol, string interfaceName)
 		{
 			return symbol.AllInterfaces.Any(x =>
 				$"{x.GetFullNameSpace()}.{x.Name}" == interfaceName);

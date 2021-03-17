@@ -7,6 +7,7 @@ using Imfact.Steps.Dependency;
 using Imfact.Steps.Semanticses;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
+using static Imfact.Entities.TypeAnalysis;
 
 namespace Imfact.Steps.Definitions
 {
@@ -47,7 +48,7 @@ namespace Imfact.Steps.Definitions
 				.WrapOrEmpty()
 				.SelectMany(x => x)
 				.Concat(signature.Parameters)
-				.Select(x => new ParameterRecord(x.Type.TypeName, x.Name))
+				.Select(x => new ParameterRecord(x.TypeAnalysis, x.Name))
 				.ToArray();
 
 			return new ConstructorRecord(_semantics.Factory.Type, signature.Accessibility, ps);
@@ -57,7 +58,6 @@ namespace Imfact.Steps.Definitions
 		{
 			return new Class(_semantics.Factory.Type.Name,
 				BuildMethods(),
-				BuildPropertyNodes(),
 				BuildFieldNode(),
 				_dependency.DisposableInfo);
 		}
@@ -65,18 +65,10 @@ namespace Imfact.Steps.Definitions
 		private MethodInfo[] BuildMethods()
 		{
 			return _methodBuilder.ConstructorBuilder.BuildConstructorInfo().WrapByArray()
-				//.Concat(_methodBuilder.BuildEntryMethodInfo())
 				.Concat(_methodBuilder.BuildRegisterServiceMethodInfo().WrapOrEmpty())
 				.Concat(_methodBuilder.BuildResolverInfo())
 				.Concat(_methodBuilder.BuildEnumerableMethodInfo())
 				.Concat(_methodBuilder.DisposeMethodBuilder.BuildDisposeMethodInfo())
-				.ToArray();
-		}
-
-		private Property[] BuildPropertyNodes()
-		{
-			return _semantics.Factory.Delegations
-				.Select(x => new Property(new Type(x.Type), x.PropertyName))
 				.ToArray();
 		}
 
@@ -94,12 +86,12 @@ namespace Imfact.Steps.Definitions
 				.Select(x => (t: x.HookType, f: x.FieldName));
 
 			var fields = deps.Concat(hooks).Concat(hooks2)
-				.Select(x => new Field(new Type(x.t), x.f, x.t.DisposableType));
+				.Select(x => new Field(x.t, x.f, x.t.DisposableType));
 
 			if (!_semantics.Factory.Inheritances.Any())
 			{
 				fields = fields.Append(new Field(
-					new Type(TypeNode.FromRuntime(typeof(ResolverService))),
+					FromRuntime(typeof(ResolverService)),
 					"__resolverService", DisposableType.NonDisposable, false,
 					Accessibility.ProtectedAndInternal));
 			}

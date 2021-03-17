@@ -61,6 +61,18 @@ namespace Imfact.Utilities
 			return new T[] { item };
 		}
 
+		public static IEnumerable<T> FilterNull<T>
+			(this IEnumerable<T?> source) where T : struct
+		{
+			foreach (var item in source)
+			{
+				if (item.HasValue)
+				{
+					yield return item.Value;
+				}
+			}
+		}
+
 		public static IEnumerable<T> FilterNull<T>(this IEnumerable<T?> source) where T : notnull
 		{
 			foreach (var item in source)
@@ -70,6 +82,25 @@ namespace Imfact.Utilities
 					yield return item;
 				}
 			}
+		}
+
+		public static IEnumerable<TR> FilterMap<T, TR>
+			(this IEnumerable<T> source, Func<T, TR?> map)
+			where T : notnull
+			where TR : notnull
+		{
+			foreach (var item in source)
+			{
+				if (map(item) is {} value)
+				{
+					yield return value;
+				}
+			}
+		}
+
+		public static (T1, T2) Pair<T1, T2>(this T1 item1, T2 item2)
+		{
+			return (item1, item2);
 		}
 	}
 }

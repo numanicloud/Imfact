@@ -59,14 +59,14 @@ namespace Imfact.Steps.Definitions
 			var returnType = isAsync ? typeof(ValueTask) : typeof(void);
 
 			var signature = new OrdinalSignature(Accessibility.Public,
-				new Type(TypeNode.FromRuntime(returnType)),
+				TypeAnalysis.FromRuntime(returnType),
 				methodName, new Parameter[0], modifiers);
 
 			var impl = new DisposeImplementation(
 				disposables.Select(x => x.MemberName).ToArray(),
 				isAsync);
 
-			return new MethodInfo(signature, new Attribute[0], impl);
+			return new MethodInfo(signature, impl);
 		}
 	}
 }

@@ -28,7 +28,7 @@ namespace Imfact.Steps.Dependency.Components
 		public string Code => AccessExp;
 	}
 
-	internal record UnsatisfiedField(TypeNode Type, string Name) : ICreationNode
+	internal record UnsatisfiedField(TypeAnalysis Type, string Name) : ICreationNode
 	{
 		public string Code => Name;
 	}

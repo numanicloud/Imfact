@@ -9,15 +9,15 @@ namespace Imfact.Steps.Aspects.Rules
 		public TypeToCreate ExtractTypeToCreate(INamedTypeSymbol symbol, params ITypeSymbol[] typeArguments)
 		{
 			var args = symbol.Constructors.FirstOrDefault()?.Parameters
-				.Select(x => TypeNode.FromSymbol(x.Type))
-				.ToArray() ?? new TypeNode[0];
+				.Select(x => TypeAnalysis.FromSymbol(x.Type))
+				.ToArray() ?? new TypeAnalysis[0];
 
 			if (symbol.IsUnboundGenericType)
 			{
 				symbol = symbol.ConstructedFrom.Construct(typeArguments);
 			}
 
-			return new TypeToCreate(TypeNode.FromSymbol(symbol), args);
+			return new TypeToCreate(TypeAnalysis.FromSymbol(symbol), args);
 		}
 	}
 }

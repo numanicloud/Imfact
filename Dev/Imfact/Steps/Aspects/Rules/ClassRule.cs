@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Imfact.Annotations;
 using Imfact.Entities;
-using Imfact.Interfaces;
 using Imfact.Steps.Ranking;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
@@ -12,40 +10,60 @@ namespace Imfact.Steps.Aspects.Rules
 {
 	internal class ClassRule
 	{
-		private readonly IAnalysisContext _context;
 		private readonly GenerationContext _genContext;
 		private readonly MethodRule _methodRule;
+		private readonly PropertyRule _propertyRule;
 
-		public ClassRule(IAnalysisContext context, GenerationContext genContext)
+		public ClassRule(GenerationContext genContext, MethodRule methodRule,
+			PropertyRule propertyRule)
 		{
-			var typeRule = new TypeRule();
-
-			_context = context;
 			_genContext = genContext;
-
-			_methodRule = new MethodRule(context,
-				new AttributeRule(typeRule),
-				typeRule);
+			_methodRule = methodRule;
+			_propertyRule = propertyRule;
 		}
 
 		public ClassAspect Aggregate(RankedClass root)
 		{
-			var baseClasses = TraverseBase(root.Symbol).Select(x =>
+			return ExtractThis(root.Syntax, root.Symbol, ExtractBases(root.Symbol));
+		}
+
+		private ClassAspect ExtractThis
+			(ClassDeclarationSyntax syntax, INamedTypeSymbol symbol, ClassAspect[] baseClasses)
+		{
+			return new(TypeAnalysis.FromSymbol(symbol),
+				baseClasses,
+				GetMethodAspects(syntax, partialOnly: true),
+				GetPropertyAspects(syntax), null);
+		}
+
+		// NOTE: 基底クラスのプロパティを追う必要は無いのでは？
+		// 逆に、コンストラクタはこちらにしか無いので、BaseClassAspect みたいな型で区別してもいいかも
+		private ClassAspect ExtractBase
+			(ClassDeclarationSyntax syntax, INamedTypeSymbol symbol)
+		{
+			return new(
+				TypeAnalysis.FromSymbol(symbol),
+				new ClassAspect[0],
+				GetMethodAspects(syntax, false),
+				GetPropertyAspects(syntax),
+				GetConstructor(symbol));
+		}
+
+		private ClassAspect[] ExtractBases(INamedTypeSymbol thisSymbol)
+		{
+			return TraverseBase(thisSymbol)
+				.Select(x => GetSyntax(x)?.Pair(x))
+				.FilterNull()
+				.Select(x => ExtractBase(x.Item1, x.Item2))
+				.ToArray();
+
+			static ClassDeclarationSyntax? GetSyntax(INamedTypeSymbol x)
 			{
-				var syntax = x.DeclaringSyntaxReferences
+				return x.DeclaringSyntaxReferences
 					.Select(y => y.GetSyntax())
 					.OfType<ClassDeclarationSyntax>()
 					.FirstOrDefault();
-
-				if (syntax is null)
-				{
-					return null;
-				}
-
-				return ExtractAspect(syntax, x, constructor: GetConstructor(x));
-			}).FilterNull().ToArray();
-
-			return ExtractAspect(root.Syntax, root.Symbol, baseClasses, partialOnly:true);
+			}
 
 			static IEnumerable<INamedTypeSymbol> TraverseBase(INamedTypeSymbol pivot)
 			{
@@ -60,72 +78,33 @@ namespace Imfact.Steps.Aspects.Rules
 			}
 		}
 
+		private MethodAspect[] GetMethodAspects(ClassDeclarationSyntax @class, bool partialOnly)
+		{
+			return @class.Members
+				.OfType<MethodDeclarationSyntax>()
+				.Select(x => _methodRule.ExtractAspect(x, partialOnly))
+				.FilterNull()
+				.ToArray();
+		}
+
+		private PropertyAspect[] GetPropertyAspects(ClassDeclarationSyntax @class)
+		{
+			return @class.Members
+				.OfType<PropertyDeclarationSyntax>()
+				.Select(_propertyRule.ExtractAspect)
+				.FilterNull()
+				.ToArray();
+		}
+
 		private ConstructorAspect GetConstructor(INamedTypeSymbol symbol)
 		{
-			var classType = TypeNode.FromSymbol(symbol);
+			var classType = TypeAnalysis.FromSymbol(symbol);
 			var ctor = _genContext.Constructors[classType.Id];
 			var parameters = ctor.Parameters
 				.Select(x => new ParameterAspect(x.Type, x.Name))
 				.ToArray();
 
 			return new ConstructorAspect(ctor.Accessibility, parameters);
-		}
-
-		private ClassAspect ExtractAspect(ClassDeclarationSyntax syntax,
-			INamedTypeSymbol symbol,
-			ClassAspect[]? baseClasses = null,
-			ConstructorAspect? constructor = null,
-			bool partialOnly = false)
-		{
-			var methods = syntax.Members
-				.OfType<MethodDeclarationSyntax>()
-				.Select(syntax1 => _methodRule.ExtractAspect(syntax1, partialOnly))
-				.FilterNull()
-				.ToArray();
-
-			var properties = syntax.Members
-				.OfType<PropertyDeclarationSyntax>()
-				.Select(ExtractAspect)
-				.FilterNull()
-				.ToArray();
-
-			return new ClassAspect(TypeNode.FromSymbol(symbol),
-				baseClasses ?? new ClassAspect[0],
-				methods,
-				properties,
-				constructor);
-		}
-
-		private PropertyAspect? ExtractAspect(PropertyDeclarationSyntax syntax)
-		{
-			if (_context.GetPropertySymbol(syntax) is not { } symbol)
-			{
-				return null;
-			}
-
-			var isDelegation = symbol.Type.GetAttributes()
-				.Select(x => x.AttributeClass)
-				.FilterNull()
-				.Select(x => new AttributeName(x.Name))
-				.Any(x => x.NameWithAttributeSuffix == nameof(FactoryAttribute));
-			if (!isDelegation)
-			{
-				return null;
-			}
-
-			var methods = symbol.Type.GetMembers().OfType<IMethodSymbol>()
-				.Select(m =>
-				{
-					var mm = m.DeclaringSyntaxReferences
-						.Select(x => x.GetSyntax())
-						.OfType<MethodDeclarationSyntax>()
-						.FirstOrDefault();
-					return mm is null ? null : _methodRule.ExtractAspect(mm);
-				}).FilterNull().ToArray();
-
-			return new PropertyAspect(TypeNode.FromSymbol(symbol.Type),
-				symbol.Name,
-				methods);
 		}
 	}
 }

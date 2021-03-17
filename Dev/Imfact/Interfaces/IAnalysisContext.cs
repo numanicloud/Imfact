@@ -14,7 +14,7 @@ namespace Imfact.Interfaces
 		IPropertySymbol? GetPropertySymbol(PropertyDeclarationSyntax syntax);
 	}
 
-	internal record ConstructorRecord(TypeNode ClassType, Accessibility Accessibility, ParameterRecord[] Parameters);
+	internal record ConstructorRecord(TypeAnalysis ClassType, Accessibility Accessibility, ParameterRecord[] Parameters);
 
-	internal record ParameterRecord(TypeNode Type, string Name);
+	internal record ParameterRecord(TypeAnalysis Type, string Name);
 }

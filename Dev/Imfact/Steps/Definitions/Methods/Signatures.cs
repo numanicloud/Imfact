@@ -1,16 +1,18 @@
 ﻿using System.Linq;
+using Imfact.Entities;
+using Imfact.Steps.Writing.Coding;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 
 namespace Imfact.Steps.Definitions.Methods
 {
-	internal record OrdinalSignature(Accessibility Accessibility, Type ReturnType,
+	internal record OrdinalSignature(Accessibility Accessibility, TypeAnalysis ReturnType,
 		string Name, Parameter[] Parameters, string[] Modifiers) : Signature
 	{
 		public override string GetSignatureString()
 		{
 			var access = Accessibility.ToKeyword();
-			var ret = ReturnType.Text;
+			var ret = ReturnType.GetCode();
 			var parameter = GetParameterList(Parameters);
 
 			var mod = Modifiers.Any() ? Modifiers.Join(" ") + " " : "";

@@ -11,9 +11,9 @@ namespace Imfact.Utilities
 	{
 		public static bool IsImplementing(this INamedTypeSymbol symbol, Type @interface)
 		{
-			var typeName = TypeName.FromType(@interface);
+			var typeName = TypeAnalysis.FromRuntime(@interface);
 			return symbol.AllInterfaces
-				.Any(x => x.Name == typeName.NameWithoutArguments
+				.Any(x => x.Name == typeName.Name
 						  && x.GetFullNameSpace() == typeName.FullNamespace);
 		}
 

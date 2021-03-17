@@ -4,7 +4,7 @@ namespace Imfact.Steps.Semanticses.Interfaces
 {
 	internal interface IFactorySemantics
 	{
-		TypeNode Type { get; }
+		TypeAnalysis Type { get; }
 		Resolver[] Resolvers { get; }
 		MultiResolver[] MultiResolvers { get; }
 	}

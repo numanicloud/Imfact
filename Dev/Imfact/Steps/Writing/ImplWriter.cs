@@ -47,13 +47,13 @@ namespace Imfact.Steps.Writing
 
 		private void RenderExp(ExpressionImplementation impl, ICodeBuilder builder)
 		{
-			_writer.Render(impl.ReturnType.Text, impl.Hooks, impl.Expression, builder);
+			_writer.Render(impl.ReturnType.GetCode(), impl.Hooks, impl.Expression, builder);
 		}
 
 		private void RenderMultiExp(MultiExpImplementation impl, ICodeBuilder builder)
 		{
 			var expBuilder = CodeHelper.GetBuilder();
-			expBuilder.AppendLine($"new {impl.ElementType.Text}[]");
+			expBuilder.AppendLine($"new {impl.ElementType.GetCode()}[]");
 			expBuilder.EnterBlock(inner =>
 			{
 				inner.EnterCsv(csv =>
@@ -65,7 +65,7 @@ namespace Imfact.Steps.Writing
 				});
 			});
 
-			var returnType = $"IEnumerable<{impl.ElementType.Text}>";
+			var returnType = $"IEnumerable<{impl.ElementType.GetCode()}>";
 			_writer.Render(returnType, impl.Hooks, expBuilder.GetText(), builder);
 		}
 
@@ -85,7 +85,7 @@ namespace Imfact.Steps.Writing
 				{
 					foreach (var hook in impl.Hooks)
 					{
-						var typeName = hook.FieldType.TypeName.FullBoundName;
+						var typeName = hook.TypeAnalysis.FullBoundName;
 						chunk.AppendLine($"{hook.FieldName} = new {typeName}();");
 					}
 				});

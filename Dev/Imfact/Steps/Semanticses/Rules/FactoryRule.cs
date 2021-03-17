@@ -22,7 +22,7 @@ namespace Imfact.Steps.Semanticses.Rules
 				ExtractEntryResolvers(aspect));
 		}
 
-		private FactoryCommon GetFactoryCommon(TypeNode type, MethodAspect[] methods)
+		private FactoryCommon GetFactoryCommon(TypeAnalysis type, MethodAspect[] methods)
 		{
 			return new FactoryCommon(type,
 				_resolverRule.ExtractResolver(methods),
@@ -58,7 +58,7 @@ namespace Imfact.Steps.Semanticses.Rules
 					.ToArray();
 
 				return new EntryResolver(x.Name,
-					x.ReturnType.Type.Node,
+					x.ReturnType.Type.Info,
 					parameters,
 					x.Accessibility);
 			}).ToArray();

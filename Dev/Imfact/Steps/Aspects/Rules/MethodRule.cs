@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Imfact.Steps.Aspects.Rules
 {
-	class MethodRule
+	internal sealed class MethodRule
 	{
 		private readonly IAnalysisContext _context;
 		private readonly AttributeRule _attributeRule;
@@ -26,33 +26,19 @@ namespace Imfact.Steps.Aspects.Rules
 
 		public MethodAspect? ExtractAspect(MethodDeclarationSyntax syntax, bool partialOnly = false)
 		{
-			if (partialOnly && !syntax.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword)))
+			if (!IsResolversPartial()
+				|| _context.GetMethodSymbol(syntax) is not { } symbol
+				|| symbol.ReturnType is not INamedTypeSymbol returnSymbol)
 			{
 				return null;
 			}
 
-			if (_context.GetMethodSymbol(syntax) is not { } symbol)
-			{
-				return null;
-			}
-
-			if (symbol.ReturnType is not INamedTypeSymbol returnSymbol)
-			{
-				return null;
-			}
-
-			var returnType = ExtractReturnTypeAspect(returnSymbol);
-			var attributes = symbol.GetAttributes()
-				.Select(x => _attributeRule.ExtractAspect(x, returnSymbol, symbol.Name))
-				.FilterNull()
-				.ToArray();
-			var parameters = syntax.ParameterList.Parameters
-				.Select(ExtractAspect)
-				.FilterNull()
-				.ToArray();
-
-			return new MethodAspect(symbol.Name, symbol.DeclaredAccessibility,
-				GetKind(), returnType, attributes, parameters);
+			return new MethodAspect(symbol.Name,
+				symbol.DeclaredAccessibility,
+				GetKind(),
+				GetReturnType(returnSymbol),
+				GetAttributes(symbol, returnSymbol),
+				GetParameters(syntax));
 
 			ResolverKind GetKind()
 			{
@@ -61,21 +47,42 @@ namespace Imfact.Steps.Aspects.Rules
 				var typeArgValid = idSymbol.TypeArguments.Length == 1;
 				return typeNameValid && typeArgValid ? ResolverKind.Multi : ResolverKind.Single;
 			}
+
+			bool IsResolversPartial()
+			{
+				return !partialOnly || syntax.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword));
+			}
 		}
 
-		private ReturnTypeAspect ExtractReturnTypeAspect(INamedTypeSymbol symbol)
+		private ParameterAspect[] GetParameters(MethodDeclarationSyntax syntax)
+		{
+			return syntax.ParameterList.Parameters
+				.Select(ExtractParameter)
+				.FilterNull()
+				.ToArray();
+		}
+
+		private MethodAttributeAspect[] GetAttributes(IMethodSymbol symbol, INamedTypeSymbol returnSymbol)
+		{
+			return symbol.GetAttributes()
+				.Select(x => _attributeRule.ExtractAspect(x, returnSymbol, symbol.Name))
+				.FilterNull()
+				.ToArray();
+		}
+
+		private ReturnTypeAspect GetReturnType(INamedTypeSymbol symbol)
 		{
 			return new(_typeRule.ExtractTypeToCreate(symbol), symbol.IsAbstract);
 		}
 
-		public ParameterAspect? ExtractAspect(ParameterSyntax syntax)
+		private ParameterAspect? ExtractParameter(ParameterSyntax syntax)
 		{
 			if (syntax.Type is null || _context.GetTypeSymbol(syntax.Type) is not { } symbol)
 			{
 				return null;
 			}
 
-			return new ParameterAspect(TypeNode.FromSymbol(symbol), symbol.Name);
+			return new ParameterAspect(TypeAnalysis.FromSymbol(symbol), symbol.Name);
 		}
 	}
 }

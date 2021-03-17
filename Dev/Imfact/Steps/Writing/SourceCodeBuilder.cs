@@ -61,7 +61,7 @@ namespace Imfact.Steps.Writing
 						{
 							var ro = field.IsReadonly ? "readonly " : "";
 							var access = field.Accessibility.ToKeyword();
-							chunk.AppendLine($"{access} {ro}{field.Type.Text} {field.Name};");
+							chunk.AppendLine($"{access} {ro}{field.TypeAnalysis.GetCode()} {field.Name};");
 						}
 					});
 
@@ -102,10 +102,6 @@ namespace Imfact.Steps.Writing
 		{
 			builder.EnterChunk(chunk =>
 			{
-				foreach (var attribute in method.Attributes)
-				{
-					chunk.AppendLine(attribute.Text);
-				}
 				chunk.AppendLine(method.Signature.GetSignatureString());
 				chunk.EnterBlock(block =>
 				{

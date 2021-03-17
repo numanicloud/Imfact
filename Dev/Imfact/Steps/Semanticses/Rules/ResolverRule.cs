@@ -36,14 +36,14 @@ namespace Imfact.Steps.Semanticses.Rules
 				.ToArray();
 
 			return new ResolverCommon(method.Accessibility,
-				method.ReturnType.Type.Node,
+				method.ReturnType.Type.Info,
 				method.Name,
 				parameters, resolutions, hooks);
 		}
 
 		private static Resolution ExtractResolution(TypeToCreate t)
 		{
-			return new(t.Node, t.ConstructorArguments, t.Node.DisposableType);
+			return new(t.Info, t.ConstructorArguments, t.Info.DisposableType);
 		}
 
 		private Hook? ExtractHook(MethodAttributeAspect aspect, MethodAspect method)
@@ -55,7 +55,7 @@ namespace Imfact.Steps.Semanticses.Rules
 				return null;
 			}
 
-			var typeNode = aspect.TypeToCreate.Node;
+			var typeNode = aspect.TypeToCreate.Info;
 			var name = $"_{method.Name}_{typeNode.Name}";
 			return new Hook(typeNode, name);
 		}

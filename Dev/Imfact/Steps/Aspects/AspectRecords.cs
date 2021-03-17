@@ -13,7 +13,7 @@ namespace Imfact.Steps.Aspects
 		Resolution, Hook, CacheHookPreset, CachePrHookPreset
 	}
 
-	internal record ClassAspect(TypeNode Type,
+	internal record ClassAspect(TypeAnalysis Type,
 		ClassAspect[] BaseClasses,
 		MethodAspect[] Methods,
 		PropertyAspect[] Properties,
@@ -30,16 +30,16 @@ namespace Imfact.Steps.Aspects
 		MethodAttributeAspect[] Attributes,
 		ParameterAspect[] Parameters);
 
-	internal record PropertyAspect(TypeNode Type, string Name, MethodAspect[] MethodsInType);
+	internal record PropertyAspect(TypeAnalysis Type, string Name, MethodAspect[] MethodsInType);
 
-	internal record ParameterAspect(TypeNode Type, string Name);
+	internal record ParameterAspect(TypeAnalysis Type, string Name);
 
 	internal record MethodAttributeAspect(AnnotationKind Kind,
-		TypeNode OwnerReturnType,
+		TypeAnalysis OwnerReturnType,
 		string OwnerName,
 		TypeToCreate TypeToCreate);
 
 	internal record ReturnTypeAspect(TypeToCreate Type, bool IsAbstract);
 
-	internal record TypeToCreate(TypeNode Node, TypeNode[] ConstructorArguments);
+	internal record TypeToCreate(TypeAnalysis Info, TypeAnalysis[] ConstructorArguments);
 }

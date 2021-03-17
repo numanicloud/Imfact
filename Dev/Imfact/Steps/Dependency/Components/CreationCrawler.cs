@@ -34,7 +34,7 @@ namespace Imfact.Steps.Dependency.Components
 				};
 			}
 
-			static string ToFieldName(TypeNode type)
+			static string ToFieldName(TypeAnalysis type)
 			{
 				return "_" + type.Name.ToLowerCamelCase();
 			}
@@ -66,7 +66,7 @@ namespace Imfact.Steps.Dependency.Components
 	// パラメータでもって解決すると、それはConsumedParametersに記憶される。以後同じパラメータは使われない。
 	internal record CreationContext(
 		IResolverSemantics Caller,
-		TypeNode[] TypeToResolve,
+		TypeAnalysis[] TypeToResolve,
 		List<Parameter> ConsumedParameters,
 		CreationCrawler Injector);
 

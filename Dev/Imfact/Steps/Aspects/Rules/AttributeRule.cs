@@ -64,7 +64,7 @@ namespace Imfact.Steps.Aspects.Rules
 				return null;
 			}
 
-			return new MethodAttributeAspect(kind, TypeNode.FromSymbol(ownerReturn), ownerName, type);
+			return new MethodAttributeAspect(kind, TypeAnalysis.FromSymbol(ownerReturn), ownerName, type);
 		}
 
 		private (AnnotationKind, TypeToCreate)? Resolution(AttributeData data,
@@ -100,9 +100,9 @@ namespace Imfact.Steps.Aspects.Rules
 
 		private static TypeToCreate PresetCache(Type hookType, INamedTypeSymbol ownerReturn)
 		{
-			var node = TypeNode.FromRuntime(hookType,
-				new[] {TypeNode.FromSymbol(ownerReturn)});
-			return new TypeToCreate(node, new TypeNode[0]);
+			var node = TypeAnalysis.FromRuntime(hookType,
+				new[] {TypeAnalysis.FromSymbol(ownerReturn)});
+			return new TypeToCreate(node, new TypeAnalysis[0]);
 		}
 	}
 }

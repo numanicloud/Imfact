@@ -7,11 +7,10 @@ using Imfact.Steps.Dependency;
 using Imfact.Steps.Semanticses;
 using Imfact.Steps.Semanticses.Interfaces;
 using Microsoft.CodeAnalysis;
-using Attribute = Imfact.Steps.Definitions.Methods.Attribute;
 
 namespace Imfact.Steps.Definitions
 {
-	internal record Initialization(TypeNode Type, string Name, string ParamName);
+	internal record Initialization(TypeAnalysis Type, string Name, string ParamName);
 
 	internal sealed class MethodBuilder
 	{
@@ -32,7 +31,7 @@ namespace Imfact.Steps.Definitions
 
 		public ConstructorBuilder ConstructorBuilder { get; }
 
-		public static readonly Type ResolverServiceType = new(TypeNode.FromRuntime(typeof(ResolverService)));
+		public static readonly TypeAnalysis ResolverServiceType = TypeAnalysis.FromRuntime(typeof(ResolverService));
 
 		public MethodInfo? BuildRegisterServiceMethodInfo()
 		{
@@ -42,17 +41,17 @@ namespace Imfact.Steps.Definitions
 			}
 
 			var signature = new OrdinalSignature(Accessibility.Internal,
-				new Type(TypeNode.FromRuntime(typeof(void))),
+				TypeAnalysis.FromRuntime(typeof(void)),
 				"RegisterService",
 				new[] { new Parameter(ResolverServiceType, "service", false) },
 				new string[0]);
 
 			var p = _semantics.Factory.Delegations
-				.Select(x => new Property(new Type(x.Type), x.PropertyName))
+				.Select(x => new Property(x.PropertyName))
 				.ToArray();
 
 			var impl = new RegisterServiceImplementation(p, _service.ExtractHooks());
-			return new MethodInfo(signature, new Attribute[0], impl);
+			return new MethodInfo(signature, impl);
 		}
 
 		public MethodInfo[] BuildResolverInfo()
@@ -63,7 +62,7 @@ namespace Imfact.Steps.Definitions
 					return BuildMethodCommon(x, hooks1 =>
 					{
 						var exp = _injection.Creation[x].Root.Code;
-						return new ExpressionImplementation(hooks1, new Type(x.ReturnType), exp);
+						return new ExpressionImplementation(hooks1, x.ReturnType, exp);
 					});
 				}).ToArray();
 		}
@@ -76,7 +75,7 @@ namespace Imfact.Steps.Definitions
 					return BuildMethodCommon(x, hooks1 =>
 					{
 						var exp = _injection.MultiCreation[x].Roots.Select(y => y.Code).ToArray();
-						return new MultiExpImplementation(hooks1, new Type(x.ElementType), exp);
+						return new MultiExpImplementation(hooks1, x.ElementType, exp);
 					});
 				}).ToArray();
 		}
@@ -87,14 +86,14 @@ namespace Imfact.Steps.Definitions
 			var ps = x.Parameters.Select(
 					p => _service.BuildParameter(p.Type, p.ParameterName))
 				.ToArray();
-			var hooks = x.Hooks.Select(y => new Hook(new Type(y.HookType), y.FieldName))
+			var hooks = x.Hooks.Select(y => new Hook(y.HookType, y.FieldName))
 				.ToArray();
 
 			var signature = new OrdinalSignature(x.Accessibility,
-				new Type(x.ReturnType), x.MethodName, ps, new string[]{ "partial" });
+				x.ReturnType, x.MethodName, ps, new string[]{ "partial" });
 			var impl = makeImpl(hooks);
 
-			return new MethodInfo(signature, new Attribute[0], impl);
+			return new MethodInfo(signature, impl);
 		}
 	}
 }

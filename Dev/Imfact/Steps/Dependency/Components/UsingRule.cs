@@ -44,7 +44,7 @@ namespace Imfact.Steps.Dependency.Components
 
 		private IEnumerable<IEnumerable<string>> Stage2(SemanticsRoot semantics, InjectionResult injection)
 		{
-			static IEnumerable<TypeNode> GetNestedTypes(TypeNode root)
+			static IEnumerable<TypeAnalysis> GetNestedTypes(TypeAnalysis root)
 			{
 				yield return root;
 

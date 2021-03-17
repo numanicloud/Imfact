@@ -30,7 +30,7 @@ namespace Imfact.Steps.Definitions
 
 			var signature = GetCtorSignature(fs, ps);
 			var impl = GetCtorImpl(fs.Concat(ps).ToArray());
-			return new MethodInfo(signature, new Attribute[0], impl);
+			return new MethodInfo(signature, impl);
 		}
 
 		private ConstructorSignature GetCtorSignature(Initialization[] fs, Initialization[] ps)
@@ -45,7 +45,7 @@ namespace Imfact.Steps.Definitions
 				.ToArray();
 
 			var accessibilities = parameters.Concat(baseParameters ?? new Parameter[0])
-				.Select(x => x.Type.TypeName.Accessibility)
+				.Select(x => x.TypeAnalysis.Accessibility)
 				.ToArray();
 			var a = AnalyzerHelper.GetTypeAccessibilityMostStrict(accessibilities);
 

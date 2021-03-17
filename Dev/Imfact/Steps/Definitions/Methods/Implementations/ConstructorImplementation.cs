@@ -22,7 +22,7 @@ namespace Imfact.Steps.Definitions.Methods
 				{
 					foreach (var hook in Hooks)
 					{
-						var typeName = hook.FieldType.TypeName.FullBoundName;
+						var typeName = hook.TypeAnalysis.FullBoundName;
 						chunk.AppendLine($"{hook.FieldName} = new {typeName}();");
 					}
 				});

@@ -14,8 +14,16 @@ namespace Imfact.Steps.Aspects
 
 		public ClassAspect Run(RankedClass rankedClass)
 		{
-			var classRule = new ClassRule(rankedClass.Context, _genContext);
-			return classRule.Aggregate(rankedClass);
+			var context = rankedClass.Context;
+			var typeRule = new TypeRule();
+			var methodRule = new MethodRule(context,
+				new AttributeRule(typeRule),
+				typeRule);
+			var k = new ClassRule(_genContext,
+				methodRule,
+				new PropertyRule(context, methodRule));
+
+			return k.Aggregate(rankedClass);
 		}
 	}
 }
