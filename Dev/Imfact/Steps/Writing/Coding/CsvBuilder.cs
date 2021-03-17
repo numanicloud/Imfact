@@ -1,4 +1,6 @@
-﻿namespace Imfact.Steps.Writing.Coding
+﻿using Imfact.Interfaces;
+
+namespace Imfact.Steps.Writing.Coding
 {
 	internal class CsvBuilder : ICodeBuilder
 	{

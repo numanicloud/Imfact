@@ -1,4 +1,5 @@
 ﻿using Imfact.Entities;
+using Imfact.Interfaces;
 using Imfact.Steps.Writing;
 using Imfact.Steps.Writing.Coding;
 using Imfact.Utilities;
@@ -8,7 +9,7 @@ namespace Imfact.Steps.Definitions.Methods
 	internal record MultiExpImplementation(Hook[] Hooks, TypeAnalysis ElementType, string[] Expressions)
 		: Implementation
 	{
-		public override void Render(ICodeBuilder builder, ResolverWriter writer)
+		public override void Render(ICodeBuilder builder, IResolverWriter writer)
 		{
 			var expBuilder = CodeHelper.GetBuilder();
 			expBuilder.AppendLine($"new {ElementType.GetCode()}[]");

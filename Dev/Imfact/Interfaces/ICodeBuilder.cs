@@ -1,4 +1,4 @@
-﻿namespace Imfact.Steps.Writing.Coding
+﻿namespace Imfact.Interfaces
 {
 	internal interface ICodeBuilder
 	{

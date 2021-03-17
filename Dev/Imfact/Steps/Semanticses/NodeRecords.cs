@@ -12,7 +12,7 @@ namespace Imfact.Steps.Semanticses
 		: FactoryCommon(Common);
 
 	internal record Delegation(FactoryCommon Common, string PropertyName)
-		: FactoryCommon(Common), IProbablyDisposable
+		: FactoryCommon(Common), IFieldSemantics
 	{
 		public string MemberName => PropertyName;
 	}
@@ -66,14 +66,13 @@ namespace Imfact.Steps.Semanticses
 		}
 	}
 
-	internal record Dependency(TypeAnalysis TypeName, string FieldName) : IProbablyDisposable
+	internal record Dependency(TypeAnalysis TypeName, string FieldName) : IFieldSemantics
 	{
 		public TypeAnalysis Type => TypeName;
 		public string MemberName => FieldName;
-		public string ParameterName => FieldName.TrimStart("_".ToCharArray());
 	}
 
-	internal record Hook(TypeAnalysis HookType, string FieldName) : IProbablyDisposable
+	internal record Hook(TypeAnalysis HookType, string FieldName) : IFieldSemantics
 	{
 		public TypeAnalysis Type => HookType;
 		public string MemberName => FieldName;
@@ -90,7 +89,7 @@ namespace Imfact.Steps.Semanticses
 		Parameter[] Parameters,
 		Accessibility Accessibility);
 
-	internal interface IProbablyDisposable
+	internal interface IFieldSemantics
 	{
 		TypeAnalysis Type { get; }
 		string MemberName { get; }

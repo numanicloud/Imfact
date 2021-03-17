@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Imfact.Interfaces;
 using Imfact.Steps.Definitions;
 using Imfact.Steps.Writing.Coding;
 
 namespace Imfact.Steps.Writing
 {
-	internal class ResolverWriter
+	internal class ResolverWriter : IResolverWriter
 	{
 		public void Render(string returnTypeName, Hook[] hooks, string expression, ICodeBuilder builder)
 		{

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Imfact.Interfaces;
 using Imfact.Steps.Definitions;
 using Imfact.Steps.Definitions.Methods;
 using Imfact.Steps.Writing.Coding;

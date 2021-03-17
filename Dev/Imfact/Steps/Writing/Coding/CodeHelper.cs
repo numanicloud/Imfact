@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Imfact.Entities;
+using Imfact.Interfaces;
 
 namespace Imfact.Steps.Writing.Coding
 {

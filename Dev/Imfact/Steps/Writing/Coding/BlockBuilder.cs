@@ -1,4 +1,5 @@
 ﻿using System;
+using Imfact.Interfaces;
 using Imfact.Utilities;
 
 namespace Imfact.Steps.Writing.Coding
