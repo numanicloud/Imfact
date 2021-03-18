@@ -1,12 +1,12 @@
-﻿using Imfact.Interfaces;
-using Imfact.Steps.Writing.Coding;
+﻿using Imfact.Steps.Definitions.Interfaces;
 
 namespace Imfact.Steps.Definitions.Methods
 {
-	internal record ConstructorImplementation(Initialization[] Initializations,
-		Hook[] Hooks) : Implementation
+	internal record ConstructorImplementation
+		(Initialization[] Initializations, Hook[] Hooks)
+		: Implementation
 	{
-		public override void Render(ICodeBuilder builder, IResolverWriter writer)
+		public override void Render(IFluentCodeBuilder builder, IResolverWriter writer)
 		{
 			builder.EnterSequence(inner =>
 			{

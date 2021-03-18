@@ -1,6 +1,5 @@
 ﻿using System.Linq;
-using Imfact.Interfaces;
-using Imfact.Steps.Writing.Coding;
+using Imfact.Steps.Definitions.Interfaces;
 using Imfact.Utilities;
 
 namespace Imfact.Steps.Definitions.Methods
@@ -25,6 +24,6 @@ namespace Imfact.Steps.Definitions.Methods
 
 	internal abstract record Implementation
 	{
-		public abstract void Render(ICodeBuilder builder, IResolverWriter writer);
+		public abstract void Render(IFluentCodeBuilder builder, IResolverWriter writer);
 	}
 }

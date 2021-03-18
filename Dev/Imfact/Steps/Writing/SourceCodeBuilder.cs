@@ -2,6 +2,7 @@
 using System.Linq;
 using Imfact.Interfaces;
 using Imfact.Steps.Definitions;
+using Imfact.Steps.Definitions.Interfaces;
 using Imfact.Steps.Definitions.Methods;
 using Imfact.Steps.Writing.Coding;
 using Imfact.Utilities;
@@ -106,7 +107,8 @@ namespace Imfact.Steps.Writing
 				chunk.AppendLine(method.Signature.GetSignatureString());
 				chunk.EnterBlock(block =>
 				{
-					method.Implementation.Render(block, _resolverWriter);
+					var fluent = new FluentCodeBuilder(block);
+					method.Implementation.Render(fluent, _resolverWriter);
 				});
 			});
 		}

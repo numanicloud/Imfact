@@ -2,6 +2,7 @@
 using System.Linq;
 using Imfact.Interfaces;
 using Imfact.Steps.Definitions;
+using Imfact.Steps.Definitions.Interfaces;
 using Imfact.Steps.Writing.Coding;
 
 namespace Imfact.Steps.Writing

@@ -66,5 +66,27 @@ namespace Imfact.Utilities
 				_ => throw new ArgumentOutOfRangeException(nameof(accessibility), accessibility, null)
 			};
 		}
+
+		public static string GetCode(this TypeAnalysis type)
+		{
+			return $"{type.FullNamespace}.{type.Name}" switch
+			{
+				nameof(Byte) => "byte",
+				nameof(Int16) => "short",
+				nameof(Int32) => "int",
+				nameof(Int64) => "long",
+				nameof(SByte) => "sbyte",
+				nameof(UInt16) => "ushort",
+				nameof(UInt32) => "uint",
+				nameof(UInt64) => "ulong",
+				nameof(Single) => "float",
+				nameof(Double) => "double",
+				nameof(Decimal) => "decimal",
+				nameof(Char) => "char",
+				nameof(String) => "string",
+				"System.Void" => "void",
+				_ => type.FullBoundName
+			};
+		}
 	}
 }

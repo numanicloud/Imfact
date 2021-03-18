@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 using Imfact.Entities;
-using Imfact.Interfaces;
+using Imfact.Steps.Definitions.Interfaces;
 
 namespace Imfact.Steps.Writing.Coding
 {
@@ -34,28 +34,6 @@ namespace Imfact.Steps.Writing.Coding
 		{
 			var csv = new CsvBuilder(baseBuilder);
 			build.Invoke(csv);
-		}
-
-		public static string GetCode(this TypeAnalysis type)
-		{
-			return $"{type.FullNamespace}.{type.Name}" switch
-			{
-				nameof(Byte) => "byte",
-				nameof(Int16) => "short",
-				nameof(Int32) => "int",
-				nameof(Int64) => "long",
-				nameof(SByte) => "sbyte",
-				nameof(UInt16) => "ushort",
-				nameof(UInt32) => "uint",
-				nameof(UInt64) => "ulong",
-				nameof(Single) => "float",
-				nameof(Double) => "double",
-				nameof(Decimal) => "decimal",
-				nameof(Char) => "char",
-				nameof(String) => "string",
-				"System.Void" => "void",
-				_ => type.FullBoundName
-			};
 		}
 	}
 }

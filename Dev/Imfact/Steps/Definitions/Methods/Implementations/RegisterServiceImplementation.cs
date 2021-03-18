@@ -1,11 +1,11 @@
-﻿using Imfact.Interfaces;
+﻿using Imfact.Steps.Definitions.Interfaces;
 
 namespace Imfact.Steps.Definitions.Methods
 {
 	internal record RegisterServiceImplementation(Property[] Delegations,
 		Hook[] Hooks) : Implementation
 	{
-		public override void Render(ICodeBuilder builder, IResolverWriter writer)
+		public override void Render(IFluentCodeBuilder builder, IResolverWriter writer)
 		{
 			builder.AppendLine("__resolverService = service;");
 
