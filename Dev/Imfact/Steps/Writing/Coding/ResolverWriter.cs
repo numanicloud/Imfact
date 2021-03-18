@@ -2,9 +2,8 @@
 using System.Linq;
 using Imfact.Steps.Definitions;
 using Imfact.Steps.Definitions.Interfaces;
-using Imfact.Steps.Writing.Coding;
 
-namespace Imfact.Steps.Writing
+namespace Imfact.Steps.Writing.Coding
 {
 	internal class ResolverWriter : IResolverWriter
 	{

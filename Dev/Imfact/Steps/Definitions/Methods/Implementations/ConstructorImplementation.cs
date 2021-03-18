@@ -1,6 +1,7 @@
-﻿using Imfact.Steps.Definitions.Interfaces;
+﻿using Imfact.Steps.Definitions.Builders;
+using Imfact.Steps.Definitions.Interfaces;
 
-namespace Imfact.Steps.Definitions.Methods
+namespace Imfact.Steps.Definitions.Methods.Implementations
 {
 	internal record ConstructorImplementation
 		(Initialization[] Initializations, Hook[] Hooks)

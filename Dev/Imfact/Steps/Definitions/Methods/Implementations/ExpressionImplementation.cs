@@ -2,7 +2,7 @@
 using Imfact.Steps.Definitions.Interfaces;
 using Imfact.Utilities;
 
-namespace Imfact.Steps.Definitions.Methods
+namespace Imfact.Steps.Definitions.Methods.Implementations
 {
 	internal record ExpressionImplementation(Hook[] Hooks, TypeAnalysis ReturnType, string Expression) : Implementation
 	{

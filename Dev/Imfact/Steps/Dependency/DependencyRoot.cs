@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Imfact.Steps.Dependency.Components;
+using Imfact.Steps.Semanticses;
 using Imfact.Steps.Semanticses.Interfaces;
 using Imfact.Steps.Semanticses.Records;
 

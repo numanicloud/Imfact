@@ -3,7 +3,7 @@ using Imfact.Entities;
 using Imfact.Steps.Dependency;
 using Imfact.Steps.Semanticses.Interfaces;
 
-namespace Imfact.Steps.Definitions
+namespace Imfact.Steps.Definitions.Builders
 {
 	internal sealed class MethodService
 	{

@@ -1,9 +1,10 @@
 ﻿using System.Linq;
 using Imfact.Steps.Definitions.Methods;
+using Imfact.Steps.Definitions.Methods.Implementations;
 using Imfact.Steps.Dependency;
 using Imfact.Utilities;
 
-namespace Imfact.Steps.Definitions
+namespace Imfact.Steps.Definitions.Builders
 {
 	internal sealed class ConstructorBuilder
 	{

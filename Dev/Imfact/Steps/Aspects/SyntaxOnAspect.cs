@@ -1,6 +1,4 @@
-﻿using Imfact.Steps.Aspects;
-
-namespace Imfact.Steps
+﻿namespace Imfact.Steps.Aspects
 {
 	public class SyntaxOnAspect
 	{

@@ -1,6 +1,6 @@
 ﻿using Imfact.Steps.Definitions.Interfaces;
 
-namespace Imfact.Steps.Writing
+namespace Imfact.Steps.Writing.Coding
 {
 	internal class SequenceBuilder : ICodeBuilder
 	{

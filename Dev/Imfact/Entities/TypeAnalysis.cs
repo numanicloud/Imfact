@@ -74,3 +74,10 @@ namespace Imfact.Entities
 		}
 	}
 }
+
+
+/* メモ
+ * 型の (Runtime, Symbol) から (インターフェース実装, 名前, 名前空間, ...) を抽出
+ * クラスの (Symbol, Syntax) から (名前, 型, メンバー, ...) を抽出
+ * メソッドの (Symbol, Syntax) から (名前, 引数, ...) を抽出
+ */
