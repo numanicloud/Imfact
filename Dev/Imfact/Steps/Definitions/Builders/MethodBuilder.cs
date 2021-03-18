@@ -4,7 +4,6 @@ using Imfact.Annotations;
 using Imfact.Entities;
 using Imfact.Steps.Definitions.Methods;
 using Imfact.Steps.Dependency;
-using Imfact.Steps.Semanticses;
 using Imfact.Steps.Semanticses.Interfaces;
 using Imfact.Steps.Semanticses.Records;
 using Microsoft.CodeAnalysis;

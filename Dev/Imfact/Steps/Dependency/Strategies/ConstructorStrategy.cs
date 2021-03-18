@@ -2,7 +2,6 @@
 using System.Linq;
 using Imfact.Steps.Dependency.Components;
 using Imfact.Steps.Dependency.Interfaces;
-using Imfact.Steps.Semanticses;
 using Imfact.Steps.Semanticses.Records;
 
 namespace Imfact.Steps.Dependency.Strategies

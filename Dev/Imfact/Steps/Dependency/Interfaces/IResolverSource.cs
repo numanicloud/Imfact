@@ -1,5 +1,4 @@
-﻿using Imfact.Steps.Semanticses;
-using Imfact.Steps.Semanticses.Interfaces;
+﻿using Imfact.Steps.Semanticses.Interfaces;
 using Imfact.Steps.Semanticses.Records;
 
 namespace Imfact.Steps.Dependency.Interfaces

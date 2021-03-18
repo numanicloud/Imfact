@@ -1,5 +1,4 @@
 ﻿using System;
-using Imfact.Interfaces;
 using Imfact.Steps.Definitions.Interfaces;
 using Imfact.Utilities;
 

@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Imfact.Steps.Dependency.Interfaces;
-using Imfact.Steps.Semanticses;
 using Imfact.Steps.Semanticses.Interfaces;
 using Imfact.Steps.Semanticses.Records;
 

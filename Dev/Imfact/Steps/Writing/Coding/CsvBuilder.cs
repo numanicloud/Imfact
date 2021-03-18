@@ -1,5 +1,4 @@
-﻿using Imfact.Interfaces;
-using Imfact.Steps.Definitions.Interfaces;
+﻿using Imfact.Steps.Definitions.Interfaces;
 
 namespace Imfact.Steps.Writing.Coding
 {
