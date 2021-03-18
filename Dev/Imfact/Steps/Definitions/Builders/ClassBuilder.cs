@@ -12,11 +12,11 @@ namespace Imfact.Steps.Definitions.Builders
 {
 	internal class ClassBuilder
 	{
-		private readonly SemanticsRoot _semantics;
-		private readonly DependencyRoot _dependency;
+		private readonly SemanticsResult _semantics;
+		private readonly DependencyResult _dependency;
 		private readonly MethodBuilder _methodBuilder;
 
-		public ClassBuilder(SemanticsRoot semantics, DependencyRoot dependency, MethodBuilder methodBuilder)
+		public ClassBuilder(SemanticsResult semantics, DependencyResult dependency, MethodBuilder methodBuilder)
 		{
 			_semantics = semantics;
 			_dependency = dependency;

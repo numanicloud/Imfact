@@ -2,5 +2,5 @@
 
 namespace Imfact.Steps.Semanticses
 {
-	internal record SemanticsRoot(Factory Factory);
+	internal record SemanticsResult(Factory Factory);
 }

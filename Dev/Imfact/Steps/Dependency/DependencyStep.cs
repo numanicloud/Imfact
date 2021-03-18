@@ -10,24 +10,24 @@ namespace Imfact.Steps.Dependency
 {
 	internal class DependencyStep
 	{
-		private readonly SemanticsRoot _semantics;
+		private readonly SemanticsResult _semantics;
 		private readonly CreationCrawler _crawler;
 		private readonly UsingRule _usingRule = new();
 
-		public DependencyStep(SemanticsRoot semantics)
+		public DependencyStep(SemanticsResult semantics)
 		{
 			_semantics = semantics;
 			_crawler = new CreationCrawler(semantics);
 		}
 
-		public DependencyRoot Run()
+		public DependencyResult Run()
 		{
 			var injectionResult = BuildInjection();
 			var disposable = DisposableInfo.Aggregate(_semantics.Factory,
 				injectionResult.Dependencies);
 			var usings = _usingRule.Extract(_semantics, injectionResult, disposable);
 
-			return new DependencyRoot(_semantics, injectionResult, usings, disposable);
+			return new DependencyResult(_semantics, injectionResult, usings, disposable);
 		}
 
 		private InjectionResult BuildInjection()

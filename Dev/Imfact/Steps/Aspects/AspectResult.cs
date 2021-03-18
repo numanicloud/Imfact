@@ -1,10 +1,10 @@
 ﻿namespace Imfact.Steps.Aspects
 {
-	public class SyntaxOnAspect
+	public class AspectResult
 	{
 		internal ClassAspect Class { get; }
 
-		internal SyntaxOnAspect(ClassAspect @class)
+		internal AspectResult(ClassAspect @class)
 		{
 			Class = @class;
 		}

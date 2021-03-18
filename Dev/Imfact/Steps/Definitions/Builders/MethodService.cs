@@ -7,10 +7,10 @@ namespace Imfact.Steps.Definitions.Builders
 {
 	internal sealed class MethodService
 	{
-		private readonly DependencyRoot _dependency;
+		private readonly DependencyResult _dependency;
 		private Hook[]? _cache;
 
-		public MethodService(DependencyRoot dependency)
+		public MethodService(DependencyResult dependency)
 		{
 			_dependency = dependency;
 		}

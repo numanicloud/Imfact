@@ -8,10 +8,10 @@ namespace Imfact.Steps.Definitions.Builders
 {
 	internal sealed class ConstructorBuilder
 	{
-		private readonly DependencyRoot _dependency;
+		private readonly DependencyResult _dependency;
 		private readonly MethodService _service;
 
-		public ConstructorBuilder(DependencyRoot dependency, MethodService service)
+		public ConstructorBuilder(DependencyResult dependency, MethodService service)
 		{
 			_dependency = dependency;
 			_service = service;

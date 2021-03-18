@@ -16,9 +16,9 @@ namespace Imfact.Steps.Dependency.Interfaces
 
 	class RootFactorySource : IFactorySource<Factory>
 	{
-		private readonly SemanticsRoot _semantics;
+		private readonly SemanticsResult _semantics;
 
-		public RootFactorySource(SemanticsRoot semantics)
+		public RootFactorySource(SemanticsResult semantics)
 		{
 			this._semantics = semantics;
 		}
@@ -43,9 +43,9 @@ namespace Imfact.Steps.Dependency.Interfaces
 			Accessibility.ProtectedOrInternal
 		};
 
-		private readonly SemanticsRoot _semantics;
+		private readonly SemanticsResult _semantics;
 
-		public DelegationSource(SemanticsRoot semantics)
+		public DelegationSource(SemanticsResult semantics)
 		{
 			this._semantics = semantics;
 		}
@@ -72,9 +72,9 @@ namespace Imfact.Steps.Dependency.Interfaces
 			Accessibility.ProtectedAndInternal,
 		};
 
-		private readonly SemanticsRoot _semantics;
+		private readonly SemanticsResult _semantics;
 
-		public InheritanceSource(SemanticsRoot semantics)
+		public InheritanceSource(SemanticsResult semantics)
 		{
 			this._semantics = semantics;
 		}

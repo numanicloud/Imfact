@@ -14,7 +14,7 @@ namespace Imfact.Steps.Dependency.Components
 	{
 		private readonly IExpressionStrategy[] _strategies;
 
-		public CreationCrawler(SemanticsRoot semantics)
+		public CreationCrawler(SemanticsResult semantics)
 		{
 			_strategies = GetCreations(semantics).ToArray();
 		}
@@ -41,7 +41,7 @@ namespace Imfact.Steps.Dependency.Components
 			}
 		}
 
-		private static IEnumerable<IExpressionStrategy> GetCreations(SemanticsRoot semantics)
+		private static IEnumerable<IExpressionStrategy> GetCreations(SemanticsResult semantics)
 		{
 			var factory = new RootFactorySource(semantics);
 			var delegation = new DelegationSource(semantics);

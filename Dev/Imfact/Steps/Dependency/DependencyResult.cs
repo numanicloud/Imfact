@@ -6,7 +6,7 @@ using Imfact.Steps.Semanticses.Records;
 
 namespace Imfact.Steps.Dependency
 {
-	internal record DependencyRoot(SemanticsRoot Semantics,
+	internal record DependencyResult(SemanticsResult Semantics,
 		InjectionResult Injection,
 		string[] Usings,
 		DisposableInfo DisposableInfo)

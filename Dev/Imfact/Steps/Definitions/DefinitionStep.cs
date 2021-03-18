@@ -11,10 +11,10 @@ namespace Imfact.Steps.Definitions
 	internal class DefinitionStep
 	{
 		private readonly ClassBuilder _classBuilder;
-		private readonly SemanticsRoot _semantics;
-		private readonly DependencyRoot _dependency;
+		private readonly SemanticsResult _semantics;
+		private readonly DependencyResult _dependency;
 
-		public DefinitionStep(DependencyRoot dependency)
+		public DefinitionStep(DependencyResult dependency)
 		{
 			_dependency = dependency;
 			_semantics = dependency.Semantics;
@@ -23,7 +23,7 @@ namespace Imfact.Steps.Definitions
 					new MethodService(dependency)));
 		}
 
-		public DefinitionStepResult Build()
+		public DefinitionResult Build()
 		{
 			var usings = _dependency.Usings
 				.Select(x => new Using(x))
@@ -36,7 +36,7 @@ namespace Imfact.Steps.Definitions
 				.OfType<ConstructorSignature>()
 				.First();
 
-			return new DefinitionStepResult(new DefinitionRoot(usings, nss),
+			return new DefinitionResult(new DefinitionRoot(usings, nss),
 				BuildConstructorRecord(ctor));
 		}
 

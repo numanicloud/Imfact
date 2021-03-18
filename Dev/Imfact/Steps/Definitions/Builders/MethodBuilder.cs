@@ -15,11 +15,11 @@ namespace Imfact.Steps.Definitions.Builders
 
 	internal sealed class MethodBuilder
 	{
-		private readonly SemanticsRoot _semantics;
+		private readonly SemanticsResult _semantics;
 		private readonly InjectionResult _injection;
 		private readonly MethodService _service;
 
-		public MethodBuilder(DependencyRoot dependency, MethodService service)
+		public MethodBuilder(DependencyResult dependency, MethodService service)
 		{
 			_service = service;
 			_semantics = dependency.Semantics;

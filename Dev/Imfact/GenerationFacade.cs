@@ -1,11 +1,9 @@
 ﻿using System.Linq;
-using Imfact.Steps;
 using Imfact.Steps.Aspects;
 using Imfact.Steps.Definitions;
 using Imfact.Steps.Dependency;
 using Imfact.Steps.Ranking;
 using Imfact.Steps.Semanticses;
-using Imfact.Steps.Semanticses.Records;
 using Imfact.Steps.Writing;
 using Imfact.Utilities;
 
@@ -51,32 +49,32 @@ namespace Imfact
 				.Then(SourceCodeStep);
 		}
 
-		private SyntaxOnAspect AspectStep(RankedClass syntax)
+		private AspectResult AspectStep(RankedClass syntax)
 		{
 			var aspect = _classAggregator.Run(syntax);
-			return new SyntaxOnAspect(aspect);
+			return new AspectResult(aspect);
 		}
 
-		private SemanticsRoot SemanticsStep(SyntaxOnAspect aspect)
+		private SemanticsResult SemanticsStep(AspectResult aspect)
 		{
 			return _semanticsAggregator.Run(aspect.Class);
 		}
 
-		private DependencyRoot ResolutionStep(SemanticsRoot semantics)
+		private DependencyResult ResolutionStep(SemanticsResult semantics)
 		{
 			var builder = new DependencyStep(semantics);
 			return builder.Run();
 		}
 
-		private DefinitionStepResult DefinitionStep(DependencyRoot dependency)
+		private DefinitionResult DefinitionStep(DependencyResult dependency)
 		{
 			var builder = new DefinitionStep(dependency);
 			return builder.Build();
 		}
 
-		private SourceFile SourceCodeStep(DefinitionStepResult definitionStepResult)
+		private SourceFile SourceCodeStep(DefinitionResult definitionStepResult)
 		{
-			var writer = new SourceCodeBuilder(definitionStepResult);
+			var writer = new WritingStep(definitionStepResult);
 			return writer.Write();
 		}
 	}

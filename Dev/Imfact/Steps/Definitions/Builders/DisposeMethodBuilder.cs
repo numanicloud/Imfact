@@ -12,9 +12,9 @@ namespace Imfact.Steps.Definitions.Builders
 {
 	internal sealed class DisposeMethodBuilder
 	{
-		private readonly DependencyRoot _dependency;
+		private readonly DependencyResult _dependency;
 
-		public DisposeMethodBuilder(DependencyRoot dependency)
+		public DisposeMethodBuilder(DependencyResult dependency)
 		{
 			_dependency = dependency;
 		}

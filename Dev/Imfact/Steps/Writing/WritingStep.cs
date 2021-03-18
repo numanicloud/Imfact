@@ -8,12 +8,12 @@ using Imfact.Utilities;
 
 namespace Imfact.Steps.Writing
 {
-	internal class SourceCodeBuilder
+	internal class WritingStep
 	{
 		private readonly DefinitionRoot _definitionRoot;
 		private readonly ResolverWriter _resolverWriter;
 
-		public SourceCodeBuilder(DefinitionStepResult definitionStepResult)
+		public WritingStep(DefinitionResult definitionStepResult)
 		{
 			_definitionRoot = definitionStepResult.DefinitionRoot;
 			_resolverWriter = new ResolverWriter();

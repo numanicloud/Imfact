@@ -13,10 +13,10 @@ namespace Imfact.Steps.Semanticses
 			_factoryRule = new FactoryRule(new ResolverRule());
 		}
 
-		public SemanticsRoot Run(ClassAspect @class)
+		public SemanticsResult Run(ClassAspect @class)
 		{
 			var factory = _factoryRule.ExtractFactory(@class);
-			return new SemanticsRoot(factory);
+			return new SemanticsResult(factory);
 		}
 	}
 }

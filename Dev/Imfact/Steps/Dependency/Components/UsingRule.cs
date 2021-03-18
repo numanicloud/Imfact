@@ -10,7 +10,7 @@ namespace Imfact.Steps.Dependency.Components
 {
 	internal sealed class UsingRule
 	{
-		public string[] Extract(SemanticsRoot semantics, InjectionResult injection, DisposableInfo disposableInfo)
+		public string[] Extract(SemanticsResult semantics, InjectionResult injection, DisposableInfo disposableInfo)
 		{
 			return Stage1(semantics, injection, disposableInfo)
 				.Distinct()
@@ -18,7 +18,7 @@ namespace Imfact.Steps.Dependency.Components
 				.ToArray();
 		}
 
-		private IEnumerable<string> Stage1(SemanticsRoot semantics, InjectionResult injection,
+		private IEnumerable<string> Stage1(SemanticsResult semantics, InjectionResult injection,
 			DisposableInfo disposableInfo)
 		{
 			yield return semantics.Factory.Type.FullNamespace;
@@ -42,7 +42,7 @@ namespace Imfact.Steps.Dependency.Components
 			}
 		}
 
-		private IEnumerable<IEnumerable<string>> Stage2(SemanticsRoot semantics, InjectionResult injection)
+		private IEnumerable<IEnumerable<string>> Stage2(SemanticsResult semantics, InjectionResult injection)
 		{
 			static IEnumerable<TypeAnalysis> GetNestedTypes(TypeAnalysis root)
 			{
