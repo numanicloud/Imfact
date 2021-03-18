@@ -1,4 +1,5 @@
 ﻿using Imfact.Entities;
+using Imfact.Steps.Semanticses.Records;
 
 namespace Imfact.Steps.Semanticses.Interfaces
 {

@@ -3,6 +3,7 @@ using System.Linq;
 using Imfact.Steps.Dependency.Components;
 using Imfact.Steps.Semanticses;
 using Imfact.Steps.Semanticses.Interfaces;
+using Imfact.Steps.Semanticses.Records;
 using Imfact.Utilities;
 
 namespace Imfact.Steps.Dependency
@@ -39,7 +40,7 @@ namespace Imfact.Steps.Dependency
 				.SelectMany(FindFields)
 				.GroupBy(x => x.Type.Id)
 				.Select(x => x.First())
-				.Select(x => new Semanticses.Dependency(x.Type, x.Name))
+				.Select(x => new Semanticses.Records.Dependency(x.Type, x.Name))
 				.ToArray();
 
 			var injectionResult = new InjectionResult(result, resultMulti, deps);

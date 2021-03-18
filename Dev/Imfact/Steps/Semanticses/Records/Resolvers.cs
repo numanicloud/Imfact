@@ -5,25 +5,8 @@ using Imfact.Steps.Semanticses.Interfaces;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Imfact.Steps.Semanticses
+namespace Imfact.Steps.Semanticses.Records
 {
-	internal record Factory(FactoryCommon Common,
-		Delegation[] Delegations, Inheritance[] Inheritances, EntryResolver[] EntryResolvers)
-		: FactoryCommon(Common);
-
-	internal record Delegation(FactoryCommon Common, string PropertyName)
-		: FactoryCommon(Common), IFieldSemantics
-	{
-		public string MemberName => PropertyName;
-	}
-
-	internal record Inheritance(FactoryCommon Common, Parameter[] Parameters)
-		: FactoryCommon(Common);
-
-	internal record FactoryCommon(TypeAnalysis Type,
-		Resolver[] Resolvers,
-		MultiResolver[] MultiResolvers) : IFactorySemantics;
-
 	internal record Resolver(ResolverCommon Common, Resolution? ReturnTypeResolution)
 		: ResolverCommon(Common)
 	{
@@ -56,7 +39,7 @@ namespace Imfact.Steps.Semanticses
 		public override int GetHashCode()
 		{
 			var value = 1;
-			value += (int) Accessibility * 3;
+			value += (int)Accessibility * 3;
 			value += ReturnType.Id.GetHashCode() * 7;
 			value += MethodName.GetHashCode() * 19;
 			value += Parameters.Length * 11;
@@ -66,32 +49,7 @@ namespace Imfact.Steps.Semanticses
 		}
 	}
 
-	internal record Dependency(TypeAnalysis TypeName, string FieldName) : IFieldSemantics
-	{
-		public TypeAnalysis Type => TypeName;
-		public string MemberName => FieldName;
-	}
-
-	internal record Hook(TypeAnalysis HookType, string FieldName) : IFieldSemantics
-	{
-		public TypeAnalysis Type => HookType;
-		public string MemberName => FieldName;
-	}
-
-	internal record Parameter(TypeAnalysis Type, string ParameterName);
-
 	internal record Resolution(TypeAnalysis TypeName,
 		TypeAnalysis[] Dependencies,
 		DisposableType DisposableType);
-
-	internal record EntryResolver(string MethodName,
-		TypeAnalysis ReturnType,
-		Parameter[] Parameters,
-		Accessibility Accessibility);
-
-	internal interface IFieldSemantics
-	{
-		TypeAnalysis Type { get; }
-		string MemberName { get; }
-	}
 }

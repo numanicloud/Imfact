@@ -40,18 +40,18 @@ namespace Imfact.Steps.Definitions
 			}
 		}
 
-		private IFieldSemantics[] ExtractDisposables()
+		private IVariableSemantics[] ExtractDisposables()
 		{
 			return _dependency.Resolvers
 				.Concat<IResolverSemantics>(_dependency.MultiResolvers)
 				.SelectMany(x => x.Hooks)
-				.Concat<IFieldSemantics>(_dependency.Dependencies)
+				.Concat<IVariableSemantics>(_dependency.Dependencies)
 				.Concat(_dependency.Delegations)
 				.ToArray();
 		}
 
 		private MethodInfo BuildDisposable(
-			IEnumerable<IFieldSemantics> disposables,
+			IEnumerable<IVariableSemantics> disposables,
 			bool isAsync)
 		{
 			var methodName = isAsync ? "DisposeAsync" : "Dispose";

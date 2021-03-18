@@ -1,4 +1,5 @@
 ﻿using Imfact.Entities;
+using Imfact.Steps.Semanticses.Records;
 using Microsoft.CodeAnalysis;
 
 namespace Imfact.Steps.Semanticses.Interfaces

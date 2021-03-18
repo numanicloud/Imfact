@@ -2,6 +2,7 @@
 using Imfact.Steps.Dependency.Components;
 using Imfact.Steps.Semanticses;
 using Imfact.Steps.Semanticses.Interfaces;
+using Imfact.Steps.Semanticses.Records;
 
 namespace Imfact.Steps.Dependency
 {
@@ -18,11 +19,11 @@ namespace Imfact.Steps.Dependency
 		public Dictionary<IResolverSemantics, CreationExpTree> Creation => Injection.Creation;
 		public Dictionary<IResolverSemantics, MultiCreationExpTree> MultiCreation =>
 			Injection.MultiCreation;
-		public Semanticses.Dependency[] Dependencies => Injection.Dependencies;
+		public Semanticses.Records.Dependency[] Dependencies => Injection.Dependencies;
 	}
 
 	internal record InjectionResult(
 		Dictionary<IResolverSemantics, CreationExpTree> Creation,
 		Dictionary<IResolverSemantics, MultiCreationExpTree> MultiCreation,
-		Semanticses.Dependency[] Dependencies);
+		Semanticses.Records.Dependency[] Dependencies);
 }

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Imfact.Entities;
 using Imfact.Steps.Aspects;
+using Imfact.Steps.Semanticses.Records;
 
 namespace Imfact.Steps.Semanticses.Rules
 {
@@ -18,8 +19,7 @@ namespace Imfact.Steps.Semanticses.Rules
 			var common = GetFactoryCommon(aspect.Type, aspect.Methods);
 			return new Factory(common,
 				ExtractDelegations(aspect.Properties),
-				ExtractInheritance(aspect.BaseClasses),
-				ExtractEntryResolvers(aspect));
+				ExtractInheritance(aspect.BaseClasses));
 		}
 
 		private FactoryCommon GetFactoryCommon(TypeAnalysis type, MethodAspect[] methods)
@@ -47,21 +47,6 @@ namespace Imfact.Steps.Semanticses.Rules
 			return properties.Select(x =>
 				new Delegation(GetFactoryCommon(x.Type, x.MethodsInType), x.Name))
 				.ToArray();
-		}
-
-		private EntryResolver[] ExtractEntryResolvers(ClassAspect aspect)
-		{
-			return aspect.Methods.Select(x =>
-			{
-				var parameters = x.Parameters
-					.Select(y => new Parameter(y.Type, y.Name))
-					.ToArray();
-
-				return new EntryResolver(x.Name,
-					x.ReturnType.Type.Info,
-					parameters,
-					x.Accessibility);
-			}).ToArray();
 		}
 	}
 }

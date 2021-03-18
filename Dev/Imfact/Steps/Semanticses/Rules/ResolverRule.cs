@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Imfact.Steps.Aspects;
+using Imfact.Steps.Semanticses.Records;
 using Imfact.Utilities;
 
 namespace Imfact.Steps.Semanticses.Rules

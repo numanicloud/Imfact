@@ -4,6 +4,7 @@ using Imfact.Entities;
 using Imfact.Steps.Definitions.Methods;
 using Imfact.Steps.Dependency;
 using Imfact.Steps.Semanticses;
+using Imfact.Steps.Semanticses.Interfaces;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 
@@ -46,7 +47,7 @@ namespace Imfact.Steps.Definitions
 			var hook1 = _semantics.Factory.Resolvers.SelectMany(x => x.Hooks);
 			var hook2 = _semantics.Factory.MultiResolvers.SelectMany(x => x.Hooks);
 
-			var fields = deps.Concat<IFieldSemantics>(hook1).Concat(hook2)
+			var fields = deps.Concat<IVariableSemantics>(hook1).Concat(hook2)
 				.Select(x => new Field(x.Type, x.MemberName, x.Type.DisposableType));
 
 			if (!_semantics.Factory.Inheritances.Any())
