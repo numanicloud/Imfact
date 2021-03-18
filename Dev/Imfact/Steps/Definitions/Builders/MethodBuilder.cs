@@ -7,6 +7,7 @@ using Imfact.Steps.Definitions.Methods.Implementations;
 using Imfact.Steps.Dependency;
 using Imfact.Steps.Semanticses;
 using Imfact.Steps.Semanticses.Interfaces;
+using Imfact.Steps.Semanticses.Records;
 using Microsoft.CodeAnalysis;
 
 namespace Imfact.Steps.Definitions.Builders
@@ -15,17 +16,15 @@ namespace Imfact.Steps.Definitions.Builders
 
 	internal sealed class MethodBuilder
 	{
-		private readonly SemanticsResult _semantics;
 		private readonly InjectionResult _injection;
 		private readonly MethodService _service;
 
-		public MethodBuilder(DependencyResult dependency, MethodService service)
+		public MethodBuilder(MethodService service, InjectionResult injection, DisposeMethodBuilder disposeMethodBuilder, ConstructorBuilder constructorBuilder)
 		{
 			_service = service;
-			_semantics = dependency.Semantics;
-			_injection = dependency.Injection;
-			DisposeMethodBuilder = new DisposeMethodBuilder(dependency);
-			ConstructorBuilder = new ConstructorBuilder(dependency, _service);
+			_injection = injection;
+			DisposeMethodBuilder = disposeMethodBuilder;
+			ConstructorBuilder = constructorBuilder;
 		}
 
 		public DisposeMethodBuilder DisposeMethodBuilder { get; }
@@ -34,9 +33,9 @@ namespace Imfact.Steps.Definitions.Builders
 
 		public static readonly TypeAnalysis ResolverServiceType = TypeAnalysis.FromRuntime(typeof(ResolverService));
 
-		public MethodInfo? BuildRegisterServiceMethodInfo()
+		public MethodInfo? BuildRegisterServiceMethodInfo(Inheritance[] inheritances, Delegation[] delegations)
 		{
-			if (_semantics.Factory.Inheritances.Any())
+			if (inheritances.Any())
 			{
 				return null;
 			}
@@ -47,7 +46,7 @@ namespace Imfact.Steps.Definitions.Builders
 				new[] { new Parameter(ResolverServiceType, "service", false) },
 				new string[0]);
 
-			var p = _semantics.Factory.Delegations
+			var p = delegations
 				.Select(x => new Property(x.PropertyName))
 				.ToArray();
 
@@ -55,9 +54,9 @@ namespace Imfact.Steps.Definitions.Builders
 			return new MethodInfo(signature, impl);
 		}
 
-		public MethodInfo[] BuildResolverInfo()
+		public MethodInfo[] BuildResolverInfo(Resolver[] resolvers)
 		{
-			return _semantics.Factory.Resolvers
+			return resolvers
 				.Select(x =>
 				{
 					return BuildMethodCommon(x, hooks1 =>
@@ -68,9 +67,9 @@ namespace Imfact.Steps.Definitions.Builders
 				}).ToArray();
 		}
 
-		public MethodInfo[] BuildEnumerableMethodInfo()
+		public MethodInfo[] BuildEnumerableMethodInfo(MultiResolver[] multiResolvers)
 		{
-			return _semantics.Factory.MultiResolvers
+			return multiResolvers
 				.Select(x =>
 				{
 					return BuildMethodCommon(x, hooks1 =>

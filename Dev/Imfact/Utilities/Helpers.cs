@@ -29,14 +29,6 @@ namespace Imfact.Utilities
 			return func(prevStep);
 		}
 
-		public static Dictionary<TKey, TValue> ToDictionaryWithDistinct<T, TKey, TValue>(
-			this IEnumerable<T> source, Func<T, TKey> keySelector, Func<T, TValue> valueSelector,
-			Func<IEnumerable<T>, T> selectFromGroup)
-		{
-			return source.GroupBy(keySelector).Select(selectFromGroup)
-				.ToDictionary(keySelector, valueSelector);
-		}
-
 		/// <summary>
 		/// 単一の値を、それ1つだけを含むコレクションに変換します。
 		/// </summary>
@@ -80,20 +72,6 @@ namespace Imfact.Utilities
 				if (item is not null)
 				{
 					yield return item;
-				}
-			}
-		}
-
-		public static IEnumerable<TR> FilterMap<T, TR>
-			(this IEnumerable<T> source, Func<T, TR?> map)
-			where T : notnull
-			where TR : notnull
-		{
-			foreach (var item in source)
-			{
-				if (map(item) is {} value)
-				{
-					yield return value;
 				}
 			}
 		}

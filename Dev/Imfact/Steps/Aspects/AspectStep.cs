@@ -5,25 +5,16 @@ namespace Imfact.Steps.Aspects
 {
 	internal sealed class AspectStep
 	{
-		private readonly GenerationContext _genContext;
+		private readonly ClassRule _rule;
 
-		public AspectStep(GenerationContext genContext)
+		public AspectStep(ClassRule rule)
 		{
-			_genContext = genContext;
+			_rule = rule;
 		}
 
-		public ClassAspect Run(RankedClass rankedClass)
+		public AspectResult Run(RankedClass rankedClass)
 		{
-			var context = rankedClass.Context;
-			var typeRule = new TypeRule();
-			var methodRule = new MethodRule(context,
-				new AttributeRule(typeRule),
-				typeRule);
-			var k = new ClassRule(_genContext,
-				methodRule,
-				new PropertyRule(context, methodRule));
-
-			return k.Aggregate(rankedClass);
+			return new AspectResult(_rule.Aggregate(rankedClass));
 		}
 	}
 }

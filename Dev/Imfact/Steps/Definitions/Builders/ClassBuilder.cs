@@ -33,10 +33,14 @@ namespace Imfact.Steps.Definitions.Builders
 
 		private MethodInfo[] BuildMethods()
 		{
+			var registerServiceMethod = _methodBuilder.BuildRegisterServiceMethodInfo(
+				_semantics.Factory.Inheritances,
+				_semantics.Factory.Delegations);
+
 			return _methodBuilder.ConstructorBuilder.BuildConstructorInfo().WrapByArray()
-				.Concat(_methodBuilder.BuildRegisterServiceMethodInfo().WrapOrEmpty())
-				.Concat(_methodBuilder.BuildResolverInfo())
-				.Concat(_methodBuilder.BuildEnumerableMethodInfo())
+				.Concat(registerServiceMethod.WrapOrEmpty())
+				.Concat(_methodBuilder.BuildResolverInfo(_semantics.Factory.Resolvers))
+				.Concat(_methodBuilder.BuildEnumerableMethodInfo(_semantics.Factory.MultiResolvers))
 				.Concat(_methodBuilder.DisposeMethodBuilder.BuildDisposeMethodInfo())
 				.ToArray();
 		}

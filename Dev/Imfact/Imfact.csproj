@@ -20,5 +20,10 @@
 
   <PropertyGroup>
     <PackageId>Imfact</PackageId>
+    <Description>Imfact is source generator for factory pattern. Factory pattern can alter DI container.</Description>
+    <Copyright>NumAniCloud © 2021</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/NumAniCloud/Imfact</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/NumAniCloud/Imfact</RepositoryUrl>
   </PropertyGroup>
 </Project>

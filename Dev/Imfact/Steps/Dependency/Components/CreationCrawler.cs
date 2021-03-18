@@ -2,8 +2,6 @@
 using System.Linq;
 using Imfact.Entities;
 using Imfact.Steps.Dependency.Interfaces;
-using Imfact.Steps.Dependency.Strategies;
-using Imfact.Steps.Semanticses;
 using Imfact.Steps.Semanticses.Interfaces;
 using Imfact.Steps.Semanticses.Records;
 using Imfact.Utilities;
@@ -14,9 +12,9 @@ namespace Imfact.Steps.Dependency.Components
 	{
 		private readonly IExpressionStrategy[] _strategies;
 
-		public CreationCrawler(SemanticsResult semantics)
+		public CreationCrawler(IEnumerable<IExpressionStrategy> strategies)
 		{
-			_strategies = GetCreations(semantics).ToArray();
+			_strategies = strategies.ToArray();
 		}
 
 		public IEnumerable<ICreationNode> GetExpression(CreationContext context)
@@ -40,27 +38,6 @@ namespace Imfact.Steps.Dependency.Components
 				return "_" + type.Name.ToLowerCamelCase();
 			}
 		}
-
-		private static IEnumerable<IExpressionStrategy> GetCreations(SemanticsResult semantics)
-		{
-			var factory = new RootFactorySource(semantics);
-			var delegation = new DelegationSource(semantics);
-			var inheritance = new InheritanceSource(semantics);
-			var resolver = new ResolverSource();
-			var multiResolver = new MultiResolverSource();
-
-			// この順で評価されて、最初にマッチした解決方法が使われる
-			yield return new ParameterStrategy();
-			yield return factory.GetStrategyExp();
-			yield return delegation.GetStrategyExp();
-			yield return (delegation, resolver).GetStrategyExp();
-			yield return (delegation, multiResolver).GetStrategyExp();
-			yield return new RootResolverStrategy(factory, resolver);
-			yield return (factory, multiResolver).GetStrategyExp();
-			yield return (inheritance, resolver).GetStrategyExp();
-			yield return (inheritance, multiResolver).GetStrategyExp();
-			yield return new ConstructorStrategy();
-		}
 	}
 
 	// 型を1つ解決すると、TypeToResolveの中身が減る。中身が空になったら解決完了。
@@ -70,23 +47,4 @@ namespace Imfact.Steps.Dependency.Components
 		TypeAnalysis[] TypeToResolve,
 		List<Parameter> ConsumedParameters,
 		CreationCrawler Injector);
-
-
-	static class ExpressionExtensions
-	{
-		public static FactoryItselfStrategy<TFactory> GetStrategyExp<TFactory>(
-			this IFactorySource<TFactory> source)
-			where TFactory : IFactorySemantics
-		{
-			return new(source);
-		}
-
-		public static FactoryExpressionStrategy<TFactory, TResolver> GetStrategyExp<TFactory, TResolver>(
-			this (IFactorySource<TFactory>, IResolverSource<TResolver>) components)
-			where TFactory : IFactorySemantics
-			where TResolver : IResolverSemantics
-		{
-			return new(components.Item1, components.Item2);
-		}
-	}
 }

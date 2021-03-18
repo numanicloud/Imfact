@@ -2,7 +2,7 @@
 using Imfact.Entities;
 using Imfact.Interfaces;
 
-namespace Imfact
+namespace Imfact.Main
 {
 	internal class GenerationContext
 	{

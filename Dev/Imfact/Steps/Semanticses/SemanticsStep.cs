@@ -1,5 +1,4 @@
 ﻿using Imfact.Steps.Aspects;
-using Imfact.Steps.Semanticses.Records;
 using Imfact.Steps.Semanticses.Rules;
 
 namespace Imfact.Steps.Semanticses
@@ -8,14 +7,14 @@ namespace Imfact.Steps.Semanticses
 	{
 		private readonly FactoryRule _factoryRule;
 
-		public SemanticsStep()
+		public SemanticsStep(FactoryRule rule)
 		{
-			_factoryRule = new FactoryRule(new ResolverRule());
+			_factoryRule = rule;
 		}
 
-		public SemanticsResult Run(ClassAspect @class)
+		public SemanticsResult Run(AspectResult aspectResult)
 		{
-			var factory = _factoryRule.ExtractFactory(@class);
+			var factory = _factoryRule.ExtractFactory(aspectResult.Class);
 			return new SemanticsResult(factory);
 		}
 	}

@@ -14,10 +14,10 @@ namespace Imfact.Steps.Dependency
 		private readonly CreationCrawler _crawler;
 		private readonly UsingRule _usingRule = new();
 
-		public DependencyStep(SemanticsResult semantics)
+		public DependencyStep(SemanticsResult semantics, CreationCrawler crawler)
 		{
 			_semantics = semantics;
-			_crawler = new CreationCrawler(semantics);
+			_crawler = crawler;
 		}
 
 		public DependencyResult Run()

@@ -14,13 +14,26 @@ namespace Imfact.Steps.Definitions
 		private readonly SemanticsResult _semantics;
 		private readonly DependencyResult _dependency;
 
+		public DefinitionStep(DependencyResult dependency, ClassBuilder classBuilder)
+		{
+			_dependency = dependency;
+			_semantics = dependency.Semantics;
+			_classBuilder = classBuilder;
+		}
+
 		public DefinitionStep(DependencyResult dependency)
 		{
 			_dependency = dependency;
 			_semantics = dependency.Semantics;
+
+
+			var methodService = new MethodService(dependency);
 			_classBuilder = new ClassBuilder(dependency.Semantics, dependency,
-				new MethodBuilder(dependency,
-					new MethodService(dependency)));
+				new MethodBuilder(
+					methodService,
+					dependency.Injection,
+					new DisposeMethodBuilder(dependency),
+					new ConstructorBuilder(dependency, methodService)));
 		}
 
 		public DefinitionResult Build()
