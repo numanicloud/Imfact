@@ -1,6 +1,4 @@
-﻿using Imfact.Steps.Semanticses.Records;
-
-namespace Imfact.Steps.Semanticses
+﻿namespace Imfact.Steps.Semanticses.Records
 {
 	internal record SemanticsRoot(Factory Factory);
 }

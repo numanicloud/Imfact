@@ -5,6 +5,7 @@ using Imfact.Steps.Definitions;
 using Imfact.Steps.Dependency;
 using Imfact.Steps.Ranking;
 using Imfact.Steps.Semanticses;
+using Imfact.Steps.Semanticses.Records;
 using Imfact.Steps.Writing;
 using Imfact.Utilities;
 

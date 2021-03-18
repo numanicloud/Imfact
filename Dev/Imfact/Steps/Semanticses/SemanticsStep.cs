@@ -1,4 +1,5 @@
 ﻿using Imfact.Steps.Aspects;
+using Imfact.Steps.Semanticses.Records;
 using Imfact.Steps.Semanticses.Rules;
 
 namespace Imfact.Steps.Semanticses

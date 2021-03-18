@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Imfact.Entities;
-using Imfact.Steps.Semanticses;
 using Imfact.Steps.Semanticses.Interfaces;
+using Imfact.Steps.Semanticses.Records;
 using Imfact.Utilities;
 
 namespace Imfact.Steps.Dependency.Components
@@ -62,11 +62,12 @@ namespace Imfact.Steps.Dependency.Components
 				.Concat<IResolverSemantics>(factory.MultiResolvers)
 				.SelectMany(m =>
 				{
-					var pp = m.Parameters.SelectMany(x => GetNestedTypes(x.Type));
-					var hh = m.Hooks.SelectMany(x => GetNestedTypes(x.HookType));
-					var rr = m.Resolutions.SelectMany(x => GetNestedTypes(x.TypeName));
-					var rt = GetNestedTypes(m.ReturnType);
-					return pp.Concat(hh).Concat(rr).Concat(rt)
+					return m.Parameters
+						.Concat<IVariableSemantics>(m.Hooks)
+						.Select(x => x.Type)
+						.Concat(m.Resolutions.Select(x => x.TypeName))
+						.Append(m.ReturnType)
+						.SelectMany(GetNestedTypes)
 						.Select(x => x.FullNamespace);
 				});
 			yield return factory.Resolvers.Select(x => x.ReturnTypeResolution)
