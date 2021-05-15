@@ -55,11 +55,13 @@ namespace Imfact
 			catch (System.Exception ex)
 			{
 				var title = "Internal exception occurred within Imfact source generator.";
+				var noPhantom = string.IsNullOrWhiteSpace(ex.StackTrace) ? "<empty>" : ex.StackTrace;
+				var fullDesc = $"{ex} {noPhantom}".Replace("\n", "").Replace("\r", "");
 				
 				var diagnostic = Diagnostic.Create(
 					new DiagnosticDescriptor("IMF0001",
-						$"{title} {ex} {ex.StackTrace} v19",
-						$"{title} {ex} {ex.StackTrace} v19",
+						$"{title} {fullDesc} v19",
+						$"{title} {fullDesc} v19",
 						"Internal",
 						DiagnosticSeverity.Warning,
 						true,
