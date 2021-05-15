@@ -58,8 +58,8 @@ namespace Imfact
 				
 				var diagnostic = Diagnostic.Create(
 					new DiagnosticDescriptor("IMF0001",
-						$"{title} {ex.ToString()}",
-						$"{title} {ex.ToString()}",
+						$"{title} {ex} {ex.StackTrace} v19",
+						$"{title} {ex} {ex.StackTrace} v19",
 						"Internal",
 						DiagnosticSeverity.Warning,
 						true,
