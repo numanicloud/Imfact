@@ -55,12 +55,11 @@ namespace Imfact
 			catch (System.Exception ex)
 			{
 				var title = $"Internal exception occurred within Imfact source generator. {ex.Message}";
-
+				
 				var diagnostic = Diagnostic.Create(
 					new DiagnosticDescriptor("IMF0001", title, title, "Internal", DiagnosticSeverity.Warning, true, ex.ToString()),
 					null, (object[]?)null);
 				context.ReportDiagnostic(diagnostic);
-				throw;
 			}
 		}
 	}
