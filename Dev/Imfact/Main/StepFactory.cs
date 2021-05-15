@@ -14,7 +14,7 @@ using Imfact.Steps.Writing;
 
 namespace Imfact.Main
 {
-	class StepFactory
+	internal sealed class StepFactory
 	{
 		public AspectStep Aspect(GenerationContext genContext, IAnalysisContext context)
 		{

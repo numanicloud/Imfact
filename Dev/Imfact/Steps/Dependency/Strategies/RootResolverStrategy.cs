@@ -14,6 +14,7 @@ namespace Imfact.Steps.Dependency.Strategies
 
 		protected override Source[] Filter(Source[] source, IResolverSemantics caller)
 		{
+			// リゾルバーが自分自身を呼び出さないようにするためのフィルター
 			return source
 				.Where(x => caller is not Resolver r || x.Resolver.GetHashCode() != r.GetHashCode())
 				.ToArray();

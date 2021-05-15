@@ -20,34 +20,47 @@ namespace Imfact
 
 		public void Execute(GeneratorExecutionContext context)
 		{
-			//System.Diagnostics.Debugger.Launch();
-			AnnotationGenerator.AddSource(in context);
-
-			if (context.SyntaxReceiver is not FactorySyntaxReceiver receiver
-			    || receiver.SyntaxTree is null)
+			try
 			{
-				return;
-			}
+				//System.Diagnostics.Debugger.Launch();
+				AnnotationGenerator.AddSource(in context);
 
-			var csCompilation = (CSharpCompilation)context.Compilation;
-			var options = (CSharpParseOptions)csCompilation.SyntaxTrees[0].Options;
-			var compilation =
-				context.Compilation.AddSyntaxTrees(AnnotationGenerator.GetSyntaxTrees(options));
-
-			var candidates = receiver.CandidateClasses
-				.Select(x =>
+				if (context.SyntaxReceiver is not FactorySyntaxReceiver receiver
+					|| receiver.SyntaxTree is null)
 				{
-					var sm = compilation.GetSemanticModel(x.SyntaxTree);
-					return new CandidateClass(x, new CompilationAnalysisContext(sm));
-				})
-				.ToArray();
-			var facade = new GenerationFacade();
+					return;
+				}
 
-			var sourceFiles = facade.Run(candidates);
-			foreach (var file in sourceFiles)
+				var csCompilation = (CSharpCompilation)context.Compilation;
+				var options = (CSharpParseOptions)csCompilation.SyntaxTrees[0].Options;
+				var compilation =
+					context.Compilation.AddSyntaxTrees(AnnotationGenerator.GetSyntaxTrees(options));
+
+				var candidates = receiver.CandidateClasses
+					.Select(x =>
+					{
+						var sm = compilation.GetSemanticModel(x.SyntaxTree);
+						return new CandidateClass(x, new CompilationAnalysisContext(sm));
+					})
+					.ToArray();
+				var facade = new GenerationFacade();
+
+				var sourceFiles = facade.Run(candidates);
+				foreach (var file in sourceFiles)
+				{
+					var sourceText = SourceText.From(file.Contents, Encoding.UTF8);
+					context.AddSource(file.FileName, sourceText);
+				}
+			}
+			catch (System.Exception ex)
 			{
-				var sourceText = SourceText.From(file.Contents, Encoding.UTF8);
-				context.AddSource(file.FileName, sourceText);
+				var title = $"Internal exception occurred within Imfact source generator. {ex.Message}";
+
+				var diagnostic = Diagnostic.Create(
+					new DiagnosticDescriptor("IMF0001", title, title, "Internal", DiagnosticSeverity.Warning, true, ex.ToString()),
+					null, (object[]?)null);
+				context.ReportDiagnostic(diagnostic);
+				throw;
 			}
 		}
 	}
