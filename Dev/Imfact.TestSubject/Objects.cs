@@ -147,6 +147,7 @@ namespace Deptorygen2.TestSubject
 		[Resolution(typeof(Hoge))]
 		[Resolution(typeof(Hoge2))]
 		public partial IEnumerable<IHoge> ResolveMultiHoge();
+
 	}
 
 	[Factory]

@@ -58,8 +58,6 @@ namespace Imfact
 				var noPhantom = string.IsNullOrWhiteSpace(ex.StackTrace) ? "<empty>" : ex.StackTrace;
 				var fullDesc = $"{ex} {noPhantom}";
 				
-				System.Diagnostics.Debug.WriteLine(fullDesc);
-				System.Diagnostics.Debug.Flush();
 				fullDesc = fullDesc.Replace("\n", "").Replace("\r", "");
 				
 				var diagnostic = Diagnostic.Create(

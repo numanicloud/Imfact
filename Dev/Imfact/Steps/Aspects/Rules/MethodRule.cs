@@ -24,10 +24,9 @@ namespace Imfact.Steps.Aspects.Rules
 			_typeRule = typeRule;
 		}
 
-		public MethodAspect? ExtractAspect(MethodDeclarationSyntax syntax, bool partialOnly = false)
+		public MethodAspect? ExtractAspect(MethodDeclarationSyntax syntax, IMethodSymbol symbol, bool partialOnly = false)
 		{
 			if (!IsResolversPartial()
-				|| _context.GetMethodSymbol(syntax) is not { } symbol
 				|| symbol.ReturnType is not INamedTypeSymbol returnSymbol)
 			{
 				return null;

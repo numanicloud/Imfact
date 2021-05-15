@@ -33,7 +33,7 @@ namespace Imfact.Steps.Aspects.Rules
 		{
 			return new(TypeAnalysis.FromSymbol(symbol),
 				baseClasses,
-				GetMethodAspects(syntax, partialOnly: true),
+				GetMethodAspects(symbol, partialOnly: true),
 				GetPropertyAspects(syntax), null);
 		}
 
@@ -45,7 +45,7 @@ namespace Imfact.Steps.Aspects.Rules
 			return new(
 				TypeAnalysis.FromSymbol(symbol),
 				new ClassAspect[0],
-				GetMethodAspects(syntax, false),
+				GetMethodAspects(symbol, false),
 				GetPropertyAspects(syntax),
 				GetConstructor(symbol));
 		}
@@ -79,11 +79,18 @@ namespace Imfact.Steps.Aspects.Rules
 			}
 		}
 
-		private MethodAspect[] GetMethodAspects(ClassDeclarationSyntax @class, bool partialOnly)
+		private MethodAspect[] GetMethodAspects(INamedTypeSymbol @class, bool partialOnly)
 		{
-			return @class.Members
-				.OfType<MethodDeclarationSyntax>()
-				.Select(x => _methodRule.ExtractAspect(x, partialOnly))
+			return @class.GetMembers()
+				.OfType<IMethodSymbol>()
+				.Select(x =>
+				{
+					var mm = x.DeclaringSyntaxReferences
+						.Select(m => m.GetSyntax())
+						.OfType<MethodDeclarationSyntax>()
+						.FirstOrDefault();
+					return mm is null ? null : _methodRule.ExtractAspect(mm, x, partialOnly);
+				})
 				.FilterNull()
 				.ToArray();
 		}
