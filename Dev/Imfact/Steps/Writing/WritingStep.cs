@@ -94,7 +94,7 @@ namespace Imfact.Steps.Writing
 				{
 					foreach (var item in exporter.Items)
 					{
-						block.AppendLine($"{exporter.Name}<{item.InterfaceType.Name}, {item.ConcreteType.Name}>({p.Name}, () => {item.MethodName}());");
+						block.AppendLine($"{exporter.Name}<{item.InterfaceType.Name}>({p.Name}, () => {item.MethodName}());");
 					}
 				});
 			});

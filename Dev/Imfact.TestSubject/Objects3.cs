@@ -14,7 +14,7 @@ namespace Imfact.TestSubject
 
 	public class Registerer
 	{
-		public void Register<TInterface, TImpl>(TInterface arg)
+		public void Register<TInterface>(TInterface arg)
 		{
 			Console.WriteLine(arg);
 		}
@@ -36,15 +36,15 @@ namespace Imfact.TestSubject
 		public partial IHoge ResolveHoge4();
 
 		[Exporter]
-		public void Register<TInterface, TImpl>(Registerer registerer, Func<TInterface> func)
+		public void Register<TInterface>(Registerer registerer, Func<TInterface> func)
 		{
-			registerer.Register<TInterface, TImpl>(func());
+			registerer.Register<TInterface>(func());
 		}
 
 		[Exporter] 
-		public void Register2<TInterface, TImpl>(Registerer2 registerer2, Func<TInterface> func)
+		public void Register2<TInterface>(Registerer2 registerer2, Func<TInterface> func)
 		{
-			registerer2.Register<TInterface, TImpl>(func());
+			registerer2.Register<TInterface>(func());
 		}
 	}
 }
@@ -55,7 +55,7 @@ namespace Imfact.Test
 
 	public class Registerer2
 	{
-		public void Register<TInterface, TImpl>(TInterface arg)
+		public void Register<TInterface>(TInterface arg)
 		{
 			Console.WriteLine(arg);
 		}

@@ -76,7 +76,7 @@ namespace Imfact.Steps.Aspects.Rules
 						Accessibility.NotApplicable, DisposableType.NonDisposable))
 				.ToArray() ?? Array.Empty<TypeAnalysis>();
 
-			if (typeParameters.Length != 2)
+			if (typeParameters.Length != 1)
 			{
 				return null;
 			}
