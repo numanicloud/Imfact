@@ -9,10 +9,10 @@ namespace Imfact.Steps.Aspects.Rules
 	internal class AttributeRule
 	{
 		private readonly TypeRule _typeRule;
-		private readonly AttributeName _resAt = new(nameof(ResolutionAttribute));
-		private readonly AttributeName _hokAt = new(nameof(HookAttribute));
-		private readonly AttributeName _cacAt = new(nameof(CacheAttribute));
-		private readonly AttributeName _cprAt = new(nameof(CachePerResolutionAttribute));
+		private static readonly AttributeName _resAt = new(nameof(ResolutionAttribute));
+		private static readonly AttributeName _hokAt = new(nameof(HookAttribute));
+		private static readonly AttributeName _cacAt = new(nameof(CacheAttribute));
+		private static readonly AttributeName _cprAt = new(nameof(CachePerResolutionAttribute));
 
 		public AttributeRule(TypeRule typeRule)
 		{
@@ -70,6 +70,7 @@ namespace Imfact.Steps.Aspects.Rules
 		private (AnnotationKind, TypeToCreate)? Resolution(AttributeData data,
 			INamedTypeSymbol ownerReturn)
 		{
+			using var profiler = TimeProfiler.Create("Attribute-Resolution");
 			if (data.ConstructorArguments.Length == 1
 			    && data.ConstructorArguments[0].Kind == TypedConstantKind.Type
 			    && data.ConstructorArguments[0].Value is INamedTypeSymbol t)
@@ -85,6 +86,7 @@ namespace Imfact.Steps.Aspects.Rules
 		private (AnnotationKind, TypeToCreate)? Hook(AttributeData data,
 			INamedTypeSymbol ownerReturn)
 		{
+			using var profiler = TimeProfiler.Create("Attribute-Hook");
 			if (data.ConstructorArguments.Length == 1
 			    && data.ConstructorArguments[0].Kind == TypedConstantKind.Type
 			    && data.ConstructorArguments[0].Value is INamedTypeSymbol arg
@@ -100,6 +102,7 @@ namespace Imfact.Steps.Aspects.Rules
 
 		private static TypeToCreate PresetCache(Type hookType, INamedTypeSymbol ownerReturn)
 		{
+			using var profiler = TimeProfiler.Create("Attribute-Preset");
 			var node = TypeAnalysis.FromRuntime(hookType,
 				new[] {TypeAnalysis.FromSymbol(ownerReturn)});
 			return new TypeToCreate(node, new TypeAnalysis[0]);

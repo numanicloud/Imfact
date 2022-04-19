@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Imfact.Entities;
 using Imfact.Interfaces;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -37,6 +38,7 @@ namespace Imfact
 
 		public INamedTypeSymbol? GetNamedTypeSymbol(TypeDeclarationSyntax syntax)
 		{
+			using var profiler = TimeProfiler.Create("GetNamedTypeSymbol");
 			return _semanticModel.GetDeclaredSymbol(syntax) is INamedTypeSymbol type
 				? type
 				: null;

@@ -29,6 +29,7 @@ namespace Imfact.Steps.Aspects.Rules
 
 		public MethodAspect? ExtractAspect(MethodDeclarationSyntax syntax, IMethodSymbol symbol, bool partialOnly = false)
 		{
+			using var profiler = TimeProfiler.Create("Extract-Method-Aspect");
 			if (!IsResolversPartial()
 				|| symbol.ReturnType is not INamedTypeSymbol returnSymbol)
 			{
@@ -59,6 +60,7 @@ namespace Imfact.Steps.Aspects.Rules
 		public ExporterAspect? ExtractExporterAspect
 			(MethodDeclarationSyntax syntax, IMethodSymbol symbol)
 		{
+			using var profiler = TimeProfiler.Create("Extract-Exporter-Aspect");
 			// Exporterである条件は：
 			// ExporterAttributeがついているメソッドで、
 			// 型引数が2つで、
@@ -80,8 +82,7 @@ namespace Imfact.Steps.Aspects.Rules
 			}
 
 			var parameters = GetParameters(syntax);
-
-			Debugger.Break();
+			
 			if (parameters.Length != 2
 				&& parameters[1].Name != $"Func"
 				&& parameters[1].Type.TypeArguments[0].Name == typeParameters[0].Name)
@@ -104,6 +105,7 @@ namespace Imfact.Steps.Aspects.Rules
 
 		private MethodAttributeAspect[] GetAttributes(IMethodSymbol symbol, INamedTypeSymbol returnSymbol)
 		{
+			using var profiler = TimeProfiler.Create("Extract-Attribute-Aspect");
 			return symbol.GetAttributes()
 				.Select(x => _attributeRule.ExtractAspect(x, returnSymbol, symbol.Name))
 				.FilterNull()
@@ -112,16 +114,20 @@ namespace Imfact.Steps.Aspects.Rules
 
 		private ReturnTypeAspect GetReturnType(INamedTypeSymbol symbol)
 		{
+			using var profiler = TimeProfiler.Create("Extract-ReturnType-Aspect");
 			return new(_typeRule.ExtractTypeToCreate(symbol), symbol.IsAbstract);
 		}
 
 		private ParameterAspect? ExtractParameter(ParameterSyntax syntax)
 		{
+			var profiler = TimeProfiler.Create("Extract-Parameter-Aspect1");
 			if (syntax.Type is null || _context.GetTypeSymbol(syntax.Type) is not { } symbol)
 			{
 				return null;
 			}
+			profiler.Dispose();
 
+			using var profiler2 = TimeProfiler.Create("Extract-Parameter-Aspect2");
 			return new ParameterAspect(TypeAnalysis.FromSymbol(symbol), symbol.Name);
 		}
 	}

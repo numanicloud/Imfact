@@ -8,6 +8,7 @@ using Imfact.Steps.Dependency;
 using Imfact.Steps.Semanticses;
 using Imfact.Steps.Semanticses.Interfaces;
 using Imfact.Steps.Semanticses.Records;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 
 namespace Imfact.Steps.Definitions.Builders
@@ -56,6 +57,7 @@ namespace Imfact.Steps.Definitions.Builders
 
 		public MethodInfo[] BuildResolverInfo(Resolver[] resolvers)
 		{
+			using var profiler = TimeProfiler.Create("Extract-Resolver-Definitions");
 			return resolvers
 				.Select(x =>
 				{
@@ -69,6 +71,7 @@ namespace Imfact.Steps.Definitions.Builders
 
 		public MethodInfo[] BuildEnumerableMethodInfo(MultiResolver[] multiResolvers)
 		{
+			using var profiler = TimeProfiler.Create("Extract-MultiResolver-Definitions");
 			return multiResolvers
 				.Select(x =>
 				{
@@ -83,6 +86,7 @@ namespace Imfact.Steps.Definitions.Builders
 		private MethodInfo BuildMethodCommon(IResolverSemantics x,
 			Func<Hook[], Implementation> makeImpl)
 		{
+			using var profiler = TimeProfiler.Create("Extract-MethodCommon-Definitions");
 			var ps = x.Parameters.Select(
 					p => _service.BuildParameter(p.Type, p.ParameterName))
 				.ToArray();

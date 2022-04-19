@@ -81,6 +81,7 @@ namespace Imfact.Steps.Writing
 
 		private void RenderExporter(Exporter exporter, ICodeBuilder builder)
 		{
+			using var profiler = TimeProfiler.Create("Render-Exporter");
 			builder.EnterChunk(chunk =>
 			{
 				var p = exporter.Parameters[0];
@@ -126,6 +127,7 @@ namespace Imfact.Steps.Writing
 
 		private void RenderMethod(MethodInfo method, ICodeBuilder builder)
 		{
+			using var profiler = TimeProfiler.Create("Render-Method");
 			builder.EnterChunk(chunk =>
 			{
 				chunk.AppendLine(method.Signature.GetSignatureString());

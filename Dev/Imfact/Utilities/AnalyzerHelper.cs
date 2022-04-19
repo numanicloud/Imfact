@@ -17,8 +17,9 @@ namespace Imfact.Utilities
 						  && x.GetFullNameSpace() == typeName.FullNamespace);
 		}
 
-		public static bool HasAttribute(this IEnumerable<AttributeListSyntax> attributes, AttributeName attributeName)
+		public static bool HasAttribute(this SyntaxList<AttributeListSyntax> attributes, AttributeName attributeName)
 		{
+			using var profiler = TimeProfiler.Create("HasAttribute");
 			return attributes.SelectMany(a => a.Attributes)
 				.Any(a => attributeName.MatchWithAnyName(a.Name.ToString()));
 		}

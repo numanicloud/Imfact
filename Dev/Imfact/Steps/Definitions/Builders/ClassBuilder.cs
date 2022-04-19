@@ -34,6 +34,7 @@ namespace Imfact.Steps.Definitions.Builders
 
 		private Exporter[] BuildExporters()
 		{
+			using var profiler = TimeProfiler.Create("Extract-Exporter-Definitions");
 			var items = _dependency.Resolvers
 				.Select(x =>
 					new ExporterItem(x.ReturnType, x.ActualResolution.TypeName, x.MethodName))

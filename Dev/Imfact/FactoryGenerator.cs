@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Imfact.Annotations;
 using Imfact.Main;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -39,6 +42,7 @@ namespace Imfact
 				var candidates = receiver.CandidateClasses
 					.Select(x =>
 					{
+						using var profiler = TimeProfiler.Create("LoadCandidate");
 						var sm = compilation.GetSemanticModel(x.SyntaxTree);
 						return new CandidateClass(x, new CompilationAnalysisContext(sm));
 					})
@@ -48,6 +52,7 @@ namespace Imfact
 				var sourceFiles = facade.Run(candidates);
 				foreach (var file in sourceFiles)
 				{
+					using var profiler = TimeProfiler.Create("File-Adding");
 					var sourceText = SourceText.From(file.Contents, Encoding.UTF8);
 					context.AddSource(file.FileName, sourceText);
 				}
@@ -72,6 +77,7 @@ namespace Imfact
 						WellKnownDiagnosticTags.AnalyzerException),
 					null, (object[]?)null);
 				context.ReportDiagnostic(diagnostic);
+				Debug.WriteLine($"{title} {fullDesc}");
 			}
 		}
 	}

@@ -2,7 +2,7 @@
 {
 	internal record AttributeName(string NameWithAttributeSuffix)
 	{
-		public string NameWithoutSuffix => NameWithAttributeSuffix
+		public string NameWithoutSuffix { get; } = NameWithAttributeSuffix
 			.TrimEnd("Attribute".ToCharArray());
 
 		public bool MatchWithAnyName(string attributeName)

@@ -30,8 +30,10 @@ namespace Imfact.TestSubject
 		public partial IHoge ResolveHoge2();
 
 		[Resolution(typeof(Hoge))]
-		[Cache]
 		public partial IHoge ResolveHoge3();
+
+		[Resolution(typeof(Hoge))]
+		public partial IHoge ResolveHoge4();
 
 		[Exporter]
 		public void Register<TInterface, TImpl>(Registerer registerer, Func<TInterface> func)
@@ -49,6 +51,8 @@ namespace Imfact.TestSubject
 
 namespace Imfact.Test
 {
+
+
 	public class Registerer2
 	{
 		public void Register<TInterface, TImpl>(TInterface arg)

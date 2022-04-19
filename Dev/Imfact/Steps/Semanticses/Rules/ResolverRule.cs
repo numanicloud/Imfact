@@ -24,6 +24,7 @@ namespace Imfact.Steps.Semanticses.Rules
 
 		public Exporter[] ExtractExporters(ExporterAspect[] methods)
 		{
+			using var profiler = TimeProfiler.Create("Extract-Exporter-Semantics");
 			return methods.Select(x => new Exporter(x.Name, new []
 				{
 					new Parameter(x.Parameters[0].Type, x.Parameters[0].Name),
@@ -34,6 +35,7 @@ namespace Imfact.Steps.Semanticses.Rules
 
 		private ResolverCommon GetMethodCommon(MethodAspect method)
 		{
+			using var profiler = TimeProfiler.Create("Extract-MethodCommon-Semantics");
 			var parameters = method.Parameters.Select(x => new Parameter(x.Type, x.Name))
 				.ToArray();
 
@@ -58,6 +60,7 @@ namespace Imfact.Steps.Semanticses.Rules
 
 		private Hook? ExtractHook(MethodAttributeAspect aspect, MethodAspect method)
 		{
+			using var profiler = TimeProfiler.Create("Extract-Hook-Semantics");
 			if (aspect.Kind != AnnotationKind.Hook &&
 			    aspect.Kind != AnnotationKind.CacheHookPreset &&
 			    aspect.Kind != AnnotationKind.CachePrHookPreset)

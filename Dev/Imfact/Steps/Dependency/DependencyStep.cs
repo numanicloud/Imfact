@@ -22,6 +22,7 @@ namespace Imfact.Steps.Dependency
 
 		public DependencyResult Run()
 		{
+			using var profiler = TimeProfiler.Create("Dependency-Root");
 			var injectionResult = BuildInjection();
 			var disposable = DisposableInfo.Aggregate(_semantics.Factory,
 				injectionResult.Dependencies);

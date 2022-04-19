@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Imfact.Annotations;
 using Imfact.Entities;
 using Imfact.Interfaces;
 using Imfact.Utilities;
@@ -13,8 +12,11 @@ namespace Imfact.Steps.Ranking
 {
 	internal class RankingStep
 	{
+		private static readonly AttributeName FactoryAttribute = new(nameof(Annotations.FactoryAttribute));
+
 		public RankedClass[] Run(CandidateClass[] classes)
 		{
+			using var profiler = TimeProfiler.Create("Ranking");
 			var factoryClasses = ExtractFactories(classes);
 			var relations = AnalyzeRelations(factoryClasses);
 			var (rank0, notRank0) = ExtractRank0(relations);
@@ -27,6 +29,7 @@ namespace Imfact.Steps.Ranking
 
 		private static Dictionary<int, List<Relation>> DetermineRanking(List<Relation> rank0, List<Relation> notRank0)
 		{
+			using var profiler = TimeProfiler.Create("DetermineRanking");
 			var ranks = new Dictionary<int, List<Relation>>()
 			{
 				[0] = rank0
@@ -58,6 +61,7 @@ namespace Imfact.Steps.Ranking
 
 		private static (List<Relation> rank0, List<Relation> notRank0) ExtractRank0(Relation[] relations)
 		{
+			using var profiler = TimeProfiler.Create("Extract-Rank0-Ranking");
 			var rank0 = relations
 				.Where(x => x.BaseSymbol?.SpecialType == SpecialType.System_Object)
 				.ToList();
@@ -71,9 +75,13 @@ namespace Imfact.Steps.Ranking
 		{
 			return factoryClasses
 				.Select(
-					x => x.Context.GetNamedTypeSymbol(x.Syntax) is { } symbol
-						? new Relation(x.Syntax, symbol, symbol.BaseType, x.Context)
-						: null)
+					x =>
+					{
+						using var profiler = TimeProfiler.Create("Extract-Relations-Ranking");
+						return x.Context.GetNamedTypeSymbol(x.Syntax) is { } symbol
+							? new Relation(x.Syntax, symbol, symbol.BaseType, x.Context)
+							: null;
+					})
 				.FilterNull()
 				.ToArray();
 		}
@@ -82,9 +90,10 @@ namespace Imfact.Steps.Ranking
 		{
 			return classes.Where(x =>
 			{
+				using var profiler = TimeProfiler.Create("Extract-Factory-Ranking");
 				var hasAttr = x.Syntax.AttributeLists
-					.HasAttribute(new AttributeName(nameof(FactoryAttribute)));
-				var isPartial = x.Syntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
+					.HasAttribute(FactoryAttribute);
+				var isPartial = x.Syntax.Modifiers.IndexOf(SyntaxKind.PartialKeyword) != -1;
 
 				return hasAttr && isPartial;
 			}).ToArray();
