@@ -84,7 +84,7 @@ namespace Imfact.Steps.Writing
 			builder.EnterChunk(chunk =>
 			{
 				var param0 =
-					$"{exporter.Parameters[0].TypeAnalysis.Name} {exporter.Parameters[0].Name}";
+					$"{exporter.Parameters[0].TypeAnalysis.FullBoundName} {exporter.Parameters[0].Name}";
 				var signature = $"public void {exporter.Name}({param0})";
 				chunk.AppendLine(signature);
 
