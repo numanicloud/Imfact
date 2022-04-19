@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Imfact.Entities;
 using Imfact.Steps.Aspects;
 using Imfact.Steps.Semanticses.Records;
 using Imfact.Utilities;
@@ -18,6 +19,16 @@ namespace Imfact.Steps.Semanticses.Rules
 		{
 			return methods.Where(x => x.Kind == ResolverKind.Single)
 				.Select(x => new Resolver(GetMethodCommon(x), ExtractResolution(x.ReturnType.Type)))
+				.ToArray();
+		}
+
+		public Exporter[] ExtractExporters(ExporterAspect[] methods)
+		{
+			return methods.Select(x => new Exporter(x.Name, new []
+				{
+					new Parameter(x.Parameters[0].Type, x.Parameters[0].Name),
+					new Parameter(x.Parameters[1].Type, x.Parameters[1].Name)
+				}))
 				.ToArray();
 		}
 

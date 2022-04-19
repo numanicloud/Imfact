@@ -5,7 +5,7 @@ namespace Imfact.Steps.Semanticses.Records
 {
 	internal record Factory
 		(FactoryCommon Common, Delegation[] Delegations,
-		Inheritance[] Inheritances)
+		Inheritance[] Inheritances, Exporter[] Exporters)
 		: FactoryCommon(Common);
 
 	internal record Delegation(FactoryCommon Common, string PropertyName)

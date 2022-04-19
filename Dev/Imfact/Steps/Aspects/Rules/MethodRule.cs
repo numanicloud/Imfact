@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Imfact.Annotations;
 using Imfact.Entities;
 using Imfact.Interfaces;
 using Imfact.Utilities;
@@ -51,6 +53,43 @@ namespace Imfact.Steps.Aspects.Rules
 			{
 				return !partialOnly || syntax.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword));
 			}
+		}
+
+		public ExporterAspect? ExtractExporterAspect
+			(MethodDeclarationSyntax syntax, IMethodSymbol symbol)
+		{
+			// Exporterである条件は：
+			// ExporterAttributeがついているメソッドで、
+			// 型引数が2つで、
+			// 2つめの引数の型が2つめの型引数の値を返すFuncであること。
+			if (symbol.GetAttributes().FirstOrDefault(x => x.AttributeClass?.Name == nameof(ExporterAttribute)) is null)
+			{
+				return null;
+			}
+
+			var typeParameters = syntax.TypeParameterList?.Parameters
+				.Select(p =>
+					new TypeAnalysis(new TypeId("", p.Identifier.ValueText, TypeArgId.Empty),
+						Accessibility.NotApplicable, DisposableType.NonDisposable))
+				.ToArray() ?? Array.Empty<TypeAnalysis>();
+
+			if (typeParameters.Length != 2)
+			{
+				return null;
+			}
+
+			var parameters = GetParameters(syntax);
+
+			if (parameters.Length != 2
+				&& parameters[1].Name != $"Func"
+				&& parameters[1].Type.TypeArguments[0].Name == typeParameters[0].Name)
+			{
+				return null;
+			}
+
+			return new ExporterAspect(symbol.Name,
+				GetParameters(syntax),
+				typeParameters);
 		}
 
 		private ParameterAspect[] GetParameters(MethodDeclarationSyntax syntax)

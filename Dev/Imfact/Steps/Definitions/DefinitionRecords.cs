@@ -12,7 +12,7 @@ namespace Imfact.Steps.Definitions
 	internal record Namespace(string Name, Class Class);
 
 	internal record Class(string Name, MethodInfo[] Methods,
-		Field[] Fields, DisposableInfo DisposableInfo);
+		Field[] Fields, DisposableInfo DisposableInfo, Exporter[] Exporters);
 
 	internal record Property(string Name);
 
@@ -25,4 +25,8 @@ namespace Imfact.Steps.Definitions
 	internal record Type(TypeAnalysis TypeName);
 
 	internal record Hook(TypeAnalysis TypeAnalysis, string FieldName);
+
+	internal record Exporter(string Name, Parameter[] Parameters, ExporterItem[] Items);
+
+	internal record ExporterItem(TypeAnalysis InterfaceType, TypeAnalysis ConcreteType, string MethodName);
 }

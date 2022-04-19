@@ -52,4 +52,6 @@ namespace Imfact.Steps.Semanticses.Records
 	internal record Resolution(TypeAnalysis TypeName,
 		TypeAnalysis[] Dependencies,
 		DisposableType DisposableType);
+
+	internal record Exporter(string MethodName, Parameter[] Parameters);
 }

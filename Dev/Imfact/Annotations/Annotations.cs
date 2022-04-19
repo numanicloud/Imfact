@@ -28,4 +28,9 @@ namespace Imfact.Annotations
 			Type = hookType;
 		}
 	}
+
+	[AttributeUsage(AttributeTargets.Method, Inherited = false)]
+	internal sealed class ExporterAttribute : Attribute
+	{
+	}
 }

@@ -10,14 +10,15 @@ namespace Imfact.Steps.Aspects
 
 	internal enum AnnotationKind
 	{
-		Resolution, Hook, CacheHookPreset, CachePrHookPreset
+		Resolution, Hook, CacheHookPreset, CachePrHookPreset, Exporter
 	}
 
 	internal record ClassAspect(TypeAnalysis Type,
 		ClassAspect[] BaseClasses,
 		MethodAspect[] Methods,
 		PropertyAspect[] Properties,
-		ConstructorAspect? KnownConstructor);
+		ConstructorAspect? KnownConstructor,
+		ExporterAspect[] Exporters);
 
 	internal record ConstructorAspect(
 		Accessibility Accessibility,
@@ -29,6 +30,11 @@ namespace Imfact.Steps.Aspects
 		ReturnTypeAspect ReturnType,
 		MethodAttributeAspect[] Attributes,
 		ParameterAspect[] Parameters);
+
+	internal record ExporterAspect
+		(string Name,
+		ParameterAspect[] Parameters,
+		TypeAnalysis[] TypeParameters);
 
 	internal record PropertyAspect(TypeAnalysis Type, string Name, MethodAspect[] MethodsInType);
 

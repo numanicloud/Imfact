@@ -21,7 +21,9 @@ namespace Imfact.Entities
 		{
 			return symbol is INamedTypeSymbol nts
 				? FromSymbol(nts)
-				: throw new ArgumentException(nameof(symbol));
+				: symbol is ITypeParameterSymbol tps
+					? new TypeId("", tps.Name, TypeArgId.Empty)
+					: throw new ArgumentException($"{nameof(symbol)} is not INamedTypeSymbol. This is {symbol.GetType()}.");
 		}
 
 		public static TypeId FromRuntime(Type type, TypeId[]? typeArguments = null)

@@ -70,6 +70,30 @@ namespace Imfact.Steps.Writing
 					{
 						RenderMethod(method, seqOuter);
 					}
+
+					foreach (var exporter in @class.Exporters)
+					{
+						RenderExporter(exporter, seqOuter);
+					}
+				});
+			});
+		}
+
+		private void RenderExporter(Exporter exporter, ICodeBuilder builder)
+		{
+			builder.EnterChunk(chunk =>
+			{
+				var param0 =
+					$"{exporter.Parameters[0].TypeAnalysis.Name} {exporter.Parameters[0].Name}";
+				var signature = $"public void {exporter.Name}({param0})";
+				chunk.AppendLine(signature);
+
+				chunk.EnterBlock(block =>
+				{
+					foreach (var item in exporter.Items)
+					{
+						block.AppendLine($"{exporter.Name}<{item.InterfaceType.Name}, {item.ConcreteType.Name}>({exporter.Parameters[0].Name}, () => {item.MethodName}());");
+					}
 				});
 			});
 		}

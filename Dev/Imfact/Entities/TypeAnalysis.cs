@@ -48,7 +48,9 @@ namespace Imfact.Entities
 		{
 			return symbol is INamedTypeSymbol nts
 				? FromSymbol(nts)
-				: throw new ArgumentException(nameof(symbol));
+				: symbol is ITypeParameterSymbol tps
+					? new TypeAnalysis(new TypeId("", tps.Name, TypeArgId.Empty), Accessibility.NotApplicable, NonDisposable)
+					: throw new ArgumentException($"{nameof(symbol)} is not INamedTypeSymbol. This is {symbol.GetType()}.");
 		}
 
 		public static TypeAnalysis FromRuntime(Type type, TypeAnalysis[]? typeArguments = null)

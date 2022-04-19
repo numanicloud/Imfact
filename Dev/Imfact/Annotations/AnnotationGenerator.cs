@@ -137,6 +137,11 @@ namespace Imfact.Annotations
 	public sealed class TransientAttribute : Attribute
 	{
 	}
+
+	[AttributeUsage(AttributeTargets.Method, Inherited = false)]
+	public sealed class ExporterAttribute : Attribute
+	{
+	}
 }
 ";
 
