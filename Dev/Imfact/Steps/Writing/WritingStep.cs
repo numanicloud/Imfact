@@ -83,8 +83,9 @@ namespace Imfact.Steps.Writing
 		{
 			builder.EnterChunk(chunk =>
 			{
-				var param0 =
-					$"{exporter.Parameters[0].TypeAnalysis.FullBoundName} {exporter.Parameters[0].Name}";
+				var p = exporter.Parameters[0];
+
+				var param0 = $"{p.TypeAnalysis.FullNamespace}.{p.TypeAnalysis.Name} {p.Name}";
 				var signature = $"public void {exporter.Name}({param0})";
 				chunk.AppendLine(signature);
 
@@ -92,7 +93,7 @@ namespace Imfact.Steps.Writing
 				{
 					foreach (var item in exporter.Items)
 					{
-						block.AppendLine($"{exporter.Name}<{item.InterfaceType.Name}, {item.ConcreteType.Name}>({exporter.Parameters[0].Name}, () => {item.MethodName}());");
+						block.AppendLine($"{exporter.Name}<{item.InterfaceType.Name}, {item.ConcreteType.Name}>({p.Name}, () => {item.MethodName}());");
 					}
 				});
 			});

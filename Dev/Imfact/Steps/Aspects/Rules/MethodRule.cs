@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Imfact.Annotations;
 using Imfact.Entities;
@@ -80,6 +81,7 @@ namespace Imfact.Steps.Aspects.Rules
 
 			var parameters = GetParameters(syntax);
 
+			Debugger.Break();
 			if (parameters.Length != 2
 				&& parameters[1].Name != $"Func"
 				&& parameters[1].Type.TypeArguments[0].Name == typeParameters[0].Name)
