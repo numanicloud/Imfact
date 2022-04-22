@@ -146,7 +146,7 @@ namespace Imfact.Annotations
 
 	public interface IServiceImporter
 	{
-		void Import<TInterface>(Func<TInterface> resolver);
+		void Import<TInterface>(Func<TInterface> resolver) where TInterface : class;
 	}
 }
 ";
