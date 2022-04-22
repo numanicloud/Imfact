@@ -23,6 +23,7 @@ namespace Imfact.TestSubject
 	[Factory]
 	internal partial class Factory3
 	{
+
 		[Resolution(typeof(Hoge))]
 		public partial IHoge ResolveHoge();
 
@@ -34,18 +35,6 @@ namespace Imfact.TestSubject
 
 		[Resolution(typeof(Hoge))]
 		public partial IHoge ResolveHoge4();
-
-		[Exporter]
-		public void Register<TInterface>(Registerer registerer, Func<TInterface> func)
-		{
-			registerer.Register<TInterface>(func());
-		}
-
-		[Exporter] 
-		public void Register2<TInterface>(Registerer2 registerer2, Func<TInterface> func)
-		{
-			registerer2.Register<TInterface>(func());
-		}
 	}
 }
 

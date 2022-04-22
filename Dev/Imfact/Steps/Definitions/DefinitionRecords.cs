@@ -12,7 +12,7 @@ namespace Imfact.Steps.Definitions
 	internal record Namespace(string Name, Class Class);
 
 	internal record Class(string Name, MethodInfo[] Methods,
-		Field[] Fields, DisposableInfo DisposableInfo, Exporter[] Exporters);
+		Field[] Fields, DisposableInfo DisposableInfo, ExporterItem[] Exporters);
 
 	internal record Property(string Name);
 

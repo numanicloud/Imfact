@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
@@ -141,6 +142,11 @@ namespace Imfact.Annotations
 	[AttributeUsage(AttributeTargets.Method, Inherited = false)]
 	public sealed class ExporterAttribute : Attribute
 	{
+	}
+
+	public interface IServiceImporter
+	{
+		void Import<TInterface>(Func<TInterface> resolver);
 	}
 }
 ";

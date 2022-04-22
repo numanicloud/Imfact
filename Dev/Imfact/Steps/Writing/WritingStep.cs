@@ -71,9 +71,21 @@ namespace Imfact.Steps.Writing
 						RenderMethod(method, seqOuter);
 					}
 
-					foreach (var exporter in @class.Exporters)
+					RenderExporter(seqOuter, @class.Exporters);
+				});
+			});
+		}
+
+		private void RenderExporter(ICodeBuilder builder, ExporterItem[] exports) 
+		{
+			builder.EnterChunk(chunk =>
+			{
+				chunk.AppendLine($"public void Export(Imfact.Annotations.IServiceImporter importer)");
+				chunk.EnterBlock(block =>
+				{
+					foreach (var item in exports)
 					{
-						RenderExporter(exporter, seqOuter);
+						block.AppendLine($"importer.Import<{item.InterfaceType.Name}>(() => {item.MethodName}());");
 					}
 				});
 			});

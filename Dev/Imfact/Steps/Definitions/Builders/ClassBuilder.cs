@@ -32,22 +32,14 @@ namespace Imfact.Steps.Definitions.Builders
 				BuildExporters());
 		}
 
-		private Exporter[] BuildExporters()
+		private ExporterItem[] BuildExporters()
 		{
 			using var profiler = TimeProfiler.Create("Extract-Exporter-Definitions");
-			var items = _dependency.Resolvers
+			return _dependency.Resolvers
+				.Where(x => !x.Parameters.Any())
 				.Select(x =>
 					new ExporterItem(x.ReturnType, x.ActualResolution.TypeName, x.MethodName))
 				.ToArray();
-
-			return _semantics.Factory.Exporters
-				.Select(x => new Exporter(x.MethodName, x.Parameters.Select(BuildParameter).ToArray(), items))
-				.ToArray();
-
-			Parameter BuildParameter(Semanticses.Records.Parameter parameter)
-			{
-				return new Parameter(parameter.Type, parameter.ParameterName, false);
-			}
 		}
 
 		private MethodInfo[] BuildMethods()

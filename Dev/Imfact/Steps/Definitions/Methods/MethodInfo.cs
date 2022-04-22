@@ -4,7 +4,8 @@ using Imfact.Utilities;
 
 namespace Imfact.Steps.Definitions.Methods
 {
-	internal record MethodInfo(Signature Signature, Implementation Implementation);
+	internal record MethodInfo(Signature Signature,
+		Implementation Implementation);
 
 	internal abstract record Signature
 	{
@@ -25,5 +26,13 @@ namespace Imfact.Steps.Definitions.Methods
 	internal abstract record Implementation
 	{
 		public abstract void Render(IFluentCodeBuilder builder, IResolverWriter writer);
+	}
+
+	internal sealed record ResolverExport(string InterfaceType, string MethodName)
+	{
+		public string GetExportString()
+		{
+			return $"importer.Import<{InterfaceType}>(() => {MethodName}())";
+		}
 	}
 }
