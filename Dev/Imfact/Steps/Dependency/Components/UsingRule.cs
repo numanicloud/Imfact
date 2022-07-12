@@ -13,6 +13,7 @@ namespace Imfact.Steps.Dependency.Components
 		public string[] Extract(SemanticsResult semantics, InjectionResult injection, DisposableInfo disposableInfo)
 		{
 			return Stage1(semantics, injection, disposableInfo)
+				.Where(x => !string.IsNullOrEmpty(x))
 				.Distinct()
 				.OrderBy(x => x)
 				.ToArray();
