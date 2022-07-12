@@ -33,6 +33,7 @@ namespace Imfact.Steps.Aspects.Rules
 		{
 			return new(TypeAnalysis.FromSymbol(symbol),
 				baseClasses,
+				ExtractInterfaces(symbol),
 				GetMethodAspects(symbol, partialOnly: true),
 				GetPropertyAspects(syntax), null,
 				GetExporterAspects(symbol));
@@ -46,10 +47,18 @@ namespace Imfact.Steps.Aspects.Rules
 			return new(
 				TypeAnalysis.FromSymbol(symbol),
 				new ClassAspect[0],
+				ExtractInterfaces(symbol),
 				GetMethodAspects(symbol, false),
 				GetPropertyAspects(syntax),
 				GetConstructor(symbol),
 				GetExporterAspects(symbol));
+		}
+
+		private InterfaceAspect[] ExtractInterfaces(INamedTypeSymbol thisSymbol)
+		{
+			return thisSymbol.AllInterfaces
+				.Select(x => new InterfaceAspect(TypeAnalysis.FromSymbol(x)))
+				.ToArray();
 		}
 
 		private ClassAspect[] ExtractBases(INamedTypeSymbol thisSymbol)

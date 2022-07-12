@@ -26,7 +26,9 @@ namespace Imfact.Steps.Dependency.Interfaces
 		public string GetVariableName(Factory source) => "this";
 
 		public Factory[] GetDelegationSource()
-			=> _semantics.Factory.WrapByArray();
+		{
+			return _semantics.Factory.WrapByArray();
+		}
 
 		public bool IsAvailable<TResolver>(TResolver source) where TResolver : IResolverSemantics
 		{

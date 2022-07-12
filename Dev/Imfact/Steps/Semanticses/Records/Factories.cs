@@ -19,5 +19,8 @@ namespace Imfact.Steps.Semanticses.Records
 
 	internal record FactoryCommon(TypeAnalysis Type,
 		Resolver[] Resolvers,
-		MultiResolver[] MultiResolvers) : IFactorySemantics;
+		MultiResolver[] MultiResolvers,
+		Implementation[] Implementations) : IFactorySemantics;
+
+	internal record Implementation(TypeAnalysis Type);
 }

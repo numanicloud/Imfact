@@ -10,6 +10,7 @@ using Imfact.Steps.Semanticses.Interfaces;
 using Imfact.Steps.Semanticses.Records;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
+using Implementation = Imfact.Steps.Definitions.Methods.Implementation;
 
 namespace Imfact.Steps.Definitions.Builders
 {

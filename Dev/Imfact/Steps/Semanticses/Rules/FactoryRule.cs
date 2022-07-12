@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Imfact.Entities;
 using Imfact.Steps.Aspects;
 using Imfact.Steps.Semanticses.Records;
@@ -16,18 +17,26 @@ namespace Imfact.Steps.Semanticses.Rules
 
 		public Factory ExtractFactory(ClassAspect aspect)
 		{
-			var common = GetFactoryCommon(aspect.Type, aspect.Methods);
+			var common = GetFactoryCommon(aspect.Type, aspect.Methods, ExtractImplementations(aspect));
 			return new Factory(common,
 				ExtractDelegations(aspect.Properties),
 				ExtractInheritance(aspect.BaseClasses),
 				_resolverRule.ExtractExporters(aspect.Exporters));
 		}
 
-		private FactoryCommon GetFactoryCommon(TypeAnalysis type, MethodAspect[] methods)
+		private static Implementation[] ExtractImplementations(ClassAspect aspect)
+		{
+			return aspect.Implements
+				.Select(x => new Implementation(x.Type))
+				.ToArray();
+		}
+
+		private FactoryCommon GetFactoryCommon(TypeAnalysis type, MethodAspect[] methods, Implementation[] implementations)
 		{
 			return new FactoryCommon(type,
 				_resolverRule.ExtractResolver(methods),
-				_resolverRule.ExtractMultiResolver(methods));
+				_resolverRule.ExtractMultiResolver(methods),
+				implementations);
 		}
 
 		private Inheritance[] ExtractInheritance(ClassAspect[] baseClasses)
@@ -38,7 +47,7 @@ namespace Imfact.Steps.Semanticses.Rules
 					.Select(y => new Parameter(y.Type, y.Name))
 					.ToArray();
 				return new Inheritance(
-					GetFactoryCommon(x.Type, x.Methods),
+					GetFactoryCommon(x.Type, x.Methods, ExtractImplementations(x)),
 					parameters ?? new Parameter[0]);
 			}).ToArray();
 		}
@@ -51,7 +60,8 @@ namespace Imfact.Steps.Semanticses.Rules
 						.Any(y => y.Name == "RegisterService"
 							&& y.Parameters.Length == 1
 							&& y.Parameters[0].Type.FullBoundName == "Imfact.Annotations.ResolverService");
-					return new Delegation(GetFactoryCommon(x.Type, x.MethodsInType), x.Name, hasRegisterService);
+					var common = GetFactoryCommon(x.Type, x.MethodsInType, Array.Empty<Implementation>());
+					return new Delegation(common, x.Name, hasRegisterService);
 				})
 				.ToArray();
 		}

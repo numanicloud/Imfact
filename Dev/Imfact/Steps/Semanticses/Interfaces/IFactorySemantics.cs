@@ -8,5 +8,6 @@ namespace Imfact.Steps.Semanticses.Interfaces
 		TypeAnalysis Type { get; }
 		Resolver[] Resolvers { get; }
 		MultiResolver[] MultiResolvers { get; }
+		Implementation[] Implementations { get; }
 	}
 }

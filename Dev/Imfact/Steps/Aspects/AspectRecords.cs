@@ -15,10 +15,13 @@ namespace Imfact.Steps.Aspects
 
 	internal record ClassAspect(TypeAnalysis Type,
 		ClassAspect[] BaseClasses,
+		InterfaceAspect[] Implements,
 		MethodAspect[] Methods,
 		PropertyAspect[] Properties,
 		ConstructorAspect? KnownConstructor,
 		ExporterAspect[] Exporters);
+
+	internal record InterfaceAspect(TypeAnalysis Type);
 
 	internal record ConstructorAspect(
 		Accessibility Accessibility,
