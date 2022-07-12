@@ -46,7 +46,13 @@ namespace Imfact.Steps.Semanticses.Rules
 		private Delegation[] ExtractDelegations(PropertyAspect[] properties)
 		{
 			return properties.Select(x =>
-				new Delegation(GetFactoryCommon(x.Type, x.MethodsInType), x.Name))
+				{
+					var hasRegisterService = x.MethodsInType
+						.Any(y => y.Name == "RegisterService"
+							&& y.Parameters.Length == 1
+							&& y.Parameters[0].Type.FullBoundName == "Imfact.Annotations.ResolverService");
+					return new Delegation(GetFactoryCommon(x.Type, x.MethodsInType), x.Name, hasRegisterService);
+				})
 				.ToArray();
 		}
 	}

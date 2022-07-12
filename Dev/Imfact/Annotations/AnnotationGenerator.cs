@@ -11,7 +11,7 @@ namespace Imfact.Annotations
 		private const string annotationText = @"using System;
 namespace Imfact.Annotations
 {
-	[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
 	public sealed class FactoryAttribute : Attribute
 	{
 	}

@@ -19,7 +19,7 @@ namespace Imfact.TestSubject.DelegationWithParameter
 	{
 		private readonly Service _service;
 
-		public FactoryToDelegate(Service service) : base(1)
+		public FactoryToDelegate(Service service)
 		{
 			_service = service;
 		}
@@ -28,9 +28,9 @@ namespace Imfact.TestSubject.DelegationWithParameter
 	}
 
 	[Factory]
-	internal partial class BaseFactory
+	internal abstract partial class BaseFactory
 	{
-		public virtual partial Service ResolveService();
+		public abstract Service ResolveService();
 	}
 
 	[Factory]

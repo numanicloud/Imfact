@@ -2,7 +2,7 @@
 using Imfact.Annotations;
 using Imfact.Test;
 
-namespace Imfact.TestSubject
+namespace Imfact.TestSubject.Objects3
 {
 	public interface IHoge
 	{

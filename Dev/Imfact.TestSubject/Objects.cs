@@ -1,22 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Deptorygen2.TestSubject.Sub;
+using Deptorygen2.TestSubject.Objects.Sub;
 using Imfact.Annotations;
 
-namespace Deptorygen
-{
-	class Placeholder
-	{
-	}
-}
-
-namespace ImfactSample
-{
-
-}
-
-namespace Deptorygen2.TestSubject
+namespace Deptorygen2.TestSubject.Objects
 {
 	/* Deptorygen2 機能一覧
 	 * リゾルバー生成
@@ -158,7 +146,7 @@ namespace Deptorygen2.TestSubject
 	
 }
 
-namespace Deptorygen2.TestSubject.Sub
+namespace Deptorygen2.TestSubject.Objects.Sub
 {
 	public class Service
 	{

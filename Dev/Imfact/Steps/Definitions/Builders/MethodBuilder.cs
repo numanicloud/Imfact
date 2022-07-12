@@ -48,6 +48,7 @@ namespace Imfact.Steps.Definitions.Builders
 				new string[0]);
 
 			var p = delegations
+				.Where(x => x.HasRegisterServiceMethod)
 				.Select(x => new Property(x.PropertyName))
 				.ToArray();
 

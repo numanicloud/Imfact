@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Imfact.Annotations;
 
-namespace Imfact.TestSubject2
+namespace Imfact.TestSubject2.Objects2
 {
 	interface IPika<T>
 	{
