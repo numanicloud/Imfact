@@ -41,7 +41,7 @@ namespace Imfact.Steps.Aspects.Rules
 				GetKind(),
 				GetReturnType(returnSymbol),
 				GetAttributes(symbol, returnSymbol),
-				GetParameters(syntax));
+				GetParameters(symbol));
 
 			ResolverKind GetKind()
 			{
@@ -81,7 +81,7 @@ namespace Imfact.Steps.Aspects.Rules
 				return null;
 			}
 
-			var parameters = GetParameters(syntax);
+			var parameters = GetParameters(symbol);
 			
 			if (parameters.Length != 2
 				&& parameters[1].Name != $"Func"
@@ -91,7 +91,7 @@ namespace Imfact.Steps.Aspects.Rules
 			}
 
 			return new ExporterAspect(symbol.Name,
-				GetParameters(syntax),
+				GetParameters(symbol),
 				typeParameters);
 		}
 
@@ -100,6 +100,13 @@ namespace Imfact.Steps.Aspects.Rules
 			return syntax.ParameterList.Parameters
 				.Select(ExtractParameter)
 				.FilterNull()
+				.ToArray();
+		}
+
+		private ParameterAspect[] GetParameters(IMethodSymbol symbol)
+		{
+			return symbol.Parameters
+				.Select(p => new ParameterAspect(TypeAnalysis.FromSymbol(p.Type), p.Name))
 				.ToArray();
 		}
 
