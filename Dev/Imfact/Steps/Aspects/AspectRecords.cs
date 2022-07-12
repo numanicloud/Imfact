@@ -39,7 +39,8 @@ namespace Imfact.Steps.Aspects
 		ParameterAspect[] Parameters,
 		TypeAnalysis[] TypeParameters);
 
-	internal record PropertyAspect(TypeAnalysis Type, string Name, MethodAspect[] MethodsInType);
+	internal record PropertyAspect(TypeAnalysis Type, string Name,
+		MethodAspect[] MethodsInType, bool IsAutoImplemented);
 
 	internal record ParameterAspect(TypeAnalysis Type, string Name);
 

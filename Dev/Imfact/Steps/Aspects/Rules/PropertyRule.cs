@@ -47,9 +47,14 @@ namespace Imfact.Steps.Aspects.Rules
 					return mm is null ? null : _methodRule.ExtractAspect(mm, m);
 				}).FilterNull().ToArray();
 
+			var fields = symbol.ContainingType.GetMembers().OfType<IFieldSymbol>();
+			var isAutoImplemented = fields
+				.Any(f => SymbolEqualityComparer.Default.Equals(f.AssociatedSymbol, symbol));
+
 			return new PropertyAspect(TypeAnalysis.FromSymbol(symbol.Type),
 				symbol.Name,
-				methods);
+				methods,
+				isAutoImplemented);
 		}
 	}
 }

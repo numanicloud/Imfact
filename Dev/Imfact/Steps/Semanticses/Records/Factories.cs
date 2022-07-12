@@ -8,7 +8,8 @@ namespace Imfact.Steps.Semanticses.Records
 		Inheritance[] Inheritances, Exporter[] Exporters)
 		: FactoryCommon(Common);
 
-	internal record Delegation(FactoryCommon Common, string PropertyName, bool HasRegisterServiceMethod)
+	internal record Delegation(FactoryCommon Common, string PropertyName,
+		bool HasRegisterServiceMethod, bool NeedsInitialize)
 		: FactoryCommon(Common), IVariableSemantics
 	{
 		public string MemberName => PropertyName;

@@ -61,7 +61,7 @@ namespace Imfact.Steps.Semanticses.Rules
 							&& y.Parameters.Length == 1
 							&& y.Parameters[0].Type.FullBoundName == "Imfact.Annotations.ResolverService");
 					var common = GetFactoryCommon(x.Type, x.MethodsInType, Array.Empty<Implementation>());
-					return new Delegation(common, x.Name, hasRegisterService);
+					return new Delegation(common, x.Name, hasRegisterService, x.IsAutoImplemented);
 				})
 				.ToArray();
 		}

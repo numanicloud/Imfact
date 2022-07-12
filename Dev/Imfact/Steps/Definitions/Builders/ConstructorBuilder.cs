@@ -25,6 +25,7 @@ namespace Imfact.Steps.Definitions.Builders
 				.ToArray();
 
 			var ps = _dependency.Delegations
+				.Where(x => x.NeedsInitialize)
 				.Select(x => new Initialization(x.Type, x.PropertyName, x.PropertyName))
 				.Select(x => x with { ParamName = x.ParamName.ToLowerCamelCase() })
 				.ToArray();
