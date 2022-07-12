@@ -80,12 +80,12 @@ namespace Imfact.Steps.Writing
 		{
 			builder.EnterChunk(chunk =>
 			{
-				chunk.AppendLine($"public void Export(Imfact.Annotations.IServiceImporter importer)");
+				chunk.AppendLine($"internal void Export(Imfact.Annotations.IServiceImporter importer)");
 				chunk.EnterBlock(block =>
 				{
 					foreach (var item in exports)
 					{
-						block.AppendLine($"importer.Import<{item.InterfaceType.Name}>(() => {item.MethodName}());");
+						block.AppendLine($"importer.Import<{item.InterfaceType.FullBoundName}>(() => {item.MethodName}());");
 					}
 				});
 			});

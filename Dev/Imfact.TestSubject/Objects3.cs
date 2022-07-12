@@ -12,7 +12,21 @@ namespace Imfact.TestSubject
 	{
 	}
 
-	public class Registerer
+	public class Fuga
+	{
+		public Fuga(IHoge hoge)
+		{
+		}
+	}
+
+	public class Piyo
+	{
+		public Piyo(Fuga fuga)
+		{
+		}
+	}
+
+	internal class Registerer
 	{
 		public void Register<TInterface>(TInterface arg)
 		{
@@ -36,13 +50,26 @@ namespace Imfact.TestSubject
 		[Resolution(typeof(Hoge))]
 		public partial IHoge ResolveHoge4();
 	}
+
+	[Factory]
+	internal partial class Factory1
+	{
+		private Factory3 Factory3 { get; }
+		public partial Fuga ResolveFuga();
+	}
+
+	[Factory]
+	internal partial class Factory2 : Factory1
+	{
+		public partial Piyo ResolvePiyo();
+	}
 }
 
 namespace Imfact.Test
 {
 
 
-	public class Registerer2
+	internal class Registerer2
 	{
 		public void Register<TInterface>(TInterface arg)
 		{

@@ -17,7 +17,7 @@ namespace Imfact.Annotations
 	}
 
 	[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
-	public sealed class ResolutionAttribute : Attribute
+	internal sealed class ResolutionAttribute : Attribute
 	{
 		public Type Type { get; }
 
@@ -28,7 +28,7 @@ namespace Imfact.Annotations
 	}
 
 	[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
-	public sealed class HookAttribute : Attribute
+	internal sealed class HookAttribute : Attribute
 	{
 		public Type Type { get; }
 
@@ -125,26 +125,26 @@ namespace Imfact.Annotations
 	}
 
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-	public class CacheAttribute : Attribute
+	internal class CacheAttribute : Attribute
 	{
 	}
 
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-	public class CachePerResolutionAttribute : Attribute
+	internal class CachePerResolutionAttribute : Attribute
 	{
 	}
 
 	[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-	public sealed class TransientAttribute : Attribute
+	internal sealed class TransientAttribute : Attribute
 	{
 	}
 
 	[AttributeUsage(AttributeTargets.Method, Inherited = false)]
-	public sealed class ExporterAttribute : Attribute
+	internal sealed class ExporterAttribute : Attribute
 	{
 	}
 
-	public interface IServiceImporter
+	internal interface IServiceImporter
 	{
 		void Import<TInterface>(Func<TInterface> resolver) where TInterface : class;
 	}

@@ -38,6 +38,7 @@ namespace Imfact.Steps.Definitions.Builders
 		{
 			var parameters = fs.Concat(ps)
 				.Select(x => _service.BuildParameter(x.Type, x.ParamName))
+				.OrderBy(x => x.Name)
 				.ToArray();
 
 			var baseParameters = _dependency.Inheritances
