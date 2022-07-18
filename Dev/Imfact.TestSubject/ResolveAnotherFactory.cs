@@ -23,19 +23,25 @@ internal interface IResolveAnotherFactory
 {
 }
 
+[Factory]
+internal interface IAnotherFactory
+{
+}
+
 internal interface IContext
 {
 }
 
 [Factory]
-internal partial class AnotherFactory
+internal partial class ResolveAnotherFactory : IResolveAnotherFactory
 {
-	public IResolveAnotherFactory Resolver { get; }
-	public partial Service ResolveService();
+	[Resolution(typeof(AnotherFactory))]
+	public partial IAnotherFactory ResolveAnother(IContext context);
 }
 
 [Factory]
-internal partial class ResolveAnotherFactory : IResolveAnotherFactory
+internal partial class AnotherFactory : IAnotherFactory
 {
-	public partial AnotherFactory ResolveAnother(IContext context);
+	public IResolveAnotherFactory Resolver { get; }
+	public partial Service ResolveService();
 }

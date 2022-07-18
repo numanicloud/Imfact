@@ -13,6 +13,7 @@ namespace Imfact.Steps.Ranking
 	internal class RankingStep
 	{
 		private static readonly AttributeName FactoryAttribute = new(nameof(Annotations.FactoryAttribute));
+		private static readonly AttributeName ResolutionAttribute = new(nameof(Annotations.ResolutionAttribute));
 
 		public RankedClass[] Run(CandidateClass[] classes)
 		{
@@ -39,7 +40,7 @@ namespace Imfact.Steps.Ranking
 			while (notRank0.Any())
 			{
 				var nextRank = notRank0
-					.Where(x => ranks[reference].Any(y => y.IsDerivedBy(x)))
+					.Where(x => ranks[reference].Any(y => y.IsDerivedBy(x) || x.HasResolverOf(y)))
 					.ToList();
 
 				ranks[reference + 1] = nextRank;
@@ -62,13 +63,29 @@ namespace Imfact.Steps.Ranking
 		private static (List<Relation> rank0, List<Relation> notRank0) ExtractRank0(Relation[] relations)
 		{
 			using var profiler = TimeProfiler.Create("Extract-Rank0-Ranking");
-			var rank0 = relations
-				.Where(x => x.BaseSymbol?.SpecialType == SpecialType.System_Object)
-				.ToList();
-			var notRank0 = relations
-				.Where(x => x.BaseSymbol is { } b && b.SpecialType != SpecialType.System_Object)
-				.ToList();
-			return (rank0, notRank0);
+
+			var marked = relations
+				.Select(x =>
+				{
+					var hasBaseType = x.BaseSymbol is { } b &&
+						b.SpecialType != SpecialType.System_Object;
+					var hasResolverForFactory = HasResolverForFactory(x);
+					return (hasBaseType || hasResolverForFactory, x);
+				}).ToArray();
+
+			return (marked.Where(x => !x.Item1).Select(x => x.x).ToList(),
+				marked.Where(x => x.Item1).Select(x => x.x).ToList());
+
+			bool HasResolverForFactory(Relation target)
+			{
+				return target.Symbol.GetMembers()
+					.OfType<IMethodSymbol>()
+					.Where(m => m.DeclaringSyntaxReferences
+						.Select(x => x.GetSyntax())
+						.OfType<MethodDeclarationSyntax>()
+						.Any())
+					.Any(x => IsFactoryResolver(x) is not null);
+			}
 		}
 
 		private static Relation[] AnalyzeRelations(CandidateClass[] factoryClasses)
@@ -99,12 +116,56 @@ namespace Imfact.Steps.Ranking
 			}).ToArray();
 		}
 
+		private static ITypeSymbol? IsFactoryResolver(IMethodSymbol method)
+		{
+			var returnFactory = method.ReturnType.GetAttributes()
+				.Any(a => a.AttributeClass is { } ac &&
+					FactoryAttribute.MatchWithAnyName(ac.Name));
+			if (returnFactory && method.ReturnType.TypeKind != TypeKind.Interface)
+			{
+				return method.ReturnType;
+			}
+
+			var resolutionAttr = method.GetAttributes()
+				.FirstOrDefault(a => a.AttributeClass is { } ac &&
+					ResolutionAttribute.MatchWithAnyName(ac.Name));
+			if (resolutionAttr is null)
+			{
+				return null;
+			}
+
+			if (resolutionAttr.ConstructorArguments.Length == 1
+				&& resolutionAttr.ConstructorArguments[0].Kind == TypedConstantKind.Type
+				&& resolutionAttr.ConstructorArguments[0].Value is INamedTypeSymbol type)
+			{
+				var isFactory = type.GetAttributes()
+					.Any(a => a.AttributeClass is { } ac &&
+						FactoryAttribute.MatchWithAnyName(ac.Name));
+				if (isFactory)
+				{
+					return type;
+				}
+			}
+
+			return null;
+		}
+
 		private record Relation(ClassDeclarationSyntax Syntax, INamedTypeSymbol Symbol,
 			INamedTypeSymbol? BaseSymbol, IAnalysisContext Context)
 		{
 			public bool IsDerivedBy(Relation inheritor)
 			{
 				return SymbolEqualityComparer.Default.Equals(Symbol, inheritor.BaseSymbol);
+			}
+
+			public bool HasResolverOf(Relation resolution)
+			{
+				// TODO: IsFactoryResolverを何度も走らせると重そう、キャッシュしたい
+				return Symbol.GetMembers()
+					.OfType<IMethodSymbol>()
+					.Select(IsFactoryResolver)
+					.FilterNull()
+					.Any(t => SymbolEqualityComparer.Default.Equals(t, resolution.Symbol));
 			}
 		}
 	}
