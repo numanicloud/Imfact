@@ -49,6 +49,7 @@ namespace Imfact.Main
 		public DependencyStep Dependency(SemanticsResult semantics, FactoryDependencyContext factoryDependency)
 		{
 			var crawler = new CreationCrawler(GetCreations(semantics, factoryDependency), factoryDependency);
+			factoryDependency.RegisterFactoryDelegation(semantics.Factory);
 			return new DependencyStep(semantics, crawler);
 		}
 

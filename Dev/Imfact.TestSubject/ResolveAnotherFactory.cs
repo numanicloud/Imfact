@@ -9,7 +9,7 @@ namespace Imfact.TestSubject.ResolveAnotherFactory;
 
 internal class Service
 {
-	public Service(Context context)
+	public Service(IContext context)
 	{
 	}
 }
@@ -19,13 +19,23 @@ internal class Context
 }
 
 [Factory]
+internal interface IResolveAnotherFactory
+{
+}
+
+internal interface IContext
+{
+}
+
+[Factory]
 internal partial class AnotherFactory
 {
+	public IResolveAnotherFactory Delegation { get; }
 	public partial Service ResolveService();
 }
 
 [Factory]
-internal partial class ResolveAnotherFactory
+internal partial class ResolveAnotherFactory : IResolveAnotherFactory
 {
-	public partial AnotherFactory ResolveAnother();
+	public partial AnotherFactory ResolveAnother(IContext context);
 }

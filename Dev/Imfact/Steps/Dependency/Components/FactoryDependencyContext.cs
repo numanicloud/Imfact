@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Imfact.Entities;
+using Imfact.Steps.Semanticses.Interfaces;
 using Imfact.Steps.Semanticses.Records;
 using Imfact.Utilities;
 
@@ -8,7 +9,21 @@ namespace Imfact.Steps.Dependency.Components;
 
 internal class FactoryDependencyContext
 {
+	// TODO: TypeAnalysisではなくTypeIdをKeyに使う
 	private readonly Dictionary<TypeAnalysis, List<UnsatisfiedField>> _factoryFields = new();
+
+	public void RegisterFactoryDelegation(Factory semantics)
+	{
+		var fields = semantics.Delegations.Where(x => x.NeedsInitialize)
+			.Select(x => new UnsatisfiedField(x.Type, x.MemberName));
+
+		if (!_factoryFields.ContainsKey(semantics.Type))
+		{
+			_factoryFields[semantics.Type] = new List<UnsatisfiedField>();
+		}
+
+		_factoryFields[semantics.Type].AddRange(fields);
+	}
 
 	public UnsatisfiedField RegisterUnsatisfied(TypeAnalysis type, CreationContext context)
 	{
@@ -32,11 +47,13 @@ internal class FactoryDependencyContext
 		// 依存関係以外のコンストラクタ引数が0個である前提で処理する
 		if (_factoryFields.ContainsKey(resolution.TypeName))
 		{
+			var dependencies = _factoryFields[resolution.TypeName]
+				.Select(x => x.Type)
+				.Distinct();
 			return source with
 			{
 				TypeToResolve = source.TypeToResolve
-					.Concat(_factoryFields[resolution.TypeName]
-						.Select(x => x.Type))
+					.Concat(dependencies)
 					.ToArray()
 			};
 		}
