@@ -30,7 +30,7 @@ internal interface IContext
 [Factory]
 internal partial class AnotherFactory
 {
-	public IResolveAnotherFactory Delegation { get; }
+	public IResolveAnotherFactory Resolver { get; }
 	public partial Service ResolveService();
 }
 

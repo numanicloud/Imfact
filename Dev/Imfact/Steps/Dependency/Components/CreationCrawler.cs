@@ -4,18 +4,16 @@ using Imfact.Entities;
 using Imfact.Steps.Dependency.Interfaces;
 using Imfact.Steps.Semanticses.Interfaces;
 using Imfact.Steps.Semanticses.Records;
+using Imfact.Utilities;
 
 namespace Imfact.Steps.Dependency.Components
 {
 	internal class CreationCrawler
 	{
-		private readonly FactoryDependencyContext _factoryDependency;
 		private readonly IExpressionStrategy[] _strategies;
 
-		public CreationCrawler(IEnumerable<IExpressionStrategy> strategies,
-			FactoryDependencyContext factoryDependency)
+		public CreationCrawler(IEnumerable<IExpressionStrategy> strategies)
 		{
-			_factoryDependency = factoryDependency;
 			_strategies = strategies.ToArray();
 		}
 
@@ -27,12 +25,17 @@ namespace Imfact.Steps.Dependency.Components
 
 				yield return _strategies.Select(x => x.GetExpression(context))
 					.FirstOrDefault(x => x is not null)
-					?? _factoryDependency.RegisterUnsatisfied(type, context);
+					?? new UnsatisfiedField(type, ToFieldName(type));
 
 				context = context with
 				{
 					TypeToResolve = context.TypeToResolve.Skip(1).ToArray()
 				};
+			}
+
+			static string ToFieldName(TypeAnalysis type)
+			{
+				return "_" + type.Name.ToLowerCamelCase();
 			}
 		}
 	}

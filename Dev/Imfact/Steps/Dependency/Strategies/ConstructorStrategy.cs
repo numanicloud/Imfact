@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Imfact.Main;
 using Imfact.Steps.Dependency.Components;
 using Imfact.Steps.Dependency.Interfaces;
 using Imfact.Steps.Semanticses.Records;
@@ -8,11 +9,11 @@ namespace Imfact.Steps.Dependency.Strategies
 {
 	class ConstructorStrategy : IExpressionStrategy
 	{
-		private readonly FactoryDependencyContext _factoryDependency;
+		private readonly GenerationContext _genContext;
 
-		public ConstructorStrategy(FactoryDependencyContext factoryDependency)
+		public ConstructorStrategy(GenerationContext genContext)
 		{
-			_factoryDependency = factoryDependency;
+			_genContext = genContext;
 		}
 
 		public ICreationNode? GetExpression(CreationContext context)
@@ -38,14 +39,25 @@ namespace Imfact.Steps.Dependency.Strategies
 
 		private IEnumerable<ICreationNode> GetArgs(Resolution resolution, CreationContext context)
 		{
-			var childContext = context with
+			if (_genContext.Constructors.ContainsKey(resolution.TypeName.Id))
 			{
-				TypeToResolve = resolution.Dependencies
-			};
+				context = context with
+				{
+					TypeToResolve = _genContext.Constructors[resolution.TypeName.Id]
+						.Parameters
+						.Select(x => x.Type)
+						.ToArray(),
+				};
+			}
+			else
+			{
+				context = context with
+				{
+					TypeToResolve = resolution.Dependencies
+				};
+			}
 
-			childContext = _factoryDependency.MergeContext(resolution, childContext);
-
-			return context.Injector.GetExpression(childContext);
+			return context.Injector.GetExpression(context);
 		}
 	}
 }

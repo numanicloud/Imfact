@@ -23,19 +23,18 @@ namespace Imfact.Main
 		{
 			var ranking = new RankingStep();
 			var ranked = ranking.Run(candidates);
-			var factoryDependency = new FactoryDependencyContext();
 
 			return ranked.OrderBy(x => x.Rank)
-				.Select(x => RunGeneration(x, factoryDependency))
+				.Select(x => RunGeneration(x))
 				.FilterNull()
 				.ToArray();
 		}
 
-		private SourceFile? RunGeneration(RankedClass syntax, FactoryDependencyContext factoryDependency)
+		private SourceFile? RunGeneration(RankedClass syntax)
 		{
 			return _stepFactory.Aspect(_genContext, syntax.Context).Run(syntax)
 				.Then(aspect => _semanticsStep.Run(aspect))
-				.Then(semantics => _stepFactory.Dependency(semantics, factoryDependency).Run())
+				.Then(semantics => _stepFactory.Dependency(semantics, _genContext).Run())
 				.Then(dependency =>
 				{
 					var result = _stepFactory.Definition(dependency).Build();
