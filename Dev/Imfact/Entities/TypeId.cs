@@ -38,31 +38,4 @@ namespace Imfact.Entities
 				tpr);
 		}
 	}
-
-	internal record TypeArgId(TypeId[] Arguments)
-	{
-		public virtual bool Equals(TypeArgId? other)
-		{
-			if (other?.Arguments.Length != Arguments.Length)
-			{
-				return false;
-			}
-
-			for (int i = 0; i < Arguments.Length; i++)
-			{
-				if (other.Arguments[i] != Arguments[i])
-				{
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		public override int GetHashCode()
-		{
-			return Arguments.Aggregate(0,
-				(acc, x) => unchecked(acc * 457 + x.GetHashCode() * 389));
-		}
-	}
 }
