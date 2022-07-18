@@ -7,14 +7,14 @@ using Microsoft.CodeAnalysis;
 namespace Imfact.Entities
 {
 	// 等値性判定にはこちらを使う。追加の情報はTypeNodeに持たせる
-	internal record TypeId(string FullNamespace, string Name, TypeArgId Parameters)
+	internal record TypeId(string FullNamespace, string Name, RecordArray<TypeId> Parameters)
 	{
 		public static TypeId FromSymbol(INamedTypeSymbol symbol)
 		{
 			var args = symbol.TypeArguments
 				.Select(FromSymbol)
 				.ToArray();
-			return new(symbol.GetFullNameSpace(), symbol.Name, new TypeArgId(args));
+			return new(symbol.GetFullNameSpace(), symbol.Name, new RecordArray<TypeId>(args));
 		}
 
 		public static TypeId FromSymbol(ITypeSymbol symbol)
@@ -22,15 +22,15 @@ namespace Imfact.Entities
 			return symbol is INamedTypeSymbol nts
 				? FromSymbol(nts)
 				: symbol is ITypeParameterSymbol tps
-					? new TypeId("", tps.Name, TypeArgId.Empty)
+					? new TypeId("", tps.Name, RecordArray<TypeId>.Empty)
 					: throw new ArgumentException($"{nameof(symbol)} is not INamedTypeSymbol. This is {symbol.GetType()}.");
 		}
 
 		public static TypeId FromRuntime(Type type, TypeId[]? typeArguments = null)
 		{
 			var tpr = typeArguments is null
-				? TypeArgId.Empty
-				: new TypeArgId(typeArguments);
+				? RecordArray<TypeId>.Empty
+				: new RecordArray<TypeId>(typeArguments);
 
 			return new(
 				type.Namespace ?? "",
@@ -41,8 +41,6 @@ namespace Imfact.Entities
 
 	internal record TypeArgId(TypeId[] Arguments)
 	{
-		public static readonly TypeArgId Empty = new(new TypeId[0]);
-
 		public virtual bool Equals(TypeArgId? other)
 		{
 			if (other?.Arguments.Length != Arguments.Length)

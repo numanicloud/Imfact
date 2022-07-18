@@ -54,7 +54,8 @@ namespace Imfact.Steps.Dependency
 			var multi = _semantics.Factory.MultiResolvers;
 			foreach (var multiResolver in multi)
 			{
-				var context = new CreationContext(multiResolver,
+				var context = new CreationContext(_semantics.Factory.Type,
+					multiResolver,
 					multiResolver.Resolutions.Select(x => x.TypeName).ToArray(),
 					new List<Parameter>(),
 					_crawler);
@@ -71,7 +72,8 @@ namespace Imfact.Steps.Dependency
 			var methods = _semantics.Factory.Resolvers;
 			foreach (var method in methods)
 			{
-				var context = new CreationContext(method,
+				var context = new CreationContext(_semantics.Factory.Type,
+					method,
 					method.ActualResolution.TypeName.WrapByArray(),
 					new List<Parameter>(),
 					_crawler);

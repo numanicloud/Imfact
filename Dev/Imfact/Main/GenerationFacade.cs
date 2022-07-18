@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Imfact.Steps.Dependency.Components;
 using Imfact.Steps.Ranking;
 using Imfact.Steps.Semanticses;
 using Imfact.Steps.Writing;
@@ -22,18 +23,19 @@ namespace Imfact.Main
 		{
 			var ranking = new RankingStep();
 			var ranked = ranking.Run(candidates);
+			var factoryDependency = new FactoryDependencyContext();
 
 			return ranked.OrderBy(x => x.Rank)
-				.Select(RunGeneration)
+				.Select(x => RunGeneration(x, factoryDependency))
 				.FilterNull()
 				.ToArray();
 		}
 
-		private SourceFile? RunGeneration(RankedClass syntax)
+		private SourceFile? RunGeneration(RankedClass syntax, FactoryDependencyContext factoryDependency)
 		{
 			return _stepFactory.Aspect(_genContext, syntax.Context).Run(syntax)
 				.Then(aspect => _semanticsStep.Run(aspect))
-				.Then(semantics => _stepFactory.Dependency(semantics).Run())
+				.Then(semantics => _stepFactory.Dependency(semantics, factoryDependency).Run())
 				.Then(dependency =>
 				{
 					var result = _stepFactory.Definition(dependency).Build();

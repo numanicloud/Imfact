@@ -46,9 +46,9 @@ namespace Imfact.Main
 			return new DefinitionStep(dependency, builder);
 		}
 
-		public DependencyStep Dependency(SemanticsResult semantics)
+		public DependencyStep Dependency(SemanticsResult semantics, FactoryDependencyContext factoryDependency)
 		{
-			var crawler = new CreationCrawler(GetCreations(semantics));
+			var crawler = new CreationCrawler(GetCreations(semantics, factoryDependency), factoryDependency);
 			return new DependencyStep(semantics, crawler);
 		}
 
@@ -57,7 +57,9 @@ namespace Imfact.Main
 			return new WritingStep(definition);
 		}
 
-		private static IEnumerable<IExpressionStrategy> GetCreations(SemanticsResult semantics)
+		private static IEnumerable<IExpressionStrategy> GetCreations(
+			SemanticsResult semantics,
+			FactoryDependencyContext factoryDependency)
 		{
 			var factory = new RootFactorySource(semantics);
 			var delegation = new DelegationSource(semantics);
@@ -75,7 +77,7 @@ namespace Imfact.Main
 			yield return (factory, multiResolver).GetStrategyExp();
 			yield return (inheritance, resolver).GetStrategyExp();
 			yield return (inheritance, multiResolver).GetStrategyExp();
-			yield return new ConstructorStrategy();
+			yield return new ConstructorStrategy(factoryDependency);
 		}
 	}
 }

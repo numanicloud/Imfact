@@ -13,7 +13,7 @@ namespace Imfact.Entities
 	{
 		public string FullNamespace => Id.FullNamespace;
 		public string Name => Id.Name;
-		public TypeAnalysis[] TypeArguments { get; init; } = new TypeAnalysis[0];
+		public RecordArray<TypeAnalysis> TypeArguments { get; init; } = RecordArray<TypeAnalysis>.Empty;
 
 		public string FullBoundName => TypeArguments.Any()
 			? $"{Name}<{TypeArguments.Select(x => x.FullBoundName).Join(", ")}>"
@@ -40,7 +40,7 @@ namespace Imfact.Entities
 				symbol.DeclaredAccessibility,
 				dispose)
 			{
-				TypeArguments = typeArguments
+				TypeArguments = new RecordArray<TypeAnalysis>(typeArguments)
 			};
 		}
 
@@ -49,7 +49,7 @@ namespace Imfact.Entities
 			return symbol is INamedTypeSymbol nts
 				? FromSymbol(nts)
 				: symbol is ITypeParameterSymbol tps
-					? new TypeAnalysis(new TypeId("", tps.Name, TypeArgId.Empty), Accessibility.NotApplicable, NonDisposable)
+					? new TypeAnalysis(new TypeId("", tps.Name, RecordArray<TypeId>.Empty), Accessibility.NotApplicable, NonDisposable)
 					: throw new ArgumentException($"{nameof(symbol)} is not INamedTypeSymbol. This is {symbol.GetType()}.");
 		}
 
@@ -65,7 +65,7 @@ namespace Imfact.Entities
 				type.IsPublic ? Accessibility.Public : Accessibility.Internal,
 				dispose)
 			{
-				TypeArguments = typeArguments ?? new TypeAnalysis[0]
+				TypeArguments = new RecordArray<TypeAnalysis>(typeArguments ?? Array.Empty<TypeAnalysis>())
 			};
 		}
 

@@ -72,7 +72,7 @@ namespace Imfact.Steps.Aspects.Rules
 
 			var typeParameters = syntax.TypeParameterList?.Parameters
 				.Select(p =>
-					new TypeAnalysis(new TypeId("", p.Identifier.ValueText, TypeArgId.Empty),
+					new TypeAnalysis(new TypeId("", p.Identifier.ValueText, RecordArray<TypeId>.Empty),
 						Accessibility.NotApplicable, DisposableType.NonDisposable))
 				.ToArray() ?? Array.Empty<TypeAnalysis>();
 

@@ -8,6 +8,13 @@ namespace Imfact.Steps.Dependency.Strategies
 {
 	class ConstructorStrategy : IExpressionStrategy
 	{
+		private readonly FactoryDependencyContext _factoryDependency;
+
+		public ConstructorStrategy(FactoryDependencyContext factoryDependency)
+		{
+			_factoryDependency = factoryDependency;
+		}
+
 		public ICreationNode? GetExpression(CreationContext context)
 		{
 			var ttr = context.TypeToResolve[0].Id;
@@ -35,6 +42,9 @@ namespace Imfact.Steps.Dependency.Strategies
 			{
 				TypeToResolve = resolution.Dependencies
 			};
+
+			childContext = _factoryDependency.MergeContext(resolution, childContext);
+
 			return context.Injector.GetExpression(childContext);
 		}
 	}

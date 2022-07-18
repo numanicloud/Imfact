@@ -25,7 +25,7 @@ namespace Imfact
 		{
 			try
 			{
-				//System.Diagnostics.Debugger.Launch();
+				System.Diagnostics.Debugger.Launch();
 				AnnotationGenerator.AddSource(in context);
 
 				if (context.SyntaxReceiver is not FactorySyntaxReceiver receiver
