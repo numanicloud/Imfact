@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Imfact.Annotations;
 
-namespace Imfact.TestSubject;
+namespace Imfact.TestSubject.ResolveIntoDelegation;
 
 internal class Service
 {
@@ -26,7 +26,7 @@ internal class ResolveIntoDelegationBase : IResolveIntoDelegationBase
 [Factory]
 internal partial class ResolveIntoDelegationFactory
 {
-	public ResolveIntoDelegationBase Delegation { get; }
+	//public ResolveIntoDelegationBase Delegation { get; }
 
 	public partial Service ResolveService();
 }

@@ -15,7 +15,7 @@ namespace Imfact.TestSubject.EnumNamespace
 	internal partial class EnumNamespaceFactory
 	{
 		// 必要な時が来たら、戻り値をジェネリックに出来るようにする
-		public partial Service<Enum.MyEnum> Resolve(Enum2.MyEnum2 arg);
+		//public partial Service<Enum.MyEnum> Resolve(Enum2.MyEnum2 arg);
 	}
 }
 

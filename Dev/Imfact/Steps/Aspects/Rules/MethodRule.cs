@@ -30,7 +30,7 @@ namespace Imfact.Steps.Aspects.Rules
 		public MethodAspect? ExtractAspect(MethodDeclarationSyntax syntax, IMethodSymbol symbol, bool partialOnly = false)
 		{
 			using var profiler = TimeProfiler.Create("Extract-Method-Aspect");
-			if (!IsResolversPartial()
+			if (partialOnly && !IsResolverPartial(syntax)
 				|| symbol.ReturnType is not INamedTypeSymbol returnSymbol)
 			{
 				return null;
@@ -38,23 +38,25 @@ namespace Imfact.Steps.Aspects.Rules
 
 			return new MethodAspect(symbol.Name,
 				symbol.DeclaredAccessibility,
-				GetKind(),
+				GetKind(returnSymbol),
 				GetReturnType(returnSymbol),
 				GetAttributes(symbol, returnSymbol),
 				GetParameters(symbol));
+		}
 
-			ResolverKind GetKind()
+		public MethodAspect? ExtractNotAsRootResolver(IMethodSymbol symbol)
+		{
+			if (symbol.ReturnType is not INamedTypeSymbol returnSymbol)
 			{
-				var idSymbol = returnSymbol.ConstructedFrom;
-				var typeNameValid = idSymbol.MetadataName == typeof(IEnumerable<>).Name;
-				var typeArgValid = idSymbol.TypeArguments.Length == 1;
-				return typeNameValid && typeArgValid ? ResolverKind.Multi : ResolverKind.Single;
+				return null;
 			}
 
-			bool IsResolversPartial()
-			{
-				return !partialOnly || syntax.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword));
-			}
+			return new MethodAspect(symbol.Name,
+				symbol.DeclaredAccessibility,
+				GetKind(returnSymbol),
+				GetReturnType(returnSymbol),
+				GetAttributes(symbol, returnSymbol),
+				GetParameters(symbol));
 		}
 
 		public ExporterAspect? ExtractExporterAspect
@@ -95,14 +97,6 @@ namespace Imfact.Steps.Aspects.Rules
 				typeParameters);
 		}
 
-		private ParameterAspect[] GetParameters(MethodDeclarationSyntax syntax)
-		{
-			return syntax.ParameterList.Parameters
-				.Select(ExtractParameter)
-				.FilterNull()
-				.ToArray();
-		}
-
 		private ParameterAspect[] GetParameters(IMethodSymbol symbol)
 		{
 			return symbol.Parameters
@@ -125,17 +119,17 @@ namespace Imfact.Steps.Aspects.Rules
 			return new(_typeRule.ExtractTypeToCreate(symbol), symbol.IsAbstract);
 		}
 
-		private ParameterAspect? ExtractParameter(ParameterSyntax syntax)
+		private static ResolverKind GetKind(INamedTypeSymbol returnSymbol)
 		{
-			var profiler = TimeProfiler.Create("Extract-Parameter-Aspect1");
-			if (syntax.Type is null || _context.GetTypeSymbol(syntax.Type) is not { } symbol)
-			{
-				return null;
-			}
-			profiler.Dispose();
+			var idSymbol = returnSymbol.ConstructedFrom;
+			var typeNameValid = idSymbol.MetadataName == typeof(IEnumerable<>).Name;
+			var typeArgValid = idSymbol.TypeArguments.Length == 1;
+			return typeNameValid && typeArgValid ? ResolverKind.Multi : ResolverKind.Single;
+		}
 
-			using var profiler2 = TimeProfiler.Create("Extract-Parameter-Aspect2");
-			return new ParameterAspect(TypeAnalysis.FromSymbol(symbol), symbol.Name);
+		private static bool IsResolverPartial(MethodDeclarationSyntax syntax)
+		{
+			return syntax.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword));
 		}
 	}
 }

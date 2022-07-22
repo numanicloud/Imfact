@@ -37,15 +37,9 @@ namespace Imfact.Steps.Aspects.Rules
 			}
 
 			var methods = symbol.Type.GetMembers().OfType<IMethodSymbol>()
-				.Select(m =>
-				{
-					// SyntaxからSymbolを引くことができるのは、シンボルが同一のファイル内にある場合だけ
-					var mm = m.DeclaringSyntaxReferences
-						.Select(x => x.GetSyntax())
-						.OfType<MethodDeclarationSyntax>()
-						.FirstOrDefault();
-					return mm is null ? null : _methodRule.ExtractAspect(mm, m);
-				}).FilterNull().ToArray();
+				.Select(m => _methodRule.ExtractNotAsRootResolver(m))
+				.FilterNull()
+				.ToArray();
 
 			var fields = symbol.ContainingType.GetMembers().OfType<IFieldSymbol>();
 			var isAutoImplemented = fields

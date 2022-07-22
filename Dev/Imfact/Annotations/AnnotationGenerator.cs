@@ -12,7 +12,7 @@ namespace Imfact.Annotations
 namespace Imfact.Annotations
 {
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
-	public sealed class FactoryAttribute : Attribute
+	internal sealed class FactoryAttribute : Attribute
 	{
 	}
 
