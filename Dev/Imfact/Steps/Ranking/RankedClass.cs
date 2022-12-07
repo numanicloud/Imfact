@@ -2,7 +2,7 @@
 
 namespace Imfact.Steps.Ranking
 {
-	internal record RankedClass(INamedTypeSymbol Symbol,
-		INamedTypeSymbol? BaseSymbol,
+	internal record RankedClass(FactoryCandidate Self,
+		FactoryCandidate? Base,
 		int Rank);
 }

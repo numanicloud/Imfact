@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using Imfact.Annotations;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Imfact;
 
@@ -15,22 +19,48 @@ internal class IncrementalFactoryGenerator : IIncrementalGenerator
 			context.CompilationProvider
 				.Select(ExtractAnnotations);
 
-		IncrementalValuesProvider<CandidateClass> candidates =
+		IncrementalValuesProvider<FactoryCandidate> candidates =
 			context.SyntaxProvider
-				.CreateSyntaxProvider(Predicate_, Transform);
+				.CreateSyntaxProvider(Predicate, Transform)
+				.Where(x => x != null)!;
 	}
 
-	private CandidateClass Transform(GeneratorSyntaxContext context, CancellationToken arg2)
+	private FactoryCandidate? Transform(GeneratorSyntaxContext context, CancellationToken ct)
 	{
-		// CandidateClass は partial なクラス。
-		// partial なメソッドを表す CandidateMethod をCandidateClass に持たせる形で解析すると、
-		// この後のステップで Syntax を一切使わずに済んで助かるかも。
-		throw new NotImplementedException();
+		ct.ThrowIfCancellationRequested();
+		var syntax = (context.Node as TypeDeclarationSyntax)!;
+
+		var symbol = context.SemanticModel.GetDeclaredSymbol(syntax, ct);
+
+		var methods = syntax.Members
+			.OfType<MethodDeclarationSyntax>()
+			.Select(GetResolver)
+			.FilterNull()
+			.ToArray();
+
+		return symbol is not null
+			? new FactoryCandidate(symbol, methods)
+			: null;
+
+		ResolverCandidate? GetResolver(MethodDeclarationSyntax method)
+		{
+			return context.SemanticModel.GetDeclaredSymbol(method) is { } ms
+				? new ResolverCandidate(ms,
+					method.Modifiers.IndexOf(SyntaxKind.PartialKeyword) != -1
+					&& method.Modifiers.Any(x =>
+						x.IsKind(SyntaxKind.PublicKeyword)
+						|| x.IsKind(SyntaxKind.PrivateKeyword)
+						|| x.IsKind(SyntaxKind.ProtectedKeyword)
+						|| x.IsKind(SyntaxKind.InternalKeyword)))
+				: null;
+		}
 	}
 
-	private bool Predicate_(SyntaxNode arg1, CancellationToken arg2)
+	private bool Predicate(SyntaxNode node, CancellationToken ct)
 	{
-		throw new NotImplementedException();
+		ct.ThrowIfCancellationRequested();
+		return node is TypeDeclarationSyntax { AttributeLists.Count: > 0 } syntax
+			&& syntax.Modifiers.IndexOf(SyntaxKind.PartialKeyword) != -1;
 	}
 
 	private AnnotationContext ExtractAnnotations(Compilation compilation, CancellationToken ct)
@@ -64,11 +94,9 @@ internal class IncrementalFactoryGenerator : IIncrementalGenerator
 	}
 }
 
-public record FactoryCandidate(
-	INamedTypeSymbol Symbol,
-	ResolverCandidate[] Resolvers);
+public record FactoryCandidate(INamedTypeSymbol Symbol, ResolverCandidate[] Methods);
 
-public record ResolverCandidate(IMethodSymbol Symbol);
+public record ResolverCandidate(IMethodSymbol Symbol, bool IsToGenerate);
 
 internal sealed class AnnotationContext
 {

@@ -15,7 +15,7 @@ namespace Imfact.Main
 {
 	internal sealed class StepFactory
 	{
-		public AspectStep Aspect(GenerationContext genContext)
+		public AspectStep Aspect(GenerationContext genContext, FactoryCandidate[] factoryCandidates)
 		{
 			var typeRule = new TypeRule();
 
@@ -23,7 +23,8 @@ namespace Imfact.Main
 
 			var classRule = new ClassRule(genContext,
 				methodRule,
-				new PropertyRule(methodRule));
+				new PropertyRule(methodRule),
+				factoryCandidates);
 
 			return new AspectStep(classRule);
 		}

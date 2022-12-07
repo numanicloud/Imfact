@@ -20,12 +20,10 @@ namespace Imfact.Steps.Aspects.Rules
 			_typeRule = typeRule;
 		}
 
-		public MethodAspect? ExtractAspect(MethodDeclarationSyntax syntax, IMethodSymbol symbol, bool partialOnly = false)
+		public MethodAspect? ExtractAspect(IMethodSymbol symbol)
 		{
-			// TODO: partial判定が済んでいる情報が送られてくる前提の実装にする
 			using var profiler = TimeProfiler.Create("Extract-Method-Aspect");
-			if (partialOnly && !IsResolverPartial(syntax)
-				|| symbol.ReturnType is not INamedTypeSymbol returnSymbol)
+			if (symbol.ReturnType is not INamedTypeSymbol returnSymbol)
 			{
 				return null;
 			}
@@ -81,18 +79,6 @@ namespace Imfact.Steps.Aspects.Rules
 			var typeNameValid = idSymbol.MetadataName == typeof(IEnumerable<>).Name;
 			var typeArgValid = idSymbol.TypeArguments.Length == 1;
 			return typeNameValid && typeArgValid ? ResolverKind.Multi : ResolverKind.Single;
-		}
-
-		private static bool IsResolverPartial(MethodDeclarationSyntax syntax)
-		{
-			var hasAccessor = syntax.Modifiers.Any(x =>
-				x.IsKind(SyntaxKind.PublicKeyword)
-				|| x.IsKind(SyntaxKind.PrivateKeyword)
-				|| x.IsKind(SyntaxKind.ProtectedKeyword)
-				|| x.IsKind(SyntaxKind.InternalKeyword));
-
-			return syntax.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword))
-				&& hasAccessor;
 		}
 	}
 }

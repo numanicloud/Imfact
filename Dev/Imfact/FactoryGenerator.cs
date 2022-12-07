@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Imfact.Annotations;
+using Imfact.Entities;
 using Imfact.Main;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
@@ -77,7 +78,10 @@ public class FactoryGenerator : ISourceGenerator
         IEnumerable<ClassDeclarationSyntax> syntaxes,
         Compilation compilation)
     {
-        return syntaxes.Select(x =>
+        return syntaxes
+			.Where(x => x.AttributeLists.HasAttribute(new AttributeName(nameof(FactoryAttribute))))
+			.Where(x => x.Modifiers.IndexOf(SyntaxKind.PartialKeyword) != -1)
+			.Select(x =>
 			{
 				var semanticModel = compilation.GetSemanticModel(x.SyntaxTree);
 				return semanticModel.GetDeclaredSymbol(x) is { } symbol
@@ -91,14 +95,23 @@ public class FactoryGenerator : ISourceGenerator
 		{
 			return @class.Members
 				.OfType<MethodDeclarationSyntax>()
-				.Where(method => method.Modifiers.IndexOf(SyntaxKind.PartialKeyword) != -1)
-				.Select(x => semanticModel.GetDeclaredSymbol(x) is IMethodSymbol symbol
-					? new ResolverCandidate(symbol)
+				.Select(x => semanticModel.GetDeclaredSymbol(x) is { } symbol
+					? new ResolverCandidate(symbol, IsValidResolverModifier(x))
 					: null)
 				.FilterNull()
 				.ToArray();
 		}
-}
+
+		bool IsValidResolverModifier(MethodDeclarationSyntax method)
+		{
+			return method.Modifiers.IndexOf(SyntaxKind.PartialKeyword) != -1
+				&& method.Modifiers.Any(x =>
+					x.IsKind(SyntaxKind.PublicKeyword)
+					|| x.IsKind(SyntaxKind.PrivateKeyword)
+					|| x.IsKind(SyntaxKind.InternalKeyword)
+					|| x.IsKind(SyntaxKind.ProtectedKeyword));
+		}
+	}
 }
 
 class FactorySyntaxReceiver : ISyntaxReceiver

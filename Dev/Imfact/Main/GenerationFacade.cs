@@ -24,14 +24,15 @@ namespace Imfact.Main
 			var ranked = ranking.Run(candidates);
 
 			return ranked.OrderBy(x => x.Rank)
-				.Select(x => RunGeneration(x))
+				.Select(x => RunGeneration(x, candidates))
 				.FilterNull()
 				.ToArray();
 		}
 
-		private SourceFile? RunGeneration(RankedClass syntax)
+		private SourceFile? RunGeneration(RankedClass syntax, FactoryCandidate[] factoryCandidates)
 		{
-			return _stepFactory.Aspect(_genContext).Run(syntax)
+			return _stepFactory.Aspect(_genContext, factoryCandidates)
+				.Run(syntax)
 				.Then(aspect => _semanticsStep.Run(aspect))
 				.Then(semantics => _stepFactory.Dependency(semantics, _genContext).Run())
 				.Then(dependency =>
