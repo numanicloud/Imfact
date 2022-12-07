@@ -91,7 +91,6 @@ namespace Deptorygen2.TestSubject.Objects
 	{
 		public Consumer(Resource r, ResourceAsync ra)
 		{
-
 		}
 	}
 

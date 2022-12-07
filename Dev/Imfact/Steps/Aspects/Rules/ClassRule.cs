@@ -30,7 +30,18 @@ internal class ClassRule
 		return ExtractThis(root.Self, ExtractBases(root.Self));
 	}
 
-	private ClassAspect[] ExtractBases(FactoryCandidate factory)
+	private ClassAspect ExtractThis(FactoryCandidate factory, ClassAspect[] baseClasses)
+	{
+		var symbol = factory.Symbol;
+		return new(TypeAnalysis.FromSymbol(symbol),
+			baseClasses,
+			ExtractInterfaces(symbol),
+			GetMethodAspects(factory, partialOnly: true),
+			GetPropertyAspects(symbol),
+			null);
+	}
+
+    private ClassAspect[] ExtractBases(FactoryCandidate factory)
 	{
 		return TraverseBase(factory.Symbol)
 			.Join(_factoryCandidates,
@@ -52,17 +63,6 @@ internal class ClassRule
 				}
 			}
 		}
-	}
-
-	private ClassAspect ExtractThis(FactoryCandidate factory, ClassAspect[] baseClasses)
-	{
-		var symbol = factory.Symbol;
-		return new(TypeAnalysis.FromSymbol(symbol),
-			baseClasses,
-			ExtractInterfaces(symbol),
-			GetMethodAspects(factory, partialOnly: true),
-			GetPropertyAspects(symbol),
-			null);
 	}
 
 	// NOTE: 基底クラスのプロパティを追う必要は無いのでは？

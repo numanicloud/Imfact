@@ -13,7 +13,6 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Imfact;
 
-[Generator]
 public class FactoryGenerator : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
