@@ -2,34 +2,33 @@
 using Imfact.Entities;
 using Imfact.Utilities;
 
-namespace Imfact.Steps.Dependency.Components
+namespace Imfact.Steps.Dependency.Components;
+
+internal record CreationExpTree(ICreationNode Root);
+
+internal record MultiCreationExpTree(ICreationNode[] Roots);
+
+internal interface ICreationNode
 {
-	internal record CreationExpTree(ICreationNode Root);
+	string Code { get; }
+}
 
-	internal record MultiCreationExpTree(ICreationNode[] Roots);
+internal record Invocation(string AccessPart, ICreationNode[] Arguments) : ICreationNode
+{
+	public string Code => $"{AccessPart}({GetArgList()})";
 
-	internal interface ICreationNode
+	private string GetArgList()
 	{
-		string Code { get; }
+		return Arguments.Select(x => x.Code).Join(", ");
 	}
+}
 
-	internal record Invocation(string AccessPart, ICreationNode[] Arguments) : ICreationNode
-	{
-		public string Code => $"{AccessPart}({GetArgList()})";
+internal record Variable(string AccessExp) : ICreationNode
+{
+	public string Code => AccessExp;
+}
 
-		private string GetArgList()
-		{
-			return Arguments.Select(x => x.Code).Join(", ");
-		}
-	}
-
-	internal record Variable(string AccessExp) : ICreationNode
-	{
-		public string Code => AccessExp;
-	}
-
-	internal record UnsatisfiedField(TypeAnalysis Type, string Name) : ICreationNode
-	{
-		public string Code => Name;
-	}
+internal record UnsatisfiedField(TypeAnalysis Type, string Name) : ICreationNode
+{
+	public string Code => Name;
 }

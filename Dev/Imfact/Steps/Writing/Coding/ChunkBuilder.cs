@@ -2,31 +2,30 @@
 using System.Text;
 using Imfact.Steps.Definitions.Interfaces;
 
-namespace Imfact.Steps.Writing.Coding
+namespace Imfact.Steps.Writing.Coding;
+
+internal class ChunkBuilder : ICodeBuilder, IDisposable
 {
-	internal class ChunkBuilder : ICodeBuilder, IDisposable
+	private readonly ICodeBuilder _baseBuilder;
+	private readonly StringBuilder _stringBuilder = new ();
+
+	public ChunkBuilder(ICodeBuilder baseBuilder)
 	{
-		private readonly ICodeBuilder _baseBuilder;
-		private readonly StringBuilder _stringBuilder = new ();
+		_baseBuilder = baseBuilder;
+	}
 
-		public ChunkBuilder(ICodeBuilder baseBuilder)
+	public void Append(string text) => _stringBuilder.Append(text);
+
+	public void AppendLine(string text) => _stringBuilder.AppendLine(text);
+
+	public string GetText() => _stringBuilder.ToString();
+
+	public void Dispose()
+	{
+		var text = _stringBuilder.ToString().TrimEnd();
+		if (text != string.Empty)
 		{
-			_baseBuilder = baseBuilder;
-		}
-
-		public void Append(string text) => _stringBuilder.Append(text);
-
-		public void AppendLine(string text) => _stringBuilder.AppendLine(text);
-
-		public string GetText() => _stringBuilder.ToString();
-
-		public void Dispose()
-		{
-			var text = _stringBuilder.ToString().TrimEnd();
-			if (text != string.Empty)
-			{
-				_baseBuilder.AppendLine(text);
-			}
+			_baseBuilder.AppendLine(text);
 		}
 	}
 }

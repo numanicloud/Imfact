@@ -3,11 +3,11 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Imfact.Annotations
+namespace Imfact.Annotations;
+
+internal class AnnotationGenerator
 {
-	internal class AnnotationGenerator
-	{
-		private const string annotationText = @"using System;
+	private const string annotationText = @"using System;
 namespace Imfact.Annotations
 {
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
@@ -150,17 +150,16 @@ namespace Imfact.Annotations
 }
 ";
 
-		public static void AddSource(in GeneratorExecutionContext context)
-		{
-			context.AddSource("Annotations", SourceText.From(annotationText, Encoding.UTF8));
-		}
+	public static void AddSource(in GeneratorExecutionContext context)
+	{
+		context.AddSource("Annotations", SourceText.From(annotationText, Encoding.UTF8));
+	}
 
-		public static SyntaxTree[] GetSyntaxTrees(CSharpParseOptions options)
+	public static SyntaxTree[] GetSyntaxTrees(CSharpParseOptions options)
+	{
+		return new[]
 		{
-			return new[]
-			{
-				CSharpSyntaxTree.ParseText(SourceText.From(annotationText, Encoding.UTF8), options),
-			};
-		}
+			CSharpSyntaxTree.ParseText(SourceText.From(annotationText, Encoding.UTF8), options),
+		};
 	}
 }

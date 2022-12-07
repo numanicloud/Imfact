@@ -5,91 +5,90 @@ using Imfact.Steps.Semanticses.Records;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 
-namespace Imfact.Steps.Dependency.Interfaces
+namespace Imfact.Steps.Dependency.Interfaces;
+
+interface IFactorySource<T> where T : IFactorySemantics
 {
-	interface IFactorySource<T> where T : IFactorySemantics
+	string GetVariableName(T source);
+	T[] GetDelegationSource();
+	bool IsAvailable<TResolver>(TResolver source) where TResolver : IResolverSemantics;
+}
+
+class RootFactorySource : IFactorySource<Factory>
+{
+	private readonly SemanticsResult _semantics;
+
+	public RootFactorySource(SemanticsResult semantics)
 	{
-		string GetVariableName(T source);
-		T[] GetDelegationSource();
-		bool IsAvailable<TResolver>(TResolver source) where TResolver : IResolverSemantics;
+		this._semantics = semantics;
 	}
 
-	class RootFactorySource : IFactorySource<Factory>
+	public string GetVariableName(Factory source) => "this";
+
+	public Factory[] GetDelegationSource()
 	{
-		private readonly SemanticsResult _semantics;
-
-		public RootFactorySource(SemanticsResult semantics)
-		{
-			this._semantics = semantics;
-		}
-
-		public string GetVariableName(Factory source) => "this";
-
-		public Factory[] GetDelegationSource()
-		{
-			return _semantics.Factory.WrapByArray();
-		}
-
-		public bool IsAvailable<TResolver>(TResolver source) where TResolver : IResolverSemantics
-		{
-			return true;
-		}
+		return _semantics.Factory.WrapByArray();
 	}
 
-	class DelegationSource : IFactorySource<Delegation>
+	public bool IsAvailable<TResolver>(TResolver source) where TResolver : IResolverSemantics
 	{
-		private static readonly Accessibility[] AvailableLevels = new[]
-		{
-			Accessibility.Public,
-			Accessibility.Internal,
-			Accessibility.ProtectedOrInternal
-		};
+		return true;
+	}
+}
 
-		private readonly SemanticsResult _semantics;
+class DelegationSource : IFactorySource<Delegation>
+{
+	private static readonly Accessibility[] AvailableLevels = new[]
+	{
+		Accessibility.Public,
+		Accessibility.Internal,
+		Accessibility.ProtectedOrInternal
+	};
 
-		public DelegationSource(SemanticsResult semantics)
-		{
-			this._semantics = semantics;
-		}
+	private readonly SemanticsResult _semantics;
 
-		public string GetVariableName(Delegation source) => source.PropertyName;
-		public Delegation[] GetDelegationSource()
-			=> _semantics.Factory.Delegations;
-
-		public bool IsAvailable<TResolver>(TResolver source)
-			where TResolver : IResolverSemantics
-		{
-			return AvailableLevels.Contains(source.Accessibility);
-		}
+	public DelegationSource(SemanticsResult semantics)
+	{
+		this._semantics = semantics;
 	}
 
-	class InheritanceSource : IFactorySource<Inheritance>
+	public string GetVariableName(Delegation source) => source.PropertyName;
+	public Delegation[] GetDelegationSource()
+		=> _semantics.Factory.Delegations;
+
+	public bool IsAvailable<TResolver>(TResolver source)
+		where TResolver : IResolverSemantics
 	{
-		private static readonly Accessibility[] AvailableLevels = new[]
-		{
-			Accessibility.Public,
-			Accessibility.Internal,
-			Accessibility.ProtectedOrInternal,
-			Accessibility.Protected,
-			Accessibility.ProtectedAndInternal,
-		};
+		return AvailableLevels.Contains(source.Accessibility);
+	}
+}
 
-		private readonly SemanticsResult _semantics;
+class InheritanceSource : IFactorySource<Inheritance>
+{
+	private static readonly Accessibility[] AvailableLevels = new[]
+	{
+		Accessibility.Public,
+		Accessibility.Internal,
+		Accessibility.ProtectedOrInternal,
+		Accessibility.Protected,
+		Accessibility.ProtectedAndInternal,
+	};
 
-		public InheritanceSource(SemanticsResult semantics)
-		{
-			this._semantics = semantics;
-		}
+	private readonly SemanticsResult _semantics;
 
-		public string GetVariableName(Inheritance source) => "base";
+	public InheritanceSource(SemanticsResult semantics)
+	{
+		this._semantics = semantics;
+	}
 
-		public Inheritance[] GetDelegationSource()
-			=> _semantics.Factory.Inheritances;
+	public string GetVariableName(Inheritance source) => "base";
 
-		public bool IsAvailable<TResolver>(TResolver source)
-			where TResolver : IResolverSemantics
-		{
-			return AvailableLevels.Contains(source.Accessibility);
-		}
+	public Inheritance[] GetDelegationSource()
+		=> _semantics.Factory.Inheritances;
+
+	public bool IsAvailable<TResolver>(TResolver source)
+		where TResolver : IResolverSemantics
+	{
+		return AvailableLevels.Contains(source.Accessibility);
 	}
 }

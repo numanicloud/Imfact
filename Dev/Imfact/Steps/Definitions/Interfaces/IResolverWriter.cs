@@ -1,7 +1,6 @@
-﻿namespace Imfact.Steps.Definitions.Interfaces
+﻿namespace Imfact.Steps.Definitions.Interfaces;
+
+internal interface IResolverWriter
 {
-	internal interface IResolverWriter
-	{
-		void Render(string returnTypeName, Hook[] hooks, string expression, ICodeBuilder builder);
-	}
+	void Render(string returnTypeName, Hook[] hooks, string expression, ICodeBuilder builder);
 }

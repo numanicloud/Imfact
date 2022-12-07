@@ -5,75 +5,74 @@ using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using static Imfact.Entities.DisposableType;
 
-namespace Imfact.Entities
+namespace Imfact.Entities;
+
+internal record TypeAnalysis(TypeId Id,
+	Accessibility Accessibility,
+	DisposableType DisposableType)
 {
-	internal record TypeAnalysis(TypeId Id,
-		Accessibility Accessibility,
-		DisposableType DisposableType)
+	public string FullNamespace => Id.FullNamespace;
+	public string Name => Id.Name;
+	public RecordArray<TypeAnalysis> TypeArguments { get; init; } = RecordArray<TypeAnalysis>.Empty;
+
+	public string FullBoundName => TypeArguments.Any()
+		? $"{Name}<{TypeArguments.Select(x => x.FullBoundName).Join(", ")}>"
+		: Name;
+
+	protected virtual bool PrintMembers(StringBuilder builder)
 	{
-		public string FullNamespace => Id.FullNamespace;
-		public string Name => Id.Name;
-		public RecordArray<TypeAnalysis> TypeArguments { get; init; } = RecordArray<TypeAnalysis>.Empty;
+		builder.Append($"{Accessibility} {FullNamespace}.{FullBoundName}");
+		return true;
+	}
 
-		public string FullBoundName => TypeArguments.Any()
-			? $"{Name}<{TypeArguments.Select(x => x.FullBoundName).Join(", ")}>"
-			: Name;
+	public static TypeAnalysis FromSymbol(INamedTypeSymbol symbol)
+	{
+		var type = symbol.ConstructedFrom;
+		var dispose = IsImplementing(type, "System.IDisposable") ? Disposable
+			: IsImplementing(type, "System.IAsyncDisposable") ? AsyncDisposable
+			: NonDisposable;
 
-		protected virtual bool PrintMembers(StringBuilder builder)
+		var typeArguments = symbol.TypeArguments
+			.Select(FromSymbol)
+			.ToArray();
+
+		return new TypeAnalysis(TypeId.FromSymbol(symbol),
+			symbol.DeclaredAccessibility,
+			dispose)
 		{
-			builder.Append($"{Accessibility} {FullNamespace}.{FullBoundName}");
-			return true;
-		}
+			TypeArguments = new RecordArray<TypeAnalysis>(typeArguments)
+		};
+	}
 
-		public static TypeAnalysis FromSymbol(INamedTypeSymbol symbol)
+	public static TypeAnalysis FromSymbol(ITypeSymbol symbol)
+	{
+		return symbol is INamedTypeSymbol nts
+			? FromSymbol(nts)
+			: symbol is ITypeParameterSymbol tps
+				? new TypeAnalysis(new TypeId("", tps.Name, RecordArray<TypeId>.Empty), Accessibility.NotApplicable, NonDisposable)
+				: throw new ArgumentException($"{nameof(symbol)} is not INamedTypeSymbol. This is {symbol.GetType()}.");
+	}
+
+	public static TypeAnalysis FromRuntime(Type type, TypeAnalysis[]? typeArguments = null)
+	{
+		var dispose = type.GetInterface(nameof(IDisposable)) is not null ? Disposable
+			: type.GetInterface("IAsyncDisposable") is not null ? AsyncDisposable
+			: NonDisposable;
+
+		var args = typeArguments?.Select(x => x.Id).ToArray();
+
+		return new TypeAnalysis(TypeId.FromRuntime(type, args),
+			type.IsPublic ? Accessibility.Public : Accessibility.Internal,
+			dispose)
 		{
-			var type = symbol.ConstructedFrom;
-			var dispose = IsImplementing(type, "System.IDisposable") ? Disposable
-				: IsImplementing(type, "System.IAsyncDisposable") ? AsyncDisposable
-				: NonDisposable;
+			TypeArguments = new RecordArray<TypeAnalysis>(typeArguments ?? Array.Empty<TypeAnalysis>())
+		};
+	}
 
-			var typeArguments = symbol.TypeArguments
-				.Select(FromSymbol)
-				.ToArray();
-
-			return new TypeAnalysis(TypeId.FromSymbol(symbol),
-				symbol.DeclaredAccessibility,
-				dispose)
-			{
-				TypeArguments = new RecordArray<TypeAnalysis>(typeArguments)
-			};
-		}
-
-		public static TypeAnalysis FromSymbol(ITypeSymbol symbol)
-		{
-			return symbol is INamedTypeSymbol nts
-				? FromSymbol(nts)
-				: symbol is ITypeParameterSymbol tps
-					? new TypeAnalysis(new TypeId("", tps.Name, RecordArray<TypeId>.Empty), Accessibility.NotApplicable, NonDisposable)
-					: throw new ArgumentException($"{nameof(symbol)} is not INamedTypeSymbol. This is {symbol.GetType()}.");
-		}
-
-		public static TypeAnalysis FromRuntime(Type type, TypeAnalysis[]? typeArguments = null)
-		{
-			var dispose = type.GetInterface(nameof(IDisposable)) is not null ? Disposable
-				: type.GetInterface("IAsyncDisposable") is not null ? AsyncDisposable
-				: NonDisposable;
-
-			var args = typeArguments?.Select(x => x.Id).ToArray();
-
-			return new TypeAnalysis(TypeId.FromRuntime(type, args),
-				type.IsPublic ? Accessibility.Public : Accessibility.Internal,
-				dispose)
-			{
-				TypeArguments = new RecordArray<TypeAnalysis>(typeArguments ?? Array.Empty<TypeAnalysis>())
-			};
-		}
-
-		public static bool IsImplementing(INamedTypeSymbol symbol, string interfaceName)
-		{
-			return symbol.AllInterfaces.Any(x =>
-				$"{x.GetFullNameSpace()}.{x.Name}" == interfaceName);
-		}
+	public static bool IsImplementing(INamedTypeSymbol symbol, string interfaceName)
+	{
+		return symbol.AllInterfaces.Any(x =>
+			$"{x.GetFullNameSpace()}.{x.Name}" == interfaceName);
 	}
 }
 

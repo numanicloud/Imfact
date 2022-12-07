@@ -2,10 +2,9 @@
 using Imfact.Entities;
 using Imfact.Interfaces;
 
-namespace Imfact.Main
+namespace Imfact.Main;
+
+internal class GenerationContext
 {
-	internal class GenerationContext
-	{
-		public Dictionary<TypeId, ConstructorRecord> Constructors { get; } = new();
-	}
+	public Dictionary<TypeId, ConstructorRecord> Constructors { get; } = new();
 }

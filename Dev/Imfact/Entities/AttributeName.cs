@@ -1,14 +1,13 @@
-﻿namespace Imfact.Entities
-{
-	internal record AttributeName(string NameWithAttributeSuffix)
-	{
-		public string NameWithoutSuffix { get; } = NameWithAttributeSuffix
-			.TrimEnd("Attribute".ToCharArray());
+﻿namespace Imfact.Entities;
 
-		public bool MatchWithAnyName(string attributeName)
-		{
-			return attributeName == NameWithAttributeSuffix
-			       || attributeName == NameWithoutSuffix;
-		}
+internal record AttributeName(string NameWithAttributeSuffix)
+{
+	public string NameWithoutSuffix { get; } = NameWithAttributeSuffix
+		.TrimEnd("Attribute".ToCharArray());
+
+	public bool MatchWithAnyName(string attributeName)
+	{
+		return attributeName == NameWithAttributeSuffix
+			|| attributeName == NameWithoutSuffix;
 	}
 }

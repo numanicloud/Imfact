@@ -3,31 +3,30 @@ using Imfact.Steps.Definitions.Methods;
 using Imfact.Steps.Dependency.Components;
 using Microsoft.CodeAnalysis;
 
-namespace Imfact.Steps.Definitions
-{
-	internal record DefinitionRoot(Using[] Usings, Namespace Namespace);
+namespace Imfact.Steps.Definitions;
 
-	internal record Using(string Namespace);
+internal record DefinitionRoot(Using[] Usings, Namespace Namespace);
 
-	internal record Namespace(string Name, Class Class);
+internal record Using(string Namespace);
 
-	internal record Class(string Name, MethodInfo[] Methods,
-		Field[] Fields, DisposableInfo DisposableInfo, ExporterItem[] Exporters,
-		bool DoOverrideExporter);
+internal record Namespace(string Name, Class Class);
 
-	internal record Property(string Name);
+internal record Class(string Name, MethodInfo[] Methods,
+	Field[] Fields, DisposableInfo DisposableInfo, ExporterItem[] Exporters,
+	bool DoOverrideExporter);
 
-	internal record Field
-		(TypeAnalysis TypeAnalysis, string Name, DisposableType Disposable,
-		bool IsReadonly = true, Accessibility Accessibility = Accessibility.Private);
+internal record Property(string Name);
 
-	internal record Parameter(TypeAnalysis TypeAnalysis, string Name, bool IsNullable);
+internal record Field
+	(TypeAnalysis TypeAnalysis, string Name, DisposableType Disposable,
+	bool IsReadonly = true, Accessibility Accessibility = Accessibility.Private);
 
-	internal record Type(TypeAnalysis TypeName);
+internal record Parameter(TypeAnalysis TypeAnalysis, string Name, bool IsNullable);
 
-	internal record Hook(TypeAnalysis TypeAnalysis, string FieldName);
+internal record Type(TypeAnalysis TypeName);
 
-	internal record Exporter(string Name, Parameter[] Parameters, ExporterItem[] Items);
+internal record Hook(TypeAnalysis TypeAnalysis, string FieldName);
 
-	internal record ExporterItem(TypeAnalysis InterfaceType, TypeAnalysis ConcreteType, string MethodName);
-}
+internal record Exporter(string Name, Parameter[] Parameters, ExporterItem[] Items);
+
+internal record ExporterItem(TypeAnalysis InterfaceType, TypeAnalysis ConcreteType, string MethodName);

@@ -1,12 +1,11 @@
-﻿namespace Imfact.Steps.Aspects
-{
-	public class AspectResult
-	{
-		internal ClassAspect Class { get; }
+﻿namespace Imfact.Steps.Aspects;
 
-		internal AspectResult(ClassAspect @class)
-		{
-			Class = @class;
-		}
+public class AspectResult
+{
+	internal ClassAspect Class { get; }
+
+	internal AspectResult(ClassAspect @class)
+	{
+		Class = @class;
 	}
 }

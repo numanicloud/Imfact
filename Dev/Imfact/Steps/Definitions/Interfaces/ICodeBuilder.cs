@@ -1,9 +1,8 @@
-﻿namespace Imfact.Steps.Definitions.Interfaces
+﻿namespace Imfact.Steps.Definitions.Interfaces;
+
+internal interface ICodeBuilder
 {
-	internal interface ICodeBuilder
-	{
-		void Append(string text);
-		void AppendLine(string text = "");
-		string GetText();
-	}
+	void Append(string text);
+	void AppendLine(string text = "");
+	string GetText();
 }

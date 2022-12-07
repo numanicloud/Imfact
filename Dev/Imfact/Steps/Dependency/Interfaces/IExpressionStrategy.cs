@@ -1,9 +1,8 @@
 ﻿using Imfact.Steps.Dependency.Components;
 
-namespace Imfact.Steps.Dependency.Interfaces
+namespace Imfact.Steps.Dependency.Interfaces;
+
+internal interface IExpressionStrategy
 {
-	internal interface IExpressionStrategy
-	{
-		ICreationNode? GetExpression(CreationContext context);
-	}
+	ICreationNode? GetExpression(CreationContext context);
 }

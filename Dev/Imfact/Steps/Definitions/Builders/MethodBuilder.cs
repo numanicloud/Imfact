@@ -11,94 +11,93 @@ using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Implementation = Imfact.Steps.Definitions.Methods.Implementation;
 
-namespace Imfact.Steps.Definitions.Builders
+namespace Imfact.Steps.Definitions.Builders;
+
+internal record Initialization(TypeAnalysis Type, string Name, string ParamName);
+
+internal sealed class MethodBuilder
 {
-    internal record Initialization(TypeAnalysis Type, string Name, string ParamName);
+	private readonly InjectionResult _injection;
+	private readonly MethodService _service;
 
-	internal sealed class MethodBuilder
+	public MethodBuilder(MethodService service, InjectionResult injection, DisposeMethodBuilder disposeMethodBuilder, ConstructorBuilder constructorBuilder)
 	{
-		private readonly InjectionResult _injection;
-		private readonly MethodService _service;
+		_service = service;
+		_injection = injection;
+		DisposeMethodBuilder = disposeMethodBuilder;
+		ConstructorBuilder = constructorBuilder;
+	}
 
-		public MethodBuilder(MethodService service, InjectionResult injection, DisposeMethodBuilder disposeMethodBuilder, ConstructorBuilder constructorBuilder)
+	public DisposeMethodBuilder DisposeMethodBuilder { get; }
+
+	public ConstructorBuilder ConstructorBuilder { get; }
+
+	public static readonly TypeAnalysis ResolverServiceType = TypeAnalysis.FromRuntime(typeof(ResolverService));
+
+	public MethodInfo? BuildRegisterServiceMethodInfo(Inheritance[] inheritances, Delegation[] delegations)
+	{
+		if (inheritances.Any())
 		{
-			_service = service;
-			_injection = injection;
-			DisposeMethodBuilder = disposeMethodBuilder;
-			ConstructorBuilder = constructorBuilder;
+			return null;
 		}
 
-		public DisposeMethodBuilder DisposeMethodBuilder { get; }
+		var signature = new OrdinalSignature(Accessibility.Internal,
+			TypeAnalysis.FromRuntime(typeof(void)),
+			"RegisterService",
+			new[] { new Parameter(ResolverServiceType, "service", false) },
+			new string[0]);
 
-		public ConstructorBuilder ConstructorBuilder { get; }
+		var p = delegations
+			.Where(x => x.HasRegisterServiceMethod)
+			.Select(x => new Property(x.PropertyName))
+			.ToArray();
 
-		public static readonly TypeAnalysis ResolverServiceType = TypeAnalysis.FromRuntime(typeof(ResolverService));
+		var impl = new RegisterServiceImplementation(p, _service.ExtractHooks());
+		return new MethodInfo(signature, impl);
+	}
 
-		public MethodInfo? BuildRegisterServiceMethodInfo(Inheritance[] inheritances, Delegation[] delegations)
-		{
-			if (inheritances.Any())
+	public MethodInfo[] BuildResolverInfo(Resolver[] resolvers)
+	{
+		using var profiler = TimeProfiler.Create("Extract-Resolver-Definitions");
+		return resolvers
+			.Select(x =>
 			{
-				return null;
-			}
-
-			var signature = new OrdinalSignature(Accessibility.Internal,
-				TypeAnalysis.FromRuntime(typeof(void)),
-				"RegisterService",
-				new[] { new Parameter(ResolverServiceType, "service", false) },
-				new string[0]);
-
-			var p = delegations
-				.Where(x => x.HasRegisterServiceMethod)
-				.Select(x => new Property(x.PropertyName))
-				.ToArray();
-
-			var impl = new RegisterServiceImplementation(p, _service.ExtractHooks());
-			return new MethodInfo(signature, impl);
-		}
-
-		public MethodInfo[] BuildResolverInfo(Resolver[] resolvers)
-		{
-			using var profiler = TimeProfiler.Create("Extract-Resolver-Definitions");
-			return resolvers
-				.Select(x =>
+				return BuildMethodCommon(x, hooks1 =>
 				{
-					return BuildMethodCommon(x, hooks1 =>
-					{
-						var exp = _injection.Creation[x].Root.Code;
-						return new ExpressionImplementation(hooks1, x.ReturnType, exp);
-					});
-				}).ToArray();
-		}
+					var exp = _injection.Creation[x].Root.Code;
+					return new ExpressionImplementation(hooks1, x.ReturnType, exp);
+				});
+			}).ToArray();
+	}
 
-		public MethodInfo[] BuildEnumerableMethodInfo(MultiResolver[] multiResolvers)
-		{
-			using var profiler = TimeProfiler.Create("Extract-MultiResolver-Definitions");
-			return multiResolvers
-				.Select(x =>
+	public MethodInfo[] BuildEnumerableMethodInfo(MultiResolver[] multiResolvers)
+	{
+		using var profiler = TimeProfiler.Create("Extract-MultiResolver-Definitions");
+		return multiResolvers
+			.Select(x =>
+			{
+				return BuildMethodCommon(x, hooks1 =>
 				{
-					return BuildMethodCommon(x, hooks1 =>
-					{
-						var exp = _injection.MultiCreation[x].Roots.Select(y => y.Code).ToArray();
-						return new MultiExpImplementation(hooks1, x.ElementType, exp);
-					});
-				}).ToArray();
-		}
+					var exp = _injection.MultiCreation[x].Roots.Select(y => y.Code).ToArray();
+					return new MultiExpImplementation(hooks1, x.ElementType, exp);
+				});
+			}).ToArray();
+	}
 
-		private MethodInfo BuildMethodCommon(IResolverSemantics x,
-			Func<Hook[], Implementation> makeImpl)
-		{
-			using var profiler = TimeProfiler.Create("Extract-MethodCommon-Definitions");
-			var ps = x.Parameters.Select(
-					p => _service.BuildParameter(p.Type, p.ParameterName))
-				.ToArray();
-			var hooks = x.Hooks.Select(y => new Hook(y.HookType, y.FieldName))
-				.ToArray();
+	private MethodInfo BuildMethodCommon(IResolverSemantics x,
+		Func<Hook[], Implementation> makeImpl)
+	{
+		using var profiler = TimeProfiler.Create("Extract-MethodCommon-Definitions");
+		var ps = x.Parameters.Select(
+				p => _service.BuildParameter(p.Type, p.ParameterName))
+			.ToArray();
+		var hooks = x.Hooks.Select(y => new Hook(y.HookType, y.FieldName))
+			.ToArray();
 
-			var signature = new OrdinalSignature(x.Accessibility,
-				x.ReturnType, x.MethodName, ps, new string[]{ "partial" });
-			var impl = makeImpl(hooks);
+		var signature = new OrdinalSignature(x.Accessibility,
+			x.ReturnType, x.MethodName, ps, new string[]{ "partial" });
+		var impl = makeImpl(hooks);
 
-			return new MethodInfo(signature, impl);
-		}
+		return new MethodInfo(signature, impl);
 	}
 }

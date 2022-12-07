@@ -1,39 +1,38 @@
 ﻿using Imfact.Steps.Definitions.Builders;
 using Imfact.Steps.Definitions.Interfaces;
 
-namespace Imfact.Steps.Definitions.Methods.Implementations
+namespace Imfact.Steps.Definitions.Methods.Implementations;
+
+internal record ConstructorImplementation
+	(Initialization[] Initializations, Hook[] Hooks)
+	: Implementation
 {
-	internal record ConstructorImplementation
-		(Initialization[] Initializations, Hook[] Hooks)
-		: Implementation
+	public override void Render(IFluentCodeBuilder builder, IResolverWriter writer)
 	{
-		public override void Render(IFluentCodeBuilder builder, IResolverWriter writer)
+		builder.EnterSequence(inner =>
 		{
-			builder.EnterSequence(inner =>
+			inner.EnterChunk(chunk =>
 			{
-				inner.EnterChunk(chunk =>
+				foreach (var item in Initializations)
 				{
-					foreach (var item in Initializations)
-					{
-						chunk.AppendLine($"{item.Name} = {item.ParamName};");
-					}
-				});
-
-				inner.EnterChunk(chunk =>
-				{
-					foreach (var hook in Hooks)
-					{
-						var typeName = hook.TypeAnalysis.FullBoundName;
-						chunk.AppendLine($"{hook.FieldName} = new {typeName}();");
-					}
-				});
-
-				inner.EnterChunk(chunk =>
-				{
-					chunk.AppendLine("__resolverService = new ResolverService();");
-					chunk.AppendLine("this.RegisterService(__resolverService);");
-				});
+					chunk.AppendLine($"{item.Name} = {item.ParamName};");
+				}
 			});
-		}
+
+			inner.EnterChunk(chunk =>
+			{
+				foreach (var hook in Hooks)
+				{
+					var typeName = hook.TypeAnalysis.FullBoundName;
+					chunk.AppendLine($"{hook.FieldName} = new {typeName}();");
+				}
+			});
+
+			inner.EnterChunk(chunk =>
+			{
+				chunk.AppendLine("__resolverService = new ResolverService();");
+				chunk.AppendLine("this.RegisterService(__resolverService);");
+			});
+		});
 	}
 }

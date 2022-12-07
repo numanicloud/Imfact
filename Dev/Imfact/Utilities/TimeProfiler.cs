@@ -1,44 +1,43 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Imfact.Utilities
+namespace Imfact.Utilities;
+
+internal class TimeProfiler : IDisposable
 {
-	internal class TimeProfiler : IDisposable
+	private readonly string _title;
+	private readonly DateTime _start;
+
+	private TimeProfiler(string title, DateTime start)
 	{
-		private readonly string _title;
-		private readonly DateTime _start;
+		_title = title;
+		_start = start;
+	}
 
-		private TimeProfiler(string title, DateTime start)
+	public virtual void Dispose()
+	{
+		var span = DateTime.Now - _start;
+		if (span.TotalMilliseconds > 5)
 		{
-			_title = title;
-			_start = start;
+			Debug.WriteLine($"{_title}: {span.TotalMilliseconds}ms", "Imfact");
 		}
+	}
 
-		public virtual void Dispose()
-		{
-			var span = DateTime.Now - _start;
-			if (span.TotalMilliseconds > 5)
-			{
-				Debug.WriteLine($"{_title}: {span.TotalMilliseconds}ms", "Imfact");
-			}
-		}
-
-		public static IDisposable Create(string title)
-		{
+	public static IDisposable Create(string title)
+	{
 #if DEBUG
-			return new TimeProfiler(title, DateTime.Now);
+		return new TimeProfiler(title, DateTime.Now);
 #else
 			return NullDisposable.Instance;
 #endif
-        }
-    }
+	}
+}
 
-	internal class NullDisposable : IDisposable
+internal class NullDisposable : IDisposable
+{
+	public static readonly NullDisposable Instance = new();
+
+	public void Dispose()
 	{
-		public static readonly NullDisposable Instance = new();
-
-		public void Dispose()
-		{
-		}
 	}
 }

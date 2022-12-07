@@ -1,16 +1,15 @@
 ﻿using Imfact.Interfaces;
 
-namespace Imfact.Steps.Definitions
-{
-	internal class DefinitionResult
-	{
-		public DefinitionRoot DefinitionRoot { get; }
-		public ConstructorRecord ConstructorRecord { get; }
+namespace Imfact.Steps.Definitions;
 
-		public DefinitionResult(DefinitionRoot definitionRoot, ConstructorRecord constructorRecord)
-		{
-			DefinitionRoot = definitionRoot;
-			ConstructorRecord = constructorRecord;
-		}
+internal class DefinitionResult
+{
+	public DefinitionRoot DefinitionRoot { get; }
+	public ConstructorRecord ConstructorRecord { get; }
+
+	public DefinitionResult(DefinitionRoot definitionRoot, ConstructorRecord constructorRecord)
+	{
+		DefinitionRoot = definitionRoot;
+		ConstructorRecord = constructorRecord;
 	}
 }

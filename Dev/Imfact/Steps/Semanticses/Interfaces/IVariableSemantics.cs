@@ -1,10 +1,9 @@
 ﻿using Imfact.Entities;
 
-namespace Imfact.Steps.Semanticses.Interfaces
+namespace Imfact.Steps.Semanticses.Interfaces;
+
+internal interface IVariableSemantics
 {
-	internal interface IVariableSemantics
-	{
-		TypeAnalysis Type { get; }
-		string MemberName { get; }
-	}
+	TypeAnalysis Type { get; }
+	string MemberName { get; }
 }
