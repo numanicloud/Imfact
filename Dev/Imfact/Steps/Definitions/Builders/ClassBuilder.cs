@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Imfact.Annotations;
+using Imfact.Annotations.Samples;
 using Imfact.Entities;
 using Imfact.Steps.Definitions.Methods;
 using Imfact.Steps.Dependency;
@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Imfact.Steps.Definitions.Builders
 {
-	internal class ClassBuilder
+    internal class ClassBuilder
 	{
 		private readonly SemanticsResult _semantics;
 		private readonly DependencyResult _dependency;

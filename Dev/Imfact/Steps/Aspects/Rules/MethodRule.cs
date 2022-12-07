@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Imfact.Annotations;
+using Imfact.Annotations.Samples;
 using Imfact.Entities;
 using Imfact.Interfaces;
 using Imfact.Utilities;
@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Imfact.Steps.Aspects.Rules
 {
-	internal sealed class MethodRule
+    internal sealed class MethodRule
 	{
 		private readonly IAnalysisContext _context;
 		private readonly AttributeRule _attributeRule;

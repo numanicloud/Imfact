@@ -1,12 +1,12 @@
 ﻿using System;
-using Imfact.Annotations;
+using Imfact.Annotations.Samples;
 using Imfact.Entities;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 
 namespace Imfact.Steps.Aspects.Rules
 {
-	internal class AttributeRule
+    internal class AttributeRule
 	{
 		private readonly TypeRule _typeRule;
 		private static readonly AttributeName _resAt = new(nameof(ResolutionAttribute));

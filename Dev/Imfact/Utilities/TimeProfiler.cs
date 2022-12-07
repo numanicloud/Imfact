@@ -14,7 +14,7 @@ namespace Imfact.Utilities
 			_start = start;
 		}
 
-		public void Dispose()
+		public virtual void Dispose()
 		{
 			var span = DateTime.Now - _start;
 			if (span.TotalMilliseconds > 5)
@@ -23,9 +23,22 @@ namespace Imfact.Utilities
 			}
 		}
 
-		public static TimeProfiler Create(string title)
+		public static IDisposable Create(string title)
 		{
+#if DEBUG
 			return new TimeProfiler(title, DateTime.Now);
+#else
+			return NullDisposable.Instance;
+#endif
+        }
+    }
+
+	internal class NullDisposable : IDisposable
+	{
+		public static readonly NullDisposable Instance = new();
+
+		public void Dispose()
+		{
 		}
 	}
 }

@@ -10,10 +10,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Imfact.Steps.Ranking
 {
-	internal class RankingStep
+    internal class RankingStep
 	{
-		private static readonly AttributeName FactoryAttribute = new(nameof(Annotations.FactoryAttribute));
-		private static readonly AttributeName ResolutionAttribute = new(nameof(Annotations.ResolutionAttribute));
+		private static readonly AttributeName FactoryAttribute = new(nameof(Annotations.Samples.FactoryAttribute));
+		private static readonly AttributeName ResolutionAttribute = new(nameof(Annotations.Samples.ResolutionAttribute));
 
 		public RankedClass[] Run(CandidateClass[] classes)
 		{
@@ -24,7 +24,7 @@ namespace Imfact.Steps.Ranking
 			var ranks = DetermineRanking(rank0, notRank0);
 			
 			return ranks.SelectMany(x => x.Value
-					.Select(y => new RankedClass(y.Syntax, y.Symbol, y.BaseSymbol, x.Key, y.Context)))
+					.Select(y => new RankedClass(y.Symbol, y.BaseSymbol, x.Key, y.Context)))
 				.ToArray();
 		}
 

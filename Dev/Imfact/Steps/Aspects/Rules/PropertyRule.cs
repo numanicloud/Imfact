@@ -1,14 +1,14 @@
-﻿using Imfact.Annotations;
-using Imfact.Entities;
+﻿using Imfact.Entities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
 using Imfact.Interfaces;
 using Imfact.Utilities;
+using Imfact.Annotations.Samples;
 
 namespace Imfact.Steps.Aspects.Rules
 {
-	internal class PropertyRule
+    internal class PropertyRule
 	{
 		private readonly IAnalysisContext _context;
 		private readonly MethodRule _methodRule;
@@ -19,13 +19,8 @@ namespace Imfact.Steps.Aspects.Rules
 			_methodRule = methodRule;
 		}
 
-		public PropertyAspect? ExtractAspect(PropertyDeclarationSyntax syntax)
+		public PropertyAspect? ExtractAspect(IPropertySymbol symbol)
 		{
-			if (_context.GetPropertySymbol(syntax) is not { } symbol)
-			{
-				return null;
-			}
-
 			var isDelegation = symbol.Type.GetAttributes()
 				.Select(x => x.AttributeClass)
 				.FilterNull()

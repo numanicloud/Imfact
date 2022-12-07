@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Imfact.Annotations;
+using Imfact.Annotations.Samples;
 using Imfact.Entities;
 using Imfact.Steps.Definitions.Methods;
 using Imfact.Steps.Definitions.Methods.Implementations;
@@ -14,7 +14,7 @@ using Implementation = Imfact.Steps.Definitions.Methods.Implementation;
 
 namespace Imfact.Steps.Definitions.Builders
 {
-	internal record Initialization(TypeAnalysis Type, string Name, string ParamName);
+    internal record Initialization(TypeAnalysis Type, string Name, string ParamName);
 
 	internal sealed class MethodBuilder
 	{

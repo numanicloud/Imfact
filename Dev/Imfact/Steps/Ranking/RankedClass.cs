@@ -4,8 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Imfact.Steps.Ranking
 {
-	internal record RankedClass(ClassDeclarationSyntax Syntax,
-		INamedTypeSymbol Symbol,
+	internal record RankedClass(INamedTypeSymbol Symbol,
 		INamedTypeSymbol? BaseSymbol,
 		int Rank,
 		IAnalysisContext Context);

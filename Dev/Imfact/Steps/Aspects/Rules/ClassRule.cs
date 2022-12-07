@@ -25,31 +25,29 @@ namespace Imfact.Steps.Aspects.Rules
 
 		public ClassAspect Aggregate(RankedClass root)
 		{
-			return ExtractThis(root.Syntax, root.Symbol, ExtractBases(root.Symbol));
+			return ExtractThis(root.Symbol, ExtractBases(root.Symbol));
 		}
 
-		private ClassAspect ExtractThis
-			(ClassDeclarationSyntax syntax, INamedTypeSymbol symbol, ClassAspect[] baseClasses)
+		private ClassAspect ExtractThis(INamedTypeSymbol symbol, ClassAspect[] baseClasses)
 		{
 			return new(TypeAnalysis.FromSymbol(symbol),
 				baseClasses,
 				ExtractInterfaces(symbol),
 				GetMethodAspects(symbol, partialOnly: true),
-				GetPropertyAspects(syntax), null,
+				GetPropertyAspects(symbol), null,
 				GetExporterAspects(symbol));
 		}
 
 		// NOTE: 基底クラスのプロパティを追う必要は無いのでは？
 		// 逆に、コンストラクタはこちらにしか無いので、BaseClassAspect みたいな型で区別してもいいかも
-		private ClassAspect ExtractBase
-			(ClassDeclarationSyntax syntax, INamedTypeSymbol symbol)
+		private ClassAspect ExtractBase(INamedTypeSymbol symbol)
 		{
 			return new(
 				TypeAnalysis.FromSymbol(symbol),
 				new ClassAspect[0],
 				ExtractInterfaces(symbol),
 				GetMethodAspects(symbol, false),
-				GetPropertyAspects(syntax),
+				GetPropertyAspects(symbol),
 				GetConstructor(symbol),
 				GetExporterAspects(symbol));
 		}
@@ -66,7 +64,7 @@ namespace Imfact.Steps.Aspects.Rules
 			return TraverseBase(thisSymbol)
 				.Select(x => GetSyntax(x)?.Pair(x))
 				.FilterNull()
-				.Select(x => ExtractBase(x.Item1, x.Item2))
+				.Select(x => ExtractBase(x.Item2))
 				.ToArray();
 
 			static ClassDeclarationSyntax? GetSyntax(INamedTypeSymbol x)
@@ -122,10 +120,10 @@ namespace Imfact.Steps.Aspects.Rules
 				.ToArray();
 		}
 
-		private PropertyAspect[] GetPropertyAspects(ClassDeclarationSyntax @class)
+		private PropertyAspect[] GetPropertyAspects(INamedTypeSymbol @class)
 		{
-			return @class.Members
-				.OfType<PropertyDeclarationSyntax>()
+			return @class.GetMembers()
+				.OfType<IPropertySymbol>()
 				.Select(_propertyRule.ExtractAspect)
 				.FilterNull()
 				.ToArray();
