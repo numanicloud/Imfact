@@ -29,7 +29,8 @@ namespace Imfact.Steps.Definitions.Builders
 				BuildMethods(),
 				BuildFieldNode(),
 				_dependency.DisposableInfo,
-				BuildExporters());
+				BuildExporters(),
+				_semantics.Factory.Inheritances.Any());
 		}
 
 		private ExporterItem[] BuildExporters()

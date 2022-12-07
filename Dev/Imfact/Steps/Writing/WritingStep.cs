@@ -71,23 +71,36 @@ namespace Imfact.Steps.Writing
 						RenderMethod(method, seqOuter);
 					}
 
-					RenderExporter(seqOuter, @class.Exporters);
+					RenderExporter(seqOuter, @class.Exporters, @class.DoOverrideExporter);
 				});
 			});
 		}
 
-		private void RenderExporter(ICodeBuilder builder, ExporterItem[] exports) 
+		private void RenderExporter(ICodeBuilder builder, ExporterItem[] exports, bool doOverride)
 		{
 			builder.EnterChunk(chunk =>
 			{
-				chunk.AppendLine($"internal void Export(Imfact.Annotations.IServiceImporter importer)");
+				var overrideKeyword = doOverride ? "override" : "virtual";
+				chunk.AppendLine($"internal {overrideKeyword} void Export(Imfact.Annotations.IServiceImporter importer)");
 				chunk.EnterBlock(block =>
 				{
 					foreach (var item in exports)
 					{
 						block.AppendLine($"importer.Import<{item.InterfaceType.FullBoundName}>(() => {item.MethodName}());");
 					}
+
+					block.AppendLine("ManuallyExport(importer);");
+
+					if (doOverride)
+					{
+						block.AppendLine("base.Export(importer);");
+					}
 				});
+			});
+
+			builder.EnterChunk(chunk =>
+			{
+				chunk.AppendLine("partial void ManuallyExport(Imfact.Annotations.IServiceImporter importer);");
 			});
 		}
 

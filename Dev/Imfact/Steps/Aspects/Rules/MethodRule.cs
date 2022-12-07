@@ -84,7 +84,7 @@ namespace Imfact.Steps.Aspects.Rules
 			}
 
 			var parameters = GetParameters(symbol);
-			
+
 			if (parameters.Length != 2
 				&& parameters[1].Name != $"Func"
 				&& parameters[1].Type.TypeArguments[0].Name == typeParameters[0].Name)
@@ -129,7 +129,14 @@ namespace Imfact.Steps.Aspects.Rules
 
 		private static bool IsResolverPartial(MethodDeclarationSyntax syntax)
 		{
-			return syntax.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword));
+			var hasAccessor = syntax.Modifiers.Any(x =>
+				x.IsKind(SyntaxKind.PublicKeyword)
+				|| x.IsKind(SyntaxKind.PrivateKeyword)
+				|| x.IsKind(SyntaxKind.ProtectedKeyword)
+				|| x.IsKind(SyntaxKind.InternalKeyword));
+
+			return syntax.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword))
+				&& hasAccessor;
 		}
 	}
 }

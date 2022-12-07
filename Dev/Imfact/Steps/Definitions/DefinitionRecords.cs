@@ -12,7 +12,8 @@ namespace Imfact.Steps.Definitions
 	internal record Namespace(string Name, Class Class);
 
 	internal record Class(string Name, MethodInfo[] Methods,
-		Field[] Fields, DisposableInfo DisposableInfo, ExporterItem[] Exporters);
+		Field[] Fields, DisposableInfo DisposableInfo, ExporterItem[] Exporters,
+		bool DoOverrideExporter);
 
 	internal record Property(string Name);
 
