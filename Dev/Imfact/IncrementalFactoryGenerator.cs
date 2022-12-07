@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using Imfact.Annotations;
 using Imfact.Main;
+using Imfact.Steps.Writing;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -13,26 +14,26 @@ namespace Imfact;
 
 internal class PluginGlobal
 {
-	private static bool IsAttached = false;
+    private static bool IsAttached = false;
 
-	public static void Debug()
-	{
-		if (!Debugger.IsAttached && !IsAttached)
-		{
-			Debugger.Launch();
+    public static void Debug()
+    {
+        if (!Debugger.IsAttached && !IsAttached)
+        {
+            Debugger.Launch();
             Debugger.Break();
 
-			IsAttached = true;
-		}
-	}
+            IsAttached = true;
+        }
+    }
 }
 
 [Generator]
 public class IncrementalFactoryGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
-	{
-        PluginGlobal.Debug();
+    {
+        //PluginGlobal.Debug();
 
         context.RegisterPostInitializationOutput(GenerateInitialCode);
 
@@ -54,72 +55,127 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
     {
         context.CancellationToken.ThrowIfCancellationRequested();
 
-		var facade = new GenerationFacade();
-		var sources = facade.Run(new[] { candidate });
+        var facade = new GenerationFacade();
+
+        SourceFile[] sources;
+        try
+        {
+            sources = facade.Run(new[] { candidate });
+        }
+        catch (Exception ex)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor(
+                    "IMF003",
+                    "Internal erorr",
+                    $"Internal error occurd in Imfact: {ex}",
+                    "Imfact",
+                    DiagnosticSeverity.Error,
+                    true), null));
+            throw;
+        }
+
+        if (sources.Length == 0)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor(
+                    "IMF002",
+                    "No generation",
+                    $"No contents for {candidate.Symbol.Name}",
+                    "Imfact",
+                    DiagnosticSeverity.Info,
+                    true), null));
+            return;
+        }
+
+        context.ReportDiagnostic(Diagnostic.Create(
+            new DiagnosticDescriptor(
+                "IMF001",
+                "File added",
+                $"File {candidate.Symbol.Name}.g.cs added. Contents starts with {sources[0].Contents.Split('\n')[0]}",
+                "Imfact",
+                DiagnosticSeverity.Info,
+                true), null));
 
         context.AddSource(
-			hintName: $"{candidate.Symbol.GetFullNameSpace()}.{candidate.Symbol.Name}.g.cs",
-			source: sources[0].Contents);
+            hintName: $"{candidate.Symbol.Name}.g.cs",
+            source: sources[0].Contents);
     }
 
     private FactoryCandidate? PostTransform(
         (FactoryIncremental? factory, AnnotationContext annotations) tuple,
         CancellationToken ct)
     {
-        ct.ThrowIfCancellationRequested();
-        if (tuple.factory is null) return null;
-
-        var attributes = tuple.factory.Symbol.GetAttributes();
-        if (!attributes.Any(IsFactoryAttribute)) return null;
-
-        return new FactoryCandidate(tuple.factory.Symbol,
-            tuple.factory.Methods
-                .Select(x => new ResolverCandidate(x.Symbol, x.IsToGenerate))
-                .ToArray(),
-            tuple.annotations);
-
-        bool IsFactoryAttribute(AttributeData attributeData)
+        try
         {
-            return SymbolEqualityComparer.Default
-                .Equals(attributeData.AttributeClass,
-                    tuple.annotations.FactoryAttribute);
+            ct.ThrowIfCancellationRequested();
+            if (tuple.factory is null) return null;
+
+            var attributes = tuple.factory.Symbol.GetAttributes();
+            if (!attributes.Any(IsFactoryAttribute)) return null;
+
+            return new FactoryCandidate(tuple.factory.Symbol,
+                tuple.factory.Methods
+                    .Select(x => new ResolverCandidate(x.Symbol, x.IsToGenerate))
+                    .ToArray(),
+                tuple.annotations);
+
+            bool IsFactoryAttribute(AttributeData attributeData)
+            {
+                return SymbolEqualityComparer.Default
+                    .Equals(attributeData.AttributeClass,
+                        tuple.annotations.FactoryAttribute);
+            }
+        }
+        catch (Exception ex)
+        {
+			throw;
         }
     }
 
     private FactoryIncremental? Transform(GeneratorSyntaxContext context, CancellationToken ct)
     {
-        ct.ThrowIfCancellationRequested();
-        var syntax = (context.Node as TypeDeclarationSyntax)!;
-        var symbol = context.SemanticModel.GetDeclaredSymbol(syntax, ct);
-        var methods = syntax.Members
-            .OfType<MethodDeclarationSyntax>()
-            .Select(GetResolver)
-            .FilterNull()
-            .ToArray();
-
-        return symbol is not null
-            ? new FactoryIncremental(symbol, methods)
-            : null;
-
-        ResolverIncremental? GetResolver(MethodDeclarationSyntax method)
+        try
         {
             ct.ThrowIfCancellationRequested();
-            return context.SemanticModel.GetDeclaredSymbol(method) is { } ms
-                ? new ResolverIncremental(ms,
-                    method.Modifiers.IndexOf(SyntaxKind.PartialKeyword) != -1
-                    && method.Modifiers.Any(x =>
-                        x.IsKind(SyntaxKind.PublicKeyword)
-                        || x.IsKind(SyntaxKind.PrivateKeyword)
-                        || x.IsKind(SyntaxKind.ProtectedKeyword)
-                        || x.IsKind(SyntaxKind.InternalKeyword)))
+            var syntax = (context.Node as TypeDeclarationSyntax)!;
+            var symbol = context.SemanticModel.GetDeclaredSymbol(syntax, ct);
+            var methods = syntax.Members
+                .OfType<MethodDeclarationSyntax>()
+                .Select(GetResolver)
+                .FilterNull()
+                .ToArray();
+
+            return symbol is not null
+                ? new FactoryIncremental(symbol, methods)
                 : null;
+
+            ResolverIncremental? GetResolver(MethodDeclarationSyntax method)
+            {
+                ct.ThrowIfCancellationRequested();
+                return context.SemanticModel.GetDeclaredSymbol(method) is { } ms
+                    ? new ResolverIncremental(ms,
+                        method.Modifiers.IndexOf(SyntaxKind.PartialKeyword) != -1
+                        && method.Modifiers.Any(x =>
+                            x.IsKind(SyntaxKind.PublicKeyword)
+                            || x.IsKind(SyntaxKind.PrivateKeyword)
+                            || x.IsKind(SyntaxKind.ProtectedKeyword)
+                            || x.IsKind(SyntaxKind.InternalKeyword)))
+                    : null;
+            }
+        }
+        catch (Exception ex)
+        {
+			throw;
         }
     }
 
     private bool Predicate(SyntaxNode node, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        return node is TypeDeclarationSyntax { AttributeLists.Count: > 0 };
+        return node is TypeDeclarationSyntax { AttributeLists.Count: > 0 } syntax
+            && node is not InterfaceDeclarationSyntax
+            && syntax.Modifiers.IndexOf(SyntaxKind.PartialKeyword) != -1;
     }
 
     private AnnotationContext ExtractAnnotations(Compilation compilation, CancellationToken ct)

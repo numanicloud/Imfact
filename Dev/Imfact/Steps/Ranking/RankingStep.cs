@@ -70,8 +70,15 @@ internal class RankingStep
 				return (hasBaseType || hasResolverForFactory, x);
 			}).ToArray();
 
-		return (marked.Where(x => !x.Item1).Select(x => x.x).ToList(),
-			marked.Where(x => x.Item1).Select(x => x.x).ToList());
+		var rank0 = marked.Where(x => !x.Item1).Select(x => x.x).ToList();
+		var notRank0 = marked.Where(x => x.Item1).Select(x => x.x).ToList();
+
+		if (rank0.Count == 0)
+		{
+			throw new Exception();
+		}
+
+        return (rank0, notRank0);
 
 		bool HasResolverForFactory(Relation target)
 		{

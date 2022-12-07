@@ -1,6 +1,6 @@
 ﻿namespace Imfact.Annotations;
 
-[global::System.AttributeUsage(global::System.AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+[global::System.AttributeUsage(global::System.AttributeTargets.Class | global::System.AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
 internal sealed class FactoryAttribute : global::System.Attribute
 {
 }

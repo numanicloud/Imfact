@@ -19,7 +19,7 @@ internal class AnnotationDefinitions
 	public const string TransientAttributeName = "TransientAttributeName";
 
 	public static readonly string FactoryAttribute = $@"
-[global::System.AttributeUsage(global::System.AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+[global::System.AttributeUsage(global::System.AttributeTargets.Class | global::System.AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
 internal sealed class {FactoryAttributeName} : global::System.Attribute
 {{
 }}";
@@ -163,6 +163,13 @@ internal sealed class {TransientAttributeName} : global::System.Attribute
 {{
 }}";
 
+	public static readonly string IServiceImporter = """
+		internal interface IServiceImporter
+		{
+			void Import<TInterface>(Func<TInterface> resolver) where TInterface : class;
+		}
+		""";
+
 	public static string BuildAnnotationCode()
 	{
 		var builder = new StringBuilder();
@@ -180,6 +187,7 @@ internal sealed class {TransientAttributeName} : global::System.Attribute
 		builder.AppendLine(CachePerResolution);
 		builder.AppendLine(CachePerResolutionAttribute);
 		builder.AppendLine(TransientAttribute);
+		builder.AppendLine(IServiceImporter);
 
 		return builder.ToString();
 	}
