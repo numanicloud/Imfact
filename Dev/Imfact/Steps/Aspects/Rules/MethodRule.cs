@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Imfact.Entities;
+﻿using Imfact.Entities;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Imfact.Steps.Aspects.Rules;
 
@@ -21,19 +17,28 @@ internal sealed class MethodRule
 	}
 
 	public MethodAspect? ExtractAspect(IMethodSymbol symbol)
-	{
-		using var profiler = TimeProfiler.Create("Extract-Method-Aspect");
-		if (symbol.ReturnType is not INamedTypeSymbol returnSymbol)
+    {
+        using var profiler = TimeProfiler.Create("Extract-Method-Aspect");
+        try
 		{
-			return null;
-		}
+			if (symbol.ReturnType is not INamedTypeSymbol returnSymbol)
+			{
+				return null;
+			}
 
-		return new MethodAspect(symbol.Name,
-			symbol.DeclaredAccessibility,
-			GetKind(returnSymbol),
-			GetReturnType(returnSymbol),
-			GetAttributes(symbol, returnSymbol),
-			GetParameters(symbol));
+			return new MethodAspect(symbol.Name,
+				symbol.DeclaredAccessibility,
+				GetKind(returnSymbol),
+				GetReturnType(returnSymbol),
+				GetAttributes(symbol, returnSymbol),
+				GetParameters(symbol));
+		}
+		catch (Exception ex)
+		{
+			throw new Exception(
+				$"Exception occured in extracting aspect of a method {symbol.Name}.",
+				ex);
+		}
 	}
 
 	public MethodAspect? ExtractNotAsRootResolver(IMethodSymbol symbol)

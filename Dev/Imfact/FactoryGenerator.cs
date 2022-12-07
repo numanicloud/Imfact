@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Imfact.Annotations;
 using Imfact.Entities;
+using Imfact.Incremental;
 using Imfact.Main;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;

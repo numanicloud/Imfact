@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Imfact.Entities;
+using Imfact.Incremental;
 using Imfact.Main;
 using Imfact.Steps.Ranking;
 using Imfact.Utilities;
@@ -43,12 +45,10 @@ internal class ClassRule
 
     private ClassAspect[] ExtractBases(FactoryCandidate factory)
 	{
+		// 基底クラスのコンストラクタを呼ぶためには基底クラスを通す必要がある
+		// 基底クラスのリゾルバーを呼ぶためには基底クラスを通す必要がある
 		return TraverseBase(factory.Symbol)
-			.Join(_factoryCandidates,
-				o => o,
-				i => i.Symbol,
-				(o, i) => i,
-				SymbolEqualityComparer.Default)
+			.Select(x => new FactoryCandidate(x, GetMethods(x), factory.Context))
 			.Select(ExtractBase)
 			.ToArray();
 
@@ -62,6 +62,14 @@ internal class ClassRule
 					yield return baseSymbol;
 				}
 			}
+		}
+
+		static ResolverCandidate[] GetMethods(INamedTypeSymbol holder)
+		{
+			return holder.GetMembers()
+				.OfType<IMethodSymbol>()
+				.Select(x => new ResolverCandidate(x, false))
+				.ToArray();
 		}
 	}
 
@@ -110,12 +118,12 @@ internal class ClassRule
 
 	private ConstructorAspect GetConstructor(INamedTypeSymbol symbol)
 	{
-		var classType = TypeAnalysis.FromSymbol(symbol);
-		var ctor = _genContext.Constructors[classType.Id];
+		var ctor = symbol.Constructors.MaxItem(x => x.Arity);
+
 		var parameters = ctor.Parameters
-			.Select(x => new ParameterAspect(x.Type, x.Name))
+			.Select(x => new ParameterAspect(TypeAnalysis.FromSymbol(x.Type), x.Name))
 			.ToArray();
 
-		return new ConstructorAspect(ctor.Accessibility, parameters);
+		return new ConstructorAspect(ctor.DeclaredAccessibility, parameters);
 	}
 }

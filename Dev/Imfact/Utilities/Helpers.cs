@@ -80,4 +80,21 @@ public static class Helpers
 	{
 		return (item1, item2);
 	}
+
+	public static T MaxItem<T>(this IEnumerable<T> source, Func<T, int> selector)
+	{
+		var maxValue = int.MinValue;
+		var maxItem = default(T);
+		foreach (var item in source)
+		{
+			var value = selector(item);
+			if (value > maxValue)
+			{
+				maxValue = value;
+				maxItem = item;
+			}
+		}
+
+		return maxItem ?? throw new InvalidOperationException("No item in the source.");
+	}
 }

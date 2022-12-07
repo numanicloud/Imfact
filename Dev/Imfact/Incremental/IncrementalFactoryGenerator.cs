@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Imfact.Annotations;
@@ -10,30 +9,16 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Imfact;
-
-internal class PluginGlobal
-{
-    private static bool IsAttached = false;
-
-    public static void Debug()
-    {
-        if (!Debugger.IsAttached && !IsAttached)
-        {
-            Debugger.Launch();
-            Debugger.Break();
-
-            IsAttached = true;
-        }
-    }
-}
+namespace Imfact.Incremental;
 
 [Generator]
 public class IncrementalFactoryGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        //PluginGlobal.Debug();
+#if DEBUG
+        DebugHelper.Attach();
+#endif
 
         context.RegisterPostInitializationOutput(GenerateInitialCode);
 
@@ -64,38 +49,12 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
         }
         catch (Exception ex)
         {
-            context.ReportDiagnostic(Diagnostic.Create(
-                new DiagnosticDescriptor(
-                    "IMF003",
-                    "Internal erorr",
-                    $"Internal error occurd in Imfact: {ex}",
-                    "Imfact",
-                    DiagnosticSeverity.Error,
-                    true), null));
+            context.ReportDiagnostic(DebugHelper.Error(
+                "IMF001",
+                "Internal error",
+                $"Internal error occurd in Imfact: {ex}"));
             throw;
         }
-
-        if (sources.Length == 0)
-        {
-            context.ReportDiagnostic(Diagnostic.Create(
-                new DiagnosticDescriptor(
-                    "IMF002",
-                    "No generation",
-                    $"No contents for {candidate.Symbol.Name}",
-                    "Imfact",
-                    DiagnosticSeverity.Info,
-                    true), null));
-            return;
-        }
-
-        context.ReportDiagnostic(Diagnostic.Create(
-            new DiagnosticDescriptor(
-                "IMF001",
-                "File added",
-                $"File {candidate.Symbol.Name}.g.cs added. Contents starts with {sources[0].Contents.Split('\n')[0]}",
-                "Imfact",
-                DiagnosticSeverity.Info,
-                true), null));
 
         context.AddSource(
             hintName: $"{candidate.Symbol.Name}.g.cs",
@@ -209,24 +168,4 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
     }
 }
 
-internal record FactoryIncremental(INamedTypeSymbol Symbol, ResolverIncremental[] Methods);
 
-internal record ResolverIncremental(IMethodSymbol Symbol, bool IsToGenerate);
-
-internal record FactoryCandidate
-    (INamedTypeSymbol Symbol,
-    ResolverCandidate[] Methods,
-    AnnotationContext? Context = null);
-
-internal record ResolverCandidate(IMethodSymbol Symbol, bool IsToGenerate);
-
-internal sealed class AnnotationContext
-{
-    public required INamedTypeSymbol FactoryAttribute { get; init; }
-    public required INamedTypeSymbol ResolutionAttribute { get; init; }
-    public required INamedTypeSymbol HookAttribute { get; init; }
-    public required INamedTypeSymbol ExporterAttribute { get; init; }
-    public required INamedTypeSymbol CacheAttribute { get; init; }
-    public required INamedTypeSymbol CachePerResolutionAttribute { get; init; }
-    public required INamedTypeSymbol TransientAttribute { get; init; }
-}

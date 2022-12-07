@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Imfact.Incremental;
 using Imfact.Steps.Ranking;
 using Imfact.Steps.Semanticses;
 using Imfact.Steps.Writing;
