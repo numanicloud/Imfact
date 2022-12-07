@@ -1,21 +1,17 @@
 ﻿using Imfact.Entities;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
-using Imfact.Interfaces;
+using Imfact.Annotations;
 using Imfact.Utilities;
-using Imfact.Annotations.Samples;
 
 namespace Imfact.Steps.Aspects.Rules
 {
     internal class PropertyRule
 	{
-		private readonly IAnalysisContext _context;
 		private readonly MethodRule _methodRule;
 
-		public PropertyRule(IAnalysisContext context, MethodRule methodRule)
+		public PropertyRule(MethodRule methodRule)
 		{
-			_context = context;
 			_methodRule = methodRule;
 		}
 

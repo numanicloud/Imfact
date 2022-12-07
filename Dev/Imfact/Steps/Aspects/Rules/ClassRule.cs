@@ -34,8 +34,8 @@ namespace Imfact.Steps.Aspects.Rules
 				baseClasses,
 				ExtractInterfaces(symbol),
 				GetMethodAspects(symbol, partialOnly: true),
-				GetPropertyAspects(symbol), null,
-				GetExporterAspects(symbol));
+				GetPropertyAspects(symbol),
+				null);
 		}
 
 		// NOTE: 基底クラスのプロパティを追う必要は無いのでは？
@@ -48,8 +48,7 @@ namespace Imfact.Steps.Aspects.Rules
 				ExtractInterfaces(symbol),
 				GetMethodAspects(symbol, false),
 				GetPropertyAspects(symbol),
-				GetConstructor(symbol),
-				GetExporterAspects(symbol));
+				GetConstructor(symbol));
 		}
 
 		private InterfaceAspect[] ExtractInterfaces(INamedTypeSymbol thisSymbol)
@@ -99,22 +98,6 @@ namespace Imfact.Steps.Aspects.Rules
 						.OfType<MethodDeclarationSyntax>()
 						.FirstOrDefault();
 					return mm is null ? null : _methodRule.ExtractAspect(mm, x, partialOnly);
-				})
-				.FilterNull()
-				.ToArray();
-		}
-
-		private ExporterAspect[] GetExporterAspects(INamedTypeSymbol @class)
-		{
-			return @class.GetMembers()
-				.OfType<IMethodSymbol>()
-				.Select(x =>
-				{
-					var mm = x.DeclaringSyntaxReferences
-						.Select(m => m.GetSyntax())
-						.OfType<MethodDeclarationSyntax>()
-						.FirstOrDefault();
-					return mm is null ? null : _methodRule.ExtractExporterAspect(mm, x);
 				})
 				.FilterNull()
 				.ToArray();

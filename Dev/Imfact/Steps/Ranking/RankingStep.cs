@@ -2,29 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using Imfact.Entities;
-using Imfact.Interfaces;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Imfact.Steps.Ranking
 {
     internal class RankingStep
 	{
-		private static readonly AttributeName FactoryAttribute = new(nameof(Annotations.Samples.FactoryAttribute));
-		private static readonly AttributeName ResolutionAttribute = new(nameof(Annotations.Samples.ResolutionAttribute));
+		private static readonly AttributeName FactoryAttribute = new(nameof(FactoryAttribute));
+		private static readonly AttributeName ResolutionAttribute = new(nameof(ResolutionAttribute));
 
-		public RankedClass[] Run(CandidateClass[] classes)
+		public RankedClass[] Run(FactoryCandidate[] classes)
 		{
 			using var profiler = TimeProfiler.Create("Ranking");
-			var factoryClasses = ExtractFactories(classes);
-			var relations = AnalyzeRelations(factoryClasses);
+			var relations = AnalyzeRelations(classes);
 			var (rank0, notRank0) = ExtractRank0(relations);
 			var ranks = DetermineRanking(rank0, notRank0);
 			
 			return ranks.SelectMany(x => x.Value
-					.Select(y => new RankedClass(y.Symbol, y.BaseSymbol, x.Key, y.Context)))
+					.Select(y => new RankedClass(y.Symbol, y.BaseSymbol, x.Key)))
 				.ToArray();
 		}
 
@@ -88,32 +85,17 @@ namespace Imfact.Steps.Ranking
 			}
 		}
 
-		private static Relation[] AnalyzeRelations(CandidateClass[] factoryClasses)
+		private static Relation[] AnalyzeRelations(FactoryCandidate[] factoryClasses)
 		{
 			return factoryClasses
 				.Select(
 					x =>
 					{
 						using var profiler = TimeProfiler.Create("Extract-Relations-Ranking");
-						return x.Context.GetNamedTypeSymbol(x.Syntax) is { } symbol
-							? new Relation(x.Syntax, symbol, symbol.BaseType, x.Context)
-							: null;
+						return new Relation(x.Symbol, x.Symbol.BaseType);
 					})
 				.FilterNull()
 				.ToArray();
-		}
-
-		private static CandidateClass[] ExtractFactories(CandidateClass[] classes)
-		{
-			return classes.Where(x =>
-			{
-				using var profiler = TimeProfiler.Create("Extract-Factory-Ranking");
-				var hasAttr = x.Syntax.AttributeLists
-					.HasAttribute(FactoryAttribute);
-				var isPartial = x.Syntax.Modifiers.IndexOf(SyntaxKind.PartialKeyword) != -1;
-
-				return hasAttr && isPartial;
-			}).ToArray();
 		}
 
 		private static ITypeSymbol? IsFactoryResolver(IMethodSymbol method)
@@ -150,8 +132,8 @@ namespace Imfact.Steps.Ranking
 			return null;
 		}
 
-		private record Relation(ClassDeclarationSyntax Syntax, INamedTypeSymbol Symbol,
-			INamedTypeSymbol? BaseSymbol, IAnalysisContext Context)
+		private record Relation(INamedTypeSymbol Symbol,
+			INamedTypeSymbol? BaseSymbol)
 		{
 			public bool IsDerivedBy(Relation inheritor)
 			{

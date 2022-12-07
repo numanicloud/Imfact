@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
-using Imfact.Annotations.Samples;
+using Imfact.Annotations;
 using Imfact.Entities;
 using Imfact.Steps.Definitions.Methods;
 using Imfact.Steps.Definitions.Methods.Implementations;
 using Imfact.Steps.Dependency;
-using Imfact.Steps.Semanticses;
 using Imfact.Steps.Semanticses.Interfaces;
 using Imfact.Steps.Semanticses.Records;
 using Imfact.Utilities;

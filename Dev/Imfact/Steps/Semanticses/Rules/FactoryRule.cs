@@ -20,8 +20,7 @@ namespace Imfact.Steps.Semanticses.Rules
 			var common = GetFactoryCommon(aspect.Type, aspect.Methods, ExtractImplementations(aspect));
 			return new Factory(common,
 				ExtractDelegations(aspect.Properties),
-				ExtractInheritance(aspect.BaseClasses),
-				_resolverRule.ExtractExporters(aspect.Exporters));
+				ExtractInheritance(aspect.BaseClasses));
 		}
 
 		private static Implementation[] ExtractImplementations(ClassAspect aspect)

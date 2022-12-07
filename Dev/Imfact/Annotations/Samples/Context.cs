@@ -1,4 +1,4 @@
-﻿namespace Imfact.Annotations.Samples;
+﻿namespace Imfact.Annotations;
 
 internal interface IHook<T> where T : class
 {

@@ -1,5 +1,5 @@
 ﻿using System;
-using Imfact.Annotations.Samples;
+using Imfact.Annotations;
 using Imfact.Entities;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;

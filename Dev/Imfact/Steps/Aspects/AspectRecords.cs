@@ -18,8 +18,7 @@ namespace Imfact.Steps.Aspects
 		InterfaceAspect[] Implements,
 		MethodAspect[] Methods,
 		PropertyAspect[] Properties,
-		ConstructorAspect? KnownConstructor,
-		ExporterAspect[] Exporters);
+		ConstructorAspect? KnownConstructor);
 
 	internal record InterfaceAspect(TypeAnalysis Type);
 

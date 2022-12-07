@@ -20,7 +20,7 @@ internal class IncrementalFactoryGenerator : IIncrementalGenerator
 				.CreateSyntaxProvider(Predicate_, Transform);
 	}
 
-	private CandidateClass Transform(GeneratorSyntaxContext arg1, CancellationToken arg2)
+	private CandidateClass Transform(GeneratorSyntaxContext context, CancellationToken arg2)
 	{
 		// CandidateClass は partial なクラス。
 		// partial なメソッドを表す CandidateMethod をCandidateClass に持たせる形で解析すると、
@@ -63,6 +63,12 @@ internal class IncrementalFactoryGenerator : IIncrementalGenerator
 			source: AnnotationDefinitions.BuildAnnotationCode());
 	}
 }
+
+public record FactoryCandidate(
+	INamedTypeSymbol Symbol,
+	ResolverCandidate[] Resolvers);
+
+public record ResolverCandidate(IMethodSymbol Symbol);
 
 internal sealed class AnnotationContext
 {

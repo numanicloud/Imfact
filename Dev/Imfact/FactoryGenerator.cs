@@ -11,91 +11,110 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Imfact
+namespace Imfact;
+
+[Generator]
+public class FactoryGenerator : ISourceGenerator
 {
-	[Generator]
-	public class FactoryGenerator : ISourceGenerator
-	{
-		public void Initialize(GeneratorInitializationContext context)
-		{
-			context.RegisterForSyntaxNotifications(() => new FactorySyntaxReceiver());
-		}
+    public void Initialize(GeneratorInitializationContext context)
+    {
+        context.RegisterForSyntaxNotifications(() => new FactorySyntaxReceiver());
+    }
 
-		public void Execute(GeneratorExecutionContext context)
-		{
-			try
+    public void Execute(GeneratorExecutionContext context)
+    {
+        try
+        {
+            //System.Diagnostics.Debugger.Launch();
+            AnnotationGenerator.AddSource(in context);
+
+            if (context.SyntaxReceiver is not FactorySyntaxReceiver receiver
+                || receiver.SyntaxTree is null)
+            {
+                return;
+            }
+
+            var csCompilation = (CSharpCompilation)context.Compilation;
+            var options = (CSharpParseOptions)csCompilation.SyntaxTrees[0].Options;
+            var compilation =
+                context.Compilation.AddSyntaxTrees(AnnotationGenerator.GetSyntaxTrees(options));
+            
+			var candidates = ExtractCandidates(receiver.CandidateClasses, compilation);
+            var facade = new GenerationFacade();
+
+            var sourceFiles = facade.Run(candidates);
+            foreach (var file in sourceFiles)
+            {
+                using var profiler = TimeProfiler.Create("File-Adding");
+                var sourceText = SourceText.From(file.Contents, Encoding.UTF8);
+                context.AddSource(file.FileName, sourceText);
+            }
+        }
+        catch (System.Exception ex)
+        {
+            var title = "Internal exception occurred within Imfact source generator.";
+            var noPhantom = string.IsNullOrWhiteSpace(ex.StackTrace) ? "<empty>" : ex.StackTrace;
+            var fullDesc = $"{ex} {noPhantom}";
+
+            fullDesc = fullDesc.Replace("\n", "").Replace("\r", "");
+
+            var diagnostic = Diagnostic.Create(
+                new DiagnosticDescriptor("IMF0002",
+                    $"{title} {fullDesc} v19",
+                    $"{title} {fullDesc} v19",
+                    "Internal",
+                    DiagnosticSeverity.Warning,
+                    true,
+                    ex.ToString(),
+                    null,
+                    WellKnownDiagnosticTags.AnalyzerException),
+                null, (object[]?)null);
+            context.ReportDiagnostic(diagnostic);
+            Debug.WriteLine($"{title} {fullDesc}");
+        }
+    }
+
+    private FactoryCandidate[] ExtractCandidates(
+        IEnumerable<ClassDeclarationSyntax> syntaxes,
+        Compilation compilation)
+    {
+        return syntaxes.Select(x =>
 			{
-				//System.Diagnostics.Debugger.Launch();
-				AnnotationGenerator.AddSource(in context);
+				var semanticModel = compilation.GetSemanticModel(x.SyntaxTree);
+				return semanticModel.GetDeclaredSymbol(x) is { } symbol
+					? new FactoryCandidate(symbol, GetResolvers(x, semanticModel))
+					: null;
+			}).FilterNull()
+            .ToArray();
 
-				if (context.SyntaxReceiver is not FactorySyntaxReceiver receiver
-					|| receiver.SyntaxTree is null)
-				{
-					return;
-				}
-
-				var csCompilation = (CSharpCompilation)context.Compilation;
-				var options = (CSharpParseOptions)csCompilation.SyntaxTrees[0].Options;
-				var compilation =
-					context.Compilation.AddSyntaxTrees(AnnotationGenerator.GetSyntaxTrees(options));
-
-				var candidates = receiver.CandidateClasses
-					.Select(x =>
-					{
-						using var profiler = TimeProfiler.Create("LoadCandidate");
-						var sm = compilation.GetSemanticModel(x.SyntaxTree);
-						return new CandidateClass(x, new CompilationAnalysisContext(sm));
-					})
-					.ToArray();
-				var facade = new GenerationFacade();
-
-				var sourceFiles = facade.Run(candidates);
-				foreach (var file in sourceFiles)
-				{
-					using var profiler = TimeProfiler.Create("File-Adding");
-					var sourceText = SourceText.From(file.Contents, Encoding.UTF8);
-					context.AddSource(file.FileName, sourceText);
-				}
-			}
-			catch (System.Exception ex)
-			{
-				var title = "Internal exception occurred within Imfact source generator.";
-				var noPhantom = string.IsNullOrWhiteSpace(ex.StackTrace) ? "<empty>" : ex.StackTrace;
-				var fullDesc = $"{ex} {noPhantom}";
-				
-				fullDesc = fullDesc.Replace("\n", "").Replace("\r", "");
-				
-				var diagnostic = Diagnostic.Create(
-					new DiagnosticDescriptor("IMF0002",
-						$"{title} {fullDesc} v19",
-						$"{title} {fullDesc} v19",
-						"Internal",
-						DiagnosticSeverity.Warning,
-						true,
-						ex.ToString(),
-						null,
-						WellKnownDiagnosticTags.AnalyzerException),
-					null, (object[]?)null);
-				context.ReportDiagnostic(diagnostic);
-				Debug.WriteLine($"{title} {fullDesc}");
-			}
-		}
-	}
-
-	class FactorySyntaxReceiver : ISyntaxReceiver
-	{
-		public SyntaxTree? SyntaxTree { get; set; }
-		public List<ClassDeclarationSyntax> CandidateClasses { get; } = new();
-
-		public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+        ResolverCandidate[] GetResolvers(ClassDeclarationSyntax @class,
+			SemanticModel semanticModel)
 		{
-			SyntaxTree ??= syntaxNode.SyntaxTree;
-
-			if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax
-				&& classDeclarationSyntax.AttributeLists.Count > 0)
-			{
-				CandidateClasses.Add(classDeclarationSyntax);
-			}
+			return @class.Members
+				.OfType<MethodDeclarationSyntax>()
+				.Where(method => method.Modifiers.IndexOf(SyntaxKind.PartialKeyword) != -1)
+				.Select(x => semanticModel.GetDeclaredSymbol(x) is IMethodSymbol symbol
+					? new ResolverCandidate(symbol)
+					: null)
+				.FilterNull()
+				.ToArray();
 		}
-	}
+}
+}
+
+class FactorySyntaxReceiver : ISyntaxReceiver
+{
+    public SyntaxTree? SyntaxTree { get; set; }
+    public List<ClassDeclarationSyntax> CandidateClasses { get; } = new();
+
+    public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+    {
+        SyntaxTree ??= syntaxNode.SyntaxTree;
+
+        if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax
+            && classDeclarationSyntax.AttributeLists.Count > 0)
+        {
+            CandidateClasses.Add(classDeclarationSyntax);
+        }
+    }
 }

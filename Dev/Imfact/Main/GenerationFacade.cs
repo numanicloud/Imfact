@@ -19,7 +19,7 @@ namespace Imfact.Main
 			_semanticsStep = _stepFactory.Semantics();
 		}
 
-		public SourceFile[] Run(CandidateClass[] candidates)
+		public SourceFile[] Run(FactoryCandidate[] candidates)
 		{
 			var ranking = new RankingStep();
 			var ranked = ranking.Run(candidates);
@@ -32,7 +32,7 @@ namespace Imfact.Main
 
 		private SourceFile? RunGeneration(RankedClass syntax)
 		{
-			return _stepFactory.Aspect(_genContext, syntax.Context).Run(syntax)
+			return _stepFactory.Aspect(_genContext).Run(syntax)
 				.Then(aspect => _semanticsStep.Run(aspect))
 				.Then(semantics => _stepFactory.Dependency(semantics, _genContext).Run())
 				.Then(dependency =>

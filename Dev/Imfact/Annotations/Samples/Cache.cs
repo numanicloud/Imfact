@@ -1,4 +1,4 @@
-﻿namespace Imfact.Annotations.Samples;
+﻿namespace Imfact.Annotations;
 
 internal sealed class Cache<T> : IHook<T> where T : class
 {
