@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Imfact.Steps.Definitions.Interfaces;
+﻿using Imfact.Steps.Definitions.Interfaces;
 
 namespace Imfact.Steps.Definitions.Methods.Implementations
 {

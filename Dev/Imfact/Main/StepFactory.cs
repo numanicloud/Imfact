@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Imfact.Interfaces;
 using Imfact.Steps.Aspects;
 using Imfact.Steps.Aspects.Rules;
 using Imfact.Steps.Definitions;
