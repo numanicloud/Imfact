@@ -20,21 +20,21 @@ internal class GenerationFacade
         _semanticsStep = _stepFactory.Semantics();
     }
 
-    public SourceFile[] Run(FactoryCandidate[] candidates)
+    public SourceFile[] Run(GenerationSource generationSource)
     {
         var ranking = new RankingStep();
-        var ranked = ranking.Run(candidates);
+        var ranked = ranking.Run(generationSource.Factories);
 
         return ranked.OrderBy(x => x.Rank)
-            .Select(x => RunGeneration(x, candidates))
+            .Select(x => RunGeneration(x, generationSource.Annotations))
             .FilterNull()
             .ToArray();
     }
 
-    private SourceFile? RunGeneration(RankedClass syntax, FactoryCandidate[] factoryCandidates)
+    private SourceFile? RunGeneration(RankedClass ranked, AnnotationContext annotations)
     {
-        return _stepFactory.Aspect(_genContext, factoryCandidates)
-            .Run(syntax)
+        return _stepFactory.Aspect(_genContext, annotations)
+            .Run(ranked)
             .Then(aspect => _semanticsStep.Run(aspect))
             .Then(semantics => _stepFactory.Dependency(semantics, _genContext).Run())
             .Then(dependency =>

@@ -1,5 +1,4 @@
-﻿using System;
-using Imfact.Annotations;
+﻿using Imfact.Annotations;
 using Imfact.Entities;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
@@ -9,21 +8,19 @@ namespace Imfact.Steps.Aspects.Rules;
 internal class AttributeRule
 {
 	private readonly TypeRule _typeRule;
-	private static readonly AttributeName _resAt = new(nameof(ResolutionAttribute));
-	private static readonly AttributeName _hokAt = new(nameof(HookAttribute));
-	private static readonly AttributeName _cacAt = new(nameof(CacheAttribute));
-	private static readonly AttributeName _cprAt = new(nameof(CachePerResolutionAttribute));
+    private readonly AnnotationContext _annotations;
 
-	public AttributeRule(TypeRule typeRule)
+	public AttributeRule(TypeRule typeRule, AnnotationContext annotations)
 	{
 		_typeRule = typeRule;
-	}
+        _annotations = annotations;
+    }
 
 	public MethodAttributeAspect? ExtractAspect(AttributeData data,
 		INamedTypeSymbol ownerReturn,
 		string ownerName)
 	{
-		if (data.AttributeClass?.Name is not { } name)
+		if (data.AttributeClass is not { } attr)
 		{
 			return null;
 		}
@@ -31,7 +28,7 @@ internal class AttributeRule
 		AnnotationKind kind;
 		TypeToCreate? type;
 
-		if (_resAt.MatchWithAnyName(name))
+		if (Match(_annotations.ResolutionAttribute, attr))
 		{
 			if (Resolution(data, ownerReturn) is not { } tuple)
 			{
@@ -40,7 +37,16 @@ internal class AttributeRule
 
 			(kind, type) = tuple;
 		}
-		else if (_hokAt.MatchWithAnyName(name))
+		else if (Match(_annotations.ResolutionAttributeT, attr.OriginalDefinition))
+		{
+			if (ResolutionT(data, ownerReturn) is not { } tuple)
+			{
+				return null;
+			}
+
+			(kind, type) = tuple;
+		}
+		else if (Match(_annotations.HookAttribute, attr))
 		{
 			if (Hook(data, ownerReturn) is not {} tuple)
 			{
@@ -49,12 +55,12 @@ internal class AttributeRule
 
 			(kind, type) = tuple;
 		}
-		else if (_cacAt.MatchWithAnyName(name))
+		else if (Match(_annotations.CacheAttribute, attr))
 		{
 			kind = AnnotationKind.CacheHookPreset;
 			type = PresetCache(typeof(Cache<>), ownerReturn);
 		}
-		else if (_cprAt.MatchWithAnyName(name))
+		else if (Match(_annotations.CachePerResolutionAttribute, attr))
 		{
 			kind = AnnotationKind.CachePrHookPreset;
 			type = PresetCache(typeof(CachePerResolution<>), ownerReturn);
@@ -65,6 +71,11 @@ internal class AttributeRule
 		}
 
 		return new MethodAttributeAspect(kind, TypeAnalysis.FromSymbol(ownerReturn), ownerName, type);
+
+		bool Match(INamedTypeSymbol actual, INamedTypeSymbol expected)
+		{
+			return SymbolEqualityComparer.Default.Equals(actual, expected);
+		}
 	}
 
 	private (AnnotationKind, TypeToCreate)? Resolution(AttributeData data,
@@ -78,6 +89,20 @@ internal class AttributeRule
 			var kind = AnnotationKind.Resolution;
 			var type = _typeRule.ExtractTypeToCreate(t, ownerReturn);
 			return (kind, type);
+		}
+
+		return null;
+	}
+
+	private (AnnotationKind, TypeToCreate)? ResolutionT(AttributeData data,
+		INamedTypeSymbol ownerReturn)
+	{
+		if (data.ConstructorArguments.Length == 0
+			&& data.AttributeClass?.TypeArguments.Length == 1
+			&& data.AttributeClass.TypeArguments[0] is INamedTypeSymbol t)
+		{
+			var type = _typeRule.ExtractTypeToCreate(t, ownerReturn);
+			return (AnnotationKind.Resolution, type);
 		}
 
 		return null;

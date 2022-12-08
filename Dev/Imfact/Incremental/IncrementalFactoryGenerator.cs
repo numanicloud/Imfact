@@ -105,7 +105,7 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
 
         try
         {
-            var generated = facade.Run(source.Factories);
+            var generated = facade.Run(source);
             foreach (var file in generated)
             {
                 context.AddSource(

@@ -1,11 +1,11 @@
-﻿using System.Text;
+﻿using Imfact.Utilities.Coding;
+using System.Text;
 
 namespace Imfact.Annotations;
 
 internal class AnnotationDefinitions
 {
 	public const string NamespaceName = "Imfact.Annotations";
-
 	public const string FactoryAttributeName = "FactoryAttribute";
 	public const string ResolutionAttributeName = "ResolutionAttribute";
 	public const string HookAttributeName = "HookAttribute";
@@ -190,24 +190,26 @@ internal class AnnotationDefinitions
 		""";
 
 	public static string BuildAnnotationCode()
-	{
-		var builder = new StringBuilder();
-		builder.AppendLine($"namespace {NamespaceName};");
-
-		builder.AppendLine(FactoryAttribute);
-		builder.AppendLine(ResolutionAttribute);
-		builder.AppendLine(ResolutionAttributeT);
-		builder.AppendLine(HookAttribute);
-		builder.AppendLine(ExporterAttribute);
-		builder.AppendLine(IHook);
-		builder.AppendLine(IResolverService);
-		builder.AppendLine(ResolverService);
-		builder.AppendLine(Cache);
-		builder.AppendLine(CacheAttribute);
-		builder.AppendLine(CachePerResolution);
-		builder.AppendLine(CachePerResolutionAttribute);
-		builder.AppendLine(TransientAttribute);
-		builder.AppendLine(IServiceImporter);
+    {
+        var builder = new StringBuilder();
+        CodeHelper.GetBuilder(builder).EnterSequence(seq =>
+        {
+            seq.AppendLine($"namespace {NamespaceName};");
+            seq.AppendLine(FactoryAttribute);
+            seq.AppendLine(ResolutionAttribute);
+            seq.AppendLine(ResolutionAttributeT);
+            seq.AppendLine(HookAttribute);
+            seq.AppendLine(ExporterAttribute);
+            seq.AppendLine(IHook);
+            seq.AppendLine(IResolverService);
+            seq.AppendLine(ResolverService);
+            seq.AppendLine(Cache);
+            seq.AppendLine(CacheAttribute);
+            seq.AppendLine(CachePerResolution);
+            seq.AppendLine(CachePerResolutionAttribute);
+            seq.AppendLine(TransientAttribute);
+            seq.AppendLine(IServiceImporter);
+        });
 
 		return builder.ToString();
 	}

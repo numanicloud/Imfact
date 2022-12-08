@@ -8,6 +8,7 @@ internal sealed class AnnotationContext
 {
     public required INamedTypeSymbol FactoryAttribute { get; init; }
     public required INamedTypeSymbol ResolutionAttribute { get; init; }
+    public required INamedTypeSymbol ResolutionAttributeT { get; init; }
     public required INamedTypeSymbol HookAttribute { get; init; }
     public required INamedTypeSymbol ExporterAttribute { get; init; }
     public required INamedTypeSymbol CacheAttribute { get; init; }
@@ -21,6 +22,7 @@ internal sealed class AnnotationContext
         {
             FactoryAttribute = EnsureGetType(AnnotationDefinitions.FactoryAttributeName),
             ResolutionAttribute = EnsureGetType(AnnotationDefinitions.ResolutionAttributeName),
+            ResolutionAttributeT = EnsureGetType(AnnotationDefinitions.ResolutionAttributeName + "`1"),
             HookAttribute = EnsureGetType(AnnotationDefinitions.HookAttributeName),
             ExporterAttribute = EnsureGetType(AnnotationDefinitions.ExporterAttributeName),
             CacheAttribute = EnsureGetType(AnnotationDefinitions.CacheAttributeName),

@@ -14,10 +14,6 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Interfaces\" />
-	</ItemGroup>
-
 	<Target Name="_AddAnalyzersToOutput">
 		<ItemGroup>
 			<TfmSpecificPackageFile Include="$(OutputPath)\$(AssemblyName).dll" PackagePath="analyzers/dotnet/cs" />

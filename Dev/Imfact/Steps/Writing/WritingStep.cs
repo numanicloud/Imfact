@@ -20,7 +20,7 @@ internal class WritingStep
 
 	public SourceFile Write()
 	{
-		var fileName = _definitionRoot.Namespace.Class.Name + ".g";
+		var fileName = $"{_definitionRoot.Namespace.Name}.{_definitionRoot.Namespace.Class.Name}.g.cs";
 		var contents = Render();
 		return new SourceFile(fileName, contents);
 	}
