@@ -1,4 +1,6 @@
-﻿namespace Imfact.Steps.Definitions.Interfaces;
+﻿using Imfact.Utilities.Coding;
+
+namespace Imfact.Steps.Definitions.Interfaces;
 
 internal interface IResolverWriter
 {

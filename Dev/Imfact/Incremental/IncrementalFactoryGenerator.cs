@@ -1,17 +1,13 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Threading;
 using Imfact.Annotations;
 using Imfact.Main;
-using Imfact.Steps.Writing;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Imfact.Incremental;
-
-internal record GenerationSource(FactoryCandidate[] Factories, AnnotationContext Annotations);
 
 [Generator]
 public class IncrementalFactoryGenerator : IIncrementalGenerator
@@ -36,57 +32,6 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
                 .Select(PostTransform2);
 
         context.RegisterSourceOutput(generationSource, GenerateFileEmbed2);
-    }
-
-    private void GenerateFileEmbed2(SourceProductionContext context, GenerationSource source)
-    {
-        context.CancellationToken.ThrowIfCancellationRequested();
-
-        var facade = new GenerationFacade();
-
-        try
-        {
-            var generated = facade.Run(source.Factories);
-            foreach (var file in generated)
-            {
-                context.AddSource(
-                    hintName: file.FileName,
-                    source: file.Contents);
-            }
-        }
-        catch (Exception ex)
-        {
-            Debugger.Break();
-            context.ReportDiagnostic(DebugHelper.Error(
-                "IMF001",
-                "Internal error",
-                $"Internal error occurd in Imfact: {ex}"));
-        }
-    }
-
-    private GenerationSource PostTransform2(
-        (ImmutableArray<FactoryIncremental?> factories, AnnotationContext annotations) tuple,
-        CancellationToken ct)
-    {
-        var result = tuple.factories
-            .Select(GetCandidate)
-            .FilterNull()
-            .ToArray();
-        return new GenerationSource(result, tuple.annotations);
-
-        FactoryCandidate? GetCandidate(FactoryIncremental? factory)
-        {
-            ct.ThrowIfCancellationRequested();
-
-            if (factory is null) return null;
-            if (!GeneralRule.Instance.IsFactoryCandidate(factory, tuple.annotations)) return null;
-
-            return new FactoryCandidate(factory.Symbol,
-                factory.Methods
-                    .Select(x => new ResolverCandidate(x.Symbol, x.IsToGenerate))
-                    .ToArray(),
-                tuple.annotations);
-        }
     }
 
     private void GenerateInitialCode(IncrementalGeneratorPostInitializationContext context)
@@ -127,31 +72,46 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
         }
     }
 
-    private FactoryCandidate? PostTransform(
-        (FactoryIncremental? factory, AnnotationContext annotations) tuple,
+    private GenerationSource PostTransform2(
+        (ImmutableArray<FactoryIncremental?> factories, AnnotationContext annotations) tuple,
         CancellationToken ct)
     {
-        ct.ThrowIfCancellationRequested();
-        if (tuple.factory is not { } factory) return null;
-        if (!GeneralRule.Instance.IsFactoryCandidate(factory, tuple.annotations)) return null;
+        var result = tuple.factories
+            .Select(GetCandidate)
+            .FilterNull()
+            .ToArray();
+        return new GenerationSource(result, tuple.annotations);
 
-        return new FactoryCandidate(factory.Symbol,
-            factory.Methods
-                .Select(x => new ResolverCandidate(x.Symbol, x.IsToGenerate))
-                .ToArray(),
-            tuple.annotations);
+        FactoryCandidate? GetCandidate(FactoryIncremental? factory)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            if (factory is null) return null;
+            if (!GeneralRule.Instance.IsFactoryCandidate(factory, tuple.annotations)) return null;
+
+            return new FactoryCandidate(factory.Symbol,
+                factory.Methods
+                    .Select(x => new ResolverCandidate(x.Symbol, x.IsToGenerate))
+                    .ToArray(),
+                tuple.annotations);
+        }
     }
 
-    private void GenerateFileEmbed(SourceProductionContext context, FactoryCandidate candidate)
+    private void GenerateFileEmbed2(SourceProductionContext context, GenerationSource source)
     {
         context.CancellationToken.ThrowIfCancellationRequested();
 
         var facade = new GenerationFacade();
 
-        SourceFile[] sources;
         try
         {
-            sources = facade.Run(new[] { candidate });
+            var generated = facade.Run(source.Factories);
+            foreach (var file in generated)
+            {
+                context.AddSource(
+                    hintName: file.FileName,
+                    source: file.Contents);
+            }
         }
         catch (Exception ex)
         {
@@ -160,12 +120,7 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
                 "IMF001",
                 "Internal error",
                 $"Internal error occurd in Imfact: {ex}"));
-            return;
         }
-
-        context.AddSource(
-            hintName: $"{candidate.Symbol.Name}.g.cs",
-            source: sources[0].Contents);
     }
 }
 

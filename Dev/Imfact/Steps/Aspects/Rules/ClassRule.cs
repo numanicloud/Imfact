@@ -12,17 +12,14 @@ internal class ClassRule
 	private readonly GenerationContext _genContext;
 	private readonly MethodRule _methodRule;
 	private readonly PropertyRule _propertyRule;
-	private readonly FactoryCandidate[] _factoryCandidates;
-	private readonly GeneralRule _generalRule = new();
 
 	public ClassRule
 		(GenerationContext genContext, MethodRule methodRule,
-		PropertyRule propertyRule, FactoryCandidate[] factoryCandidates)
+		PropertyRule propertyRule)
 	{
 		_genContext = genContext;
 		_methodRule = methodRule;
 		_propertyRule = propertyRule;
-		_factoryCandidates = factoryCandidates;
 	}
 
 	public ClassAspect Aggregate(RankedClass root)

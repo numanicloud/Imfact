@@ -17,6 +17,11 @@ internal sealed class ResolutionAttribute : global::System.Attribute
 }
 
 [global::System.AttributeUsage(global::System.AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
+internal sealed class ResolutionAttribute<T> : global::System.Attribute
+{
+}
+
+[global::System.AttributeUsage(global::System.AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
 internal sealed class HookAttribute : global::System.Attribute
 {
 	public global::System.Type Type { get; }
