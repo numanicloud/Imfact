@@ -45,7 +45,7 @@ internal class ClassRule
 			baseClasses,
 			ExtractInterfaces(symbol),
 			GetMethodAspects(factory, partialOnly: true),
-			GetPropertyAspects(symbol),
+			GetPropertyAspects(symbol, factory.Annotations),
 			null);
 	}
 
@@ -54,13 +54,14 @@ internal class ClassRule
 		// 基底クラスのコンストラクタを呼ぶためには基底クラスを通す必要がある
 		// 基底クラスのリゾルバーを呼ぶためには基底クラスを通す必要がある
 		return TraverseBase(factory.Symbol)
-			.Select(x => new FactoryCandidate(x, GetMethods(x), factory.Context))
+			.Select(x => new FactoryCandidate(x, GetMethods(x), factory.Annotations))
 			.Select(ExtractBase)
 			.ToArray();
 
 		IEnumerable<INamedTypeSymbol> TraverseBase(INamedTypeSymbol pivot)
 		{
-			if (pivot.BaseType is not null && _generalRule.IsInheritanceTarget(pivot.BaseType))
+			if (pivot.BaseType is not null 
+				&& GeneralRule.Instance.IsInheritanceTarget(pivot.BaseType))
 			{
 				yield return pivot.BaseType;
 				foreach (var baseSymbol in TraverseBase(pivot.BaseType))
@@ -74,7 +75,7 @@ internal class ClassRule
 		{
 			return holder.GetMembers()
 				.OfType<IMethodSymbol>()
-				.Where(_generalRule.IsIndirectResolver)
+				.Where(GeneralRule.Instance.IsIndirectResolver)
 				.Select(x => new ResolverCandidate(x, false))
 				.ToArray();
 		}
@@ -90,7 +91,7 @@ internal class ClassRule
 			new ClassAspect[0],
 			ExtractInterfaces(symbol),
 			GetMethodAspects(factory, false),
-			GetPropertyAspects(symbol),
+			GetPropertyAspects(symbol, factory.Annotations),
 			GetConstructor(symbol));
 	}
 
@@ -114,11 +115,11 @@ internal class ClassRule
 			.ToArray();
 	}
 
-	private PropertyAspect[] GetPropertyAspects(INamedTypeSymbol @class)
+	private PropertyAspect[] GetPropertyAspects(INamedTypeSymbol @class, AnnotationContext annotations)
 	{
 		return @class.GetMembers()
 			.OfType<IPropertySymbol>()
-			.Select(_propertyRule.ExtractAspect)
+			.Select(x => _propertyRule.ExtractAspect(x, annotations))
 			.FilterNull()
 			.ToArray();
 	}

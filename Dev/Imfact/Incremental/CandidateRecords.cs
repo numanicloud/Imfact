@@ -9,6 +9,6 @@ internal record ResolverIncremental(IMethodSymbol Symbol, bool IsToGenerate);
 internal record FactoryCandidate
     (INamedTypeSymbol Symbol,
     ResolverCandidate[] Methods,
-    AnnotationContext? Context = null);
+    AnnotationContext Annotations);
 
 internal record ResolverCandidate(IMethodSymbol Symbol, bool IsToGenerate);

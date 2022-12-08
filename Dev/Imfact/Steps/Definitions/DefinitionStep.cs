@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Imfact.Interfaces;
+using Imfact.Entities;
 using Imfact.Steps.Definitions.Builders;
 using Imfact.Steps.Definitions.Methods;
 using Imfact.Steps.Dependency;

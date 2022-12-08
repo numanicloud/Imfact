@@ -1,7 +1,5 @@
 ﻿using Imfact.Entities;
 using Microsoft.CodeAnalysis;
-using System.Linq;
-using Imfact.Annotations;
 using Imfact.Utilities;
 
 namespace Imfact.Steps.Aspects.Rules;
@@ -15,17 +13,9 @@ internal class PropertyRule
 		_methodRule = methodRule;
 	}
 
-	public PropertyAspect? ExtractAspect(IPropertySymbol symbol)
+	public PropertyAspect? ExtractAspect(IPropertySymbol symbol, AnnotationContext annotations)
 	{
-		var isDelegation = symbol.Type.GetAttributes()
-			.Select(x => x.AttributeClass)
-			.FilterNull()
-			.Select(x => new AttributeName(x.Name))
-			.Any(x => x.NameWithAttributeSuffix == nameof(FactoryAttribute));
-		if (!isDelegation)
-		{
-			return null;
-		}
+		if (GeneralRule.Instance.IsDelegation(symbol, annotations)) return null;
 
 		var methods = symbol.Type.GetMembers().OfType<IMethodSymbol>()
 			.Select(m => _methodRule.ExtractNotAsRootResolver(m))

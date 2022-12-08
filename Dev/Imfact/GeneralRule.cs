@@ -1,8 +1,8 @@
 ﻿using Imfact.Incremental;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 
 namespace Imfact;
 
@@ -55,5 +55,13 @@ internal sealed class GeneralRule
                 .Equals(attributeData.AttributeClass,
                     annotations.FactoryAttribute);
         }
+    }
+
+    public bool IsDelegation(IPropertySymbol property, AnnotationContext annotations)
+    {
+        return property.Type.GetAttributes()
+            .Select(x => x.AttributeClass)
+            .FilterNull()
+            .Any(x => SymbolEqualityComparer.Default.Equals(x, annotations.FactoryAttribute));
     }
 }

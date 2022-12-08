@@ -1,4 +1,4 @@
-﻿using Imfact.Interfaces;
+﻿using Imfact.Entities;
 
 namespace Imfact.Steps.Definitions;
 

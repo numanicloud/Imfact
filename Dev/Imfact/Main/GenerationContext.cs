@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Imfact.Entities;
-using Imfact.Interfaces;
 
 namespace Imfact.Main;
 
