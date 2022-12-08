@@ -22,16 +22,6 @@ internal class GenerationFacade
 
     public SourceFile[] Run(FactoryCandidate[] candidates)
     {
-        if (candidates.Length != 1)
-        {
-            throw new ArgumentException(nameof(candidates));
-        }
-        return new RankedClass[] { new(candidates[0], null, 0) }
-            .Select(x => RunGeneration(x, candidates))
-            .FilterNull()
-            .ToArray();
-
-
         var ranking = new RankingStep();
         var ranked = ranking.Run(candidates);
 

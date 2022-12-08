@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Threading;
 using Imfact.Annotations;
 using Imfact.Main;
@@ -9,6 +10,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Imfact.Incremental;
+
+internal record GenerationSource(FactoryCandidate[] Factories, AnnotationContext Annotations);
 
 [Generator]
 public class IncrementalFactoryGenerator : IIncrementalGenerator
@@ -25,15 +28,65 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
             context.CompilationProvider
                 .Select(AnnotationContext.FromCompilation);
 
-        // Collect メソッドを使って、全てのノードを総合的に評価することができそう
-        IncrementalValuesProvider<FactoryCandidate> candidates =
+        IncrementalValueProvider<GenerationSource> generationSource =
             context.SyntaxProvider
                 .CreateSyntaxProvider(Predicate, Transform)
+                .Collect()
                 .Combine(annotations)
-                .Select(PostTransform)
-                .Where(x => x != null)!;
+                .Select(PostTransform2);
 
-        context.RegisterSourceOutput(candidates, GenerateFileEmbed);
+        context.RegisterSourceOutput(generationSource, GenerateFileEmbed2);
+    }
+
+    private void GenerateFileEmbed2(SourceProductionContext context, GenerationSource source)
+    {
+        context.CancellationToken.ThrowIfCancellationRequested();
+
+        var facade = new GenerationFacade();
+
+        try
+        {
+            var generated = facade.Run(source.Factories);
+            foreach (var file in generated)
+            {
+                context.AddSource(
+                    hintName: file.FileName,
+                    source: file.Contents);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debugger.Break();
+            context.ReportDiagnostic(DebugHelper.Error(
+                "IMF001",
+                "Internal error",
+                $"Internal error occurd in Imfact: {ex}"));
+        }
+    }
+
+    private GenerationSource PostTransform2(
+        (ImmutableArray<FactoryIncremental?> factories, AnnotationContext annotations) tuple,
+        CancellationToken ct)
+    {
+        var result = tuple.factories
+            .Select(GetCandidate)
+            .FilterNull()
+            .ToArray();
+        return new GenerationSource(result, tuple.annotations);
+
+        FactoryCandidate? GetCandidate(FactoryIncremental? factory)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            if (factory is null) return null;
+            if (!GeneralRule.Instance.IsFactoryCandidate(factory, tuple.annotations)) return null;
+
+            return new FactoryCandidate(factory.Symbol,
+                factory.Methods
+                    .Select(x => new ResolverCandidate(x.Symbol, x.IsToGenerate))
+                    .ToArray(),
+                tuple.annotations);
+        }
     }
 
     private void GenerateInitialCode(IncrementalGeneratorPostInitializationContext context)
@@ -47,9 +100,7 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
     private bool Predicate(SyntaxNode node, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        return node is TypeDeclarationSyntax { AttributeLists.Count: > 0 } syntax
-            && node is not InterfaceDeclarationSyntax
-            && syntax.Modifiers.IndexOf(SyntaxKind.PartialKeyword) != -1;
+        return GeneralRule.Instance.IsFactoryClassDeclaration(node);
     }
 
     private FactoryIncremental? Transform(GeneratorSyntaxContext context, CancellationToken ct)

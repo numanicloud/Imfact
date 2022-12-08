@@ -125,12 +125,13 @@ internal class ClassRule
 
 	private ConstructorAspect GetConstructor(INamedTypeSymbol symbol)
 	{
-		var ctor = symbol.Constructors.MaxItem(x => x.Arity);
+		var type = TypeAnalysis.FromSymbol(symbol);
+		var ctor = _genContext.Constructors[type.Id];
 
 		var parameters = ctor.Parameters
-			.Select(x => new ParameterAspect(TypeAnalysis.FromSymbol(x.Type), x.Name))
+			.Select(x => new ParameterAspect(x.Type, x.Name))
 			.ToArray();
 
-		return new ConstructorAspect(ctor.DeclaredAccessibility, parameters);
+		return new ConstructorAspect(ctor.Accessibility, parameters);
 	}
 }

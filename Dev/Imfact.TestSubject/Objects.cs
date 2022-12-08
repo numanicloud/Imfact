@@ -47,6 +47,7 @@ namespace Deptorygen2.TestSubject.Objects
 	{
 		public Client(Sub.Service service, Sub.Service service2)
 		{
+
 		}
 	}
 

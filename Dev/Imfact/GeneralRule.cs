@@ -12,6 +12,13 @@ internal sealed class GeneralRule
 
     public static GeneralRule Instance => _instance ??= new GeneralRule();
 
+    public bool IsFactoryClassDeclaration(SyntaxNode node)
+    {
+        return node is TypeDeclarationSyntax { AttributeLists.Count: > 0 } syntax
+            && node is not InterfaceDeclarationSyntax
+            && syntax.Modifiers.IndexOf(SyntaxKind.PartialKeyword) != -1;
+    }
+
     public bool IsIndirectResolver(IMethodSymbol method)
     {
         if (method.ReturnType is not INamedTypeSymbol named) return false;
