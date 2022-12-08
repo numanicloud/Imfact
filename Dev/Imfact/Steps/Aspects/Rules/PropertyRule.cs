@@ -20,13 +20,6 @@ internal class PropertyRule
 	{
 		if (!GeneralRule.Instance.IsDelegation(symbol, annotations, _logger))
         {
-			var attributeNames = symbol.Type.GetAttributes()
-				.Select(x => $"{x.AttributeClass?.GetFullNameSpace()}.{x.AttributeClass?.Name}");
-
-            _logger.Debug($$"""
-				{{symbol.Name}} is property but not Delegation.
-				Attributes={{string.Join(", ", attributeNames)}}
-				""");
             return null;
         }
 

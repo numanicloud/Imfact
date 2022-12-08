@@ -61,41 +61,19 @@ internal sealed class GeneralRule
 
     public bool IsDelegation(IPropertySymbol property, AnnotationContext annotations, Logger logger)
     {
+        var inSameModule = SymbolEqualityComparer.Default.Equals(
+            property.Type.ContainingModule,
+            annotations.FactoryAttribute.ContainingModule);
+
+        var factoryAttributeFullName = annotations.FactoryAttribute.GetFullNameSpace()
+            + "."
+            + annotations.FactoryAttribute.Name;
+
         return property.Type.GetAttributes()
-            .Select(x =>
-            {
-                var attr = x.AttributeClass;
-                if (attr is null)
-                {
-                    logger.Debug($$"""
-                        One AttributeData of {{property.Type.Name}} is null.
-                        """);
-                }
-                else
-                {
-                    logger.Debug($$"""
-                        {{attr.Name}} is an attribute of {{property.Type.Name}}.
-                        """);
-                }
-                return attr;
-            })
+            .Select(x => x.AttributeClass)
             .FilterNull()
-            .Any(x =>
-            {
-                var judge = SymbolEqualityComparer.Default.Equals(x.OriginalDefinition, annotations.FactoryAttribute);
-                if (judge)
-                {
-                    logger.Debug($$"""
-                        {{x.GetFullNameSpace()}}.{{x.Name}} is equal to {{annotations.FactoryAttribute.Name}}.
-                        """);
-                }
-                else
-                {
-                    logger.Debug($$"""
-                        {{x.GetFullNameSpace()}}.{{x.Name}} is not equal to {{annotations.FactoryAttribute.Name}}.
-                        """);
-                }
-                return judge;
-            });
+            .Any(x => inSameModule
+                ? SymbolEqualityComparer.Default.Equals(x.OriginalDefinition, annotations.FactoryAttribute)
+                : $"{x.GetFullNameSpace()}.{x.Name}" == factoryAttributeFullName);
     }
 }
