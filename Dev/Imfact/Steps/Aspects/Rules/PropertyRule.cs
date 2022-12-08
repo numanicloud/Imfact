@@ -7,24 +7,20 @@ namespace Imfact.Steps.Aspects.Rules;
 
 internal class PropertyRule
 {
-	private readonly MethodRule _methodRule;
-    private readonly Logger _logger;
-
-    public PropertyRule(MethodRule methodRule, Logger logger)
-	{
-		_methodRule = methodRule;
-        this._logger = logger;
-    }
+	public required MethodRule Rule { private get; init; }
+	public required GenerationContext GenContext { private get; init; }
 
 	public PropertyAspect? ExtractAspect(IPropertySymbol symbol, AnnotationContext annotations)
 	{
-		if (!GeneralRule.Instance.IsDelegation(symbol, annotations, _logger))
+		using var profiler = GenContext.Profiler.GetScope();
+
+		if (!GeneralRule.Instance.IsDelegation(symbol, annotations, GenContext))
         {
             return null;
         }
 
         var methods = symbol.Type.GetMembers().OfType<IMethodSymbol>()
-			.Select(m => _methodRule.ExtractNotAsRootResolver(m))
+			.Select(m => Rule.ExtractNotAsRootResolver(m))
 			.FilterNull()
 			.ToArray();
 

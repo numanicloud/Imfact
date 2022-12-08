@@ -12,7 +12,7 @@ internal class GenerationFacade
 {
     // MEMO: GenerationContextはコンパイルごとに異なる。IAnalysisContextはソースファイルごとに異なる
     private readonly GenerationContext _genContext;
-    private readonly StepFactory _stepFactory = new();
+    private readonly StepFactory _stepFactory;
     private readonly SemanticsStep _semanticsStep;
 
     public GenerationFacade(Logger logger)
@@ -21,6 +21,7 @@ internal class GenerationFacade
         {
             Logger = logger
         };
+		_stepFactory = new StepFactory(_genContext);
         _semanticsStep = _stepFactory.Semantics();
     }
 
@@ -29,15 +30,19 @@ internal class GenerationFacade
         var ranking = new RankingStep();
         var ranked = ranking.Run(generationSource.Factories);
 
-        return ranked.OrderBy(x => x.Rank)
+        var result = ranked.OrderBy(x => x.Rank)
             .Select(x => RunGeneration(x, generationSource.Annotations))
             .FilterNull()
             .ToArray();
-    }
+
+        _genContext.Profiler.WriteStats(_genContext.Logger);
+
+		return result;
+	}
 
     private SourceFile? RunGeneration(RankedClass ranked, AnnotationContext annotations)
     {
-        return _stepFactory.Aspect(_genContext, annotations)
+        return _stepFactory.Aspect(annotations)
             .Run(ranked)
             .Then(aspect => _semanticsStep.Run(aspect))
             .Then(semantics => _stepFactory.Dependency(semantics, _genContext).Run())

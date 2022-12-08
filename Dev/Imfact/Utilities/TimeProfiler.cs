@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace Imfact.Utilities;
 
@@ -30,14 +29,5 @@ internal class TimeProfiler : IDisposable
 #else
 			return NullDisposable.Instance;
 #endif
-	}
-}
-
-internal class NullDisposable : IDisposable
-{
-	public static readonly NullDisposable Instance = new();
-
-	public void Dispose()
-	{
 	}
 }

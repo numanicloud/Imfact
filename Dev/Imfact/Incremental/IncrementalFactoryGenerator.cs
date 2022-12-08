@@ -29,9 +29,9 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
                 .CreateSyntaxProvider(Predicate, Transform)
                 .Collect()
                 .Combine(annotations)
-                .Select(PostTransform2);
+                .Select(PostTransform);
 
-        context.RegisterSourceOutput(generationSource, GenerateFileEmbed2);
+        context.RegisterSourceOutput(generationSource, GenerateFileEmbed);
     }
 
     private void GenerateInitialCode(IncrementalGeneratorPostInitializationContext context)
@@ -72,7 +72,7 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
         }
     }
 
-    private GenerationSource PostTransform2(
+    private GenerationSource PostTransform(
         (ImmutableArray<FactoryIncremental?> factories, AnnotationContext annotations) tuple,
         CancellationToken ct)
     {
@@ -97,7 +97,7 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
         }
     }
 
-    private void GenerateFileEmbed2(SourceProductionContext context, GenerationSource source)
+    private void GenerateFileEmbed(SourceProductionContext context, GenerationSource source)
     {
         context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -110,7 +110,7 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
         try
         {
             var generated = facade.Run(source);
-            foreach (var file in generated)
+			foreach (var file in generated)
             {
                 context.AddSource(
                     hintName: file.FileName,

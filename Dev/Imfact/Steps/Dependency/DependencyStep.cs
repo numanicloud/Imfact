@@ -22,7 +22,8 @@ internal class DependencyStep
 
 	public DependencyResult Run()
 	{
-		using var profiler = TimeProfiler.Create("Dependency-Root");
+		using var profiler = AggregationProfiler.GetScope();
+
 		var injectionResult = BuildInjection();
 		var disposable = DisposableInfo.Aggregate(_semantics.Factory,
 			injectionResult.Dependencies);

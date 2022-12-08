@@ -16,7 +16,8 @@ internal class RankingStep
 
 	public RankedClass[] Run(FactoryCandidate[] classes)
 	{
-		using var profiler = TimeProfiler.Create("Ranking");
+		using var profiler = AggregationProfiler.GetScope();
+
 		var relations = AnalyzeRelations(classes);
 		var (rank0, notRank0) = ExtractRank0(relations);
 		var ranks = DetermineRanking(rank0, notRank0);
@@ -26,9 +27,9 @@ internal class RankingStep
 			.ToArray();
 	}
 
-	private static Dictionary<int, List<Relation>> DetermineRanking(List<Relation> rank0, List<Relation> notRank0)
+	private Dictionary<int, List<Relation>> DetermineRanking(List<Relation> rank0, List<Relation> notRank0)
 	{
-		using var profiler = TimeProfiler.Create("DetermineRanking");
+		using var profiler = AggregationProfiler.GetScope();
 		var ranks = new Dictionary<int, List<Relation>>()
 		{
 			[0] = rank0
@@ -60,7 +61,7 @@ internal class RankingStep
 
 	private static (List<Relation> rank0, List<Relation> notRank0) ExtractRank0(Relation[] relations)
 	{
-		using var profiler = TimeProfiler.Create("Extract-Rank0-Ranking");
+		using var profiler = AggregationProfiler.GetScope();
 
 		var marked = relations
 			.Select(x =>
@@ -99,7 +100,8 @@ internal class RankingStep
 			.Select(
 				x =>
 				{
-					using var profiler = TimeProfiler.Create("Extract-Relations-Ranking");
+					using var profiler = AggregationProfiler.GetScope();
+
 					var baseType = factoryClasses
 						.FirstOrDefault(y => SymbolEquals(y.Symbol, x.Symbol.BaseType));
 					return new Relation(x, baseType);

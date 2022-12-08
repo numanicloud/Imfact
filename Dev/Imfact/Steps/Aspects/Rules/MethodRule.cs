@@ -1,4 +1,5 @@
 ﻿using Imfact.Entities;
+using Imfact.Main;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 
@@ -6,19 +7,13 @@ namespace Imfact.Steps.Aspects.Rules;
 
 internal sealed class MethodRule
 {
-	private readonly AttributeRule _attributeRule;
-	private readonly TypeRule _typeRule;
-
-	public MethodRule(AttributeRule attributeRule,
-		TypeRule typeRule)
-	{
-		_attributeRule = attributeRule;
-		_typeRule = typeRule;
-	}
+	public required AttributeRule AttributeRule { private get; init; }
+	public required TypeRule TypeRule { private get; init; }
+	public required GenerationContext GenContext { private get; init; }
 
 	public MethodAspect? ExtractAspect(IMethodSymbol symbol)
     {
-        using var profiler = TimeProfiler.Create("Extract-Method-Aspect");
+        using var profiler = GenContext.Profiler.GetScope();
         try
 		{
 			if (symbol.ReturnType is not INamedTypeSymbol returnSymbol)
@@ -65,17 +60,15 @@ internal sealed class MethodRule
 
 	private MethodAttributeAspect[] GetAttributes(IMethodSymbol symbol, INamedTypeSymbol returnSymbol)
 	{
-		using var profiler = TimeProfiler.Create("Extract-Attribute-Aspect");
 		return symbol.GetAttributes()
-			.Select(x => _attributeRule.ExtractAspect(x, returnSymbol, symbol.Name))
+			.Select(x => AttributeRule.ExtractAspect(x, returnSymbol, symbol.Name))
 			.FilterNull()
 			.ToArray();
 	}
 
 	private ReturnTypeAspect GetReturnType(INamedTypeSymbol symbol)
 	{
-		using var profiler = TimeProfiler.Create("Extract-ReturnType-Aspect");
-		return new(_typeRule.ExtractTypeToCreate(symbol), symbol.IsAbstract);
+		return new(TypeRule.ExtractTypeToCreate(symbol), symbol.IsAbstract);
 	}
 
 	private static ResolverKind GetKind(INamedTypeSymbol returnSymbol)

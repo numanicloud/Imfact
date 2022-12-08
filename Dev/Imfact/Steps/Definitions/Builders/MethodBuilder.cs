@@ -58,7 +58,6 @@ internal sealed class MethodBuilder
 
 	public MethodInfo[] BuildResolverInfo(Resolver[] resolvers)
 	{
-		using var profiler = TimeProfiler.Create("Extract-Resolver-Definitions");
 		return resolvers
 			.Select(x =>
 			{
@@ -72,7 +71,6 @@ internal sealed class MethodBuilder
 
 	public MethodInfo[] BuildEnumerableMethodInfo(MultiResolver[] multiResolvers)
 	{
-		using var profiler = TimeProfiler.Create("Extract-MultiResolver-Definitions");
 		return multiResolvers
 			.Select(x =>
 			{
@@ -87,7 +85,6 @@ internal sealed class MethodBuilder
 	private MethodInfo BuildMethodCommon(IResolverSemantics x,
 		Func<Hook[], Implementation> makeImpl)
 	{
-		using var profiler = TimeProfiler.Create("Extract-MethodCommon-Definitions");
 		var ps = x.Parameters.Select(
 				p => _service.BuildParameter(p.Type, p.ParameterName))
 			.ToArray();

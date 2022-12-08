@@ -35,7 +35,8 @@ internal class ClassBuilder
 
 	private ExporterItem[] BuildExporters()
 	{
-		using var profiler = TimeProfiler.Create("Extract-Exporter-Definitions");
+		using var profiler = AggregationProfiler.GetScope();
+
 		return _dependency.Resolvers
 			.Where(x => !x.Parameters.Any())
 			.Select(x =>

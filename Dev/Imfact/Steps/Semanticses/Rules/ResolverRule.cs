@@ -23,7 +23,8 @@ internal sealed class ResolverRule
 
 	public Exporter[] ExtractExporters(ExporterAspect[] methods)
 	{
-		using var profiler = TimeProfiler.Create("Extract-Exporter-Semantics");
+		using var profiler = AggregationProfiler.GetScope();
+
 		return methods.Select(x => new Exporter(x.Name, new []
 			{
 				new Parameter(x.Parameters[0].Type, x.Parameters[0].Name),
@@ -34,7 +35,8 @@ internal sealed class ResolverRule
 
 	private ResolverCommon GetMethodCommon(MethodAspect method)
 	{
-		using var profiler = TimeProfiler.Create("Extract-MethodCommon-Semantics");
+		using var profiler = AggregationProfiler.GetScope();
+
 		var parameters = method.Parameters.Select(x => new Parameter(x.Type, x.Name))
 			.ToArray();
 
@@ -59,7 +61,8 @@ internal sealed class ResolverRule
 
 	private Hook? ExtractHook(MethodAttributeAspect aspect, MethodAspect method)
 	{
-		using var profiler = TimeProfiler.Create("Extract-Hook-Semantics");
+		using var profiler = AggregationProfiler.GetScope();
+
 		if (aspect.Kind != AnnotationKind.Hook &&
 			aspect.Kind != AnnotationKind.CacheHookPreset &&
 			aspect.Kind != AnnotationKind.CachePrHookPreset)

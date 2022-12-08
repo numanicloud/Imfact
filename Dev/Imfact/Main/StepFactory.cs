@@ -16,24 +16,38 @@ namespace Imfact.Main;
 
 internal sealed class StepFactory
 {
-	public AspectStep Aspect(GenerationContext genContext, AnnotationContext annotations)
+	private readonly GenerationContext _genContext;
+
+	public StepFactory(GenerationContext genContext)
+	{
+		_genContext = genContext;
+	}
+
+	public AspectStep Aspect(AnnotationContext annotations)
 	{
 		var typeRule = new TypeRule();
+		
+		var methodRule = new MethodRule
+		{
+			AttributeRule = new AttributeRule(typeRule, annotations),
+			TypeRule = typeRule,
+			GenContext = _genContext
+		};
 
-		var methodRule = new MethodRule(
-			new AttributeRule(typeRule, annotations),
-			typeRule);
-
-		var classRule = new ClassRule(genContext,
+		var classRule = new ClassRule(_genContext,
 			methodRule,
-			new PropertyRule(methodRule, genContext.Logger));
+			new PropertyRule
+			{
+				GenContext = _genContext,
+				Rule = methodRule
+			});
 
 		return new AspectStep(classRule);
 	}
 
 	public SemanticsStep Semantics()
 	{
-		return new SemanticsStep(new FactoryRule(new ResolverRule()));
+		return new SemanticsStep(new FactoryRule(new ResolverRule()), _genContext);
 	}
 
 	public DefinitionStep Definition(DependencyResult dependency)
@@ -45,23 +59,22 @@ internal sealed class StepFactory
 				dependency.Injection,
 				new DisposeMethodBuilder(dependency),
 				new ConstructorBuilder(dependency, methodService)));
-		return new DefinitionStep(dependency, builder);
+		return new DefinitionStep(dependency, builder, _genContext);
 	}
 
 	public DependencyStep Dependency(SemanticsResult semantics, GenerationContext genContext)
 	{
-		var crawler = new CreationCrawler(GetCreations(semantics, genContext));
+		var crawler = new CreationCrawler(GetCreations(semantics));
 		return new DependencyStep(semantics, crawler);
 	}
 
 	public WritingStep Writing(DefinitionResult definition)
 	{
-		return new WritingStep(definition);
+		return new WritingStep(definition, _genContext);
 	}
 
-	private static IEnumerable<IExpressionStrategy> GetCreations(
-		SemanticsResult semantics,
-		GenerationContext genContext)
+	private IEnumerable<IExpressionStrategy> GetCreations(
+		SemanticsResult semantics)
 	{
 		var factory = new RootFactorySource(semantics);
 		var delegation = new DelegationSource(semantics);
@@ -79,6 +92,6 @@ internal sealed class StepFactory
 		yield return (factory, multiResolver).GetStrategyExp();
 		yield return (inheritance, resolver).GetStrategyExp();
 		yield return (inheritance, multiResolver).GetStrategyExp();
-		yield return new ConstructorStrategy(genContext);
+		yield return new ConstructorStrategy(_genContext);
 	}
 }

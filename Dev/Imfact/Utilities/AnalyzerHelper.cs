@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Imfact.Entities;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Imfact.Utilities;
 
@@ -15,13 +14,6 @@ internal static class AnalyzerHelper
 		return symbol.AllInterfaces
 			.Any(x => x.Name == typeName.Name
 				&& x.GetFullNameSpace() == typeName.FullNamespace);
-	}
-
-	public static bool HasAttribute(this SyntaxList<AttributeListSyntax> attributes, AttributeName attributeName)
-	{
-		using var profiler = TimeProfiler.Create("HasAttribute");
-		return attributes.SelectMany(a => a.Attributes)
-			.Any(a => attributeName.MatchWithAnyName(a.Name.ToString()));
 	}
 
 	public static string GetFullNameSpace(this ITypeSymbol typeSymbol)

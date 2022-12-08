@@ -59,8 +59,10 @@ internal sealed class GeneralRule
         }
     }
 
-    public bool IsDelegation(IPropertySymbol property, AnnotationContext annotations, Logger logger)
+    public bool IsDelegation(IPropertySymbol property, AnnotationContext annotations, GenerationContext genContext)
     {
+		using var profiler = genContext.Profiler.GetScope();
+
         var inSameModule = SymbolEqualityComparer.Default.Equals(
             property.Type.ContainingModule,
             annotations.FactoryAttribute.ContainingModule);

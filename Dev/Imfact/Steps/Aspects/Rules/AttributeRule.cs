@@ -81,7 +81,6 @@ internal class AttributeRule
 	private (AnnotationKind, TypeToCreate)? Resolution(AttributeData data,
 		INamedTypeSymbol ownerReturn)
 	{
-		using var profiler = TimeProfiler.Create("Attribute-Resolution");
 		if (data.ConstructorArguments.Length == 1
 			&& data.ConstructorArguments[0].Kind == TypedConstantKind.Type
 			&& data.ConstructorArguments[0].Value is INamedTypeSymbol t)
@@ -111,7 +110,6 @@ internal class AttributeRule
 	private (AnnotationKind, TypeToCreate)? Hook(AttributeData data,
 		INamedTypeSymbol ownerReturn)
 	{
-		using var profiler = TimeProfiler.Create("Attribute-Hook");
 		if (data.ConstructorArguments.Length == 1
 			&& data.ConstructorArguments[0].Kind == TypedConstantKind.Type
 			&& data.ConstructorArguments[0].Value is INamedTypeSymbol arg
@@ -127,7 +125,6 @@ internal class AttributeRule
 
 	private static TypeToCreate PresetCache(Type hookType, INamedTypeSymbol ownerReturn)
 	{
-		using var profiler = TimeProfiler.Create("Attribute-Preset");
 		var node = TypeAnalysis.FromRuntime(hookType,
 			new[] {TypeAnalysis.FromSymbol(ownerReturn)});
 		return new TypeToCreate(node, new TypeAnalysis[0]);
