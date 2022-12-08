@@ -11,12 +11,16 @@ namespace Imfact.Main;
 internal class GenerationFacade
 {
     // MEMO: GenerationContextはコンパイルごとに異なる。IAnalysisContextはソースファイルごとに異なる
-    private readonly GenerationContext _genContext = new();
+    private readonly GenerationContext _genContext;
     private readonly StepFactory _stepFactory = new();
     private readonly SemanticsStep _semanticsStep;
 
-    public GenerationFacade()
+    public GenerationFacade(Logger logger)
     {
+        _genContext = new GenerationContext()
+        {
+            Logger = logger
+        };
         _semanticsStep = _stepFactory.Semantics();
     }
 

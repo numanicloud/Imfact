@@ -101,7 +101,11 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
     {
         context.CancellationToken.ThrowIfCancellationRequested();
 
-        var facade = new GenerationFacade();
+        var facade = new GenerationFacade(
+            new Logger(msg => context.ReportDiagnostic(DebugHelper.Info(
+                "IMF000",
+                "Debug info",
+                msg))));
 
         try
         {

@@ -1,8 +1,10 @@
 ﻿using Imfact.Incremental;
+using Imfact.Main;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Xml;
 
 namespace Imfact;
 
@@ -57,11 +59,43 @@ internal sealed class GeneralRule
         }
     }
 
-    public bool IsDelegation(IPropertySymbol property, AnnotationContext annotations)
+    public bool IsDelegation(IPropertySymbol property, AnnotationContext annotations, Logger logger)
     {
         return property.Type.GetAttributes()
-            .Select(x => x.AttributeClass)
+            .Select(x =>
+            {
+                var attr = x.AttributeClass;
+                if (attr is null)
+                {
+                    logger.Debug($$"""
+                        One AttributeData of {{property.Type.Name}} is null.
+                        """);
+                }
+                else
+                {
+                    logger.Debug($$"""
+                        {{attr.Name}} is an attribute of {{property.Type.Name}}.
+                        """);
+                }
+                return attr;
+            })
             .FilterNull()
-            .Any(x => SymbolEqualityComparer.Default.Equals(x, annotations.FactoryAttribute));
+            .Any(x =>
+            {
+                var judge = SymbolEqualityComparer.Default.Equals(x.OriginalDefinition, annotations.FactoryAttribute);
+                if (judge)
+                {
+                    logger.Debug($$"""
+                        {{x.GetFullNameSpace()}}.{{x.Name}} is equal to {{annotations.FactoryAttribute.Name}}.
+                        """);
+                }
+                else
+                {
+                    logger.Debug($$"""
+                        {{x.GetFullNameSpace()}}.{{x.Name}} is not equal to {{annotations.FactoryAttribute.Name}}.
+                        """);
+                }
+                return judge;
+            });
     }
 }

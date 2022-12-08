@@ -1,23 +1,36 @@
 ﻿using Imfact.Entities;
 using Microsoft.CodeAnalysis;
 using Imfact.Utilities;
+using Imfact.Main;
 
 namespace Imfact.Steps.Aspects.Rules;
 
 internal class PropertyRule
 {
 	private readonly MethodRule _methodRule;
+    private readonly Logger _logger;
 
-	public PropertyRule(MethodRule methodRule)
+    public PropertyRule(MethodRule methodRule, Logger logger)
 	{
 		_methodRule = methodRule;
-	}
+        this._logger = logger;
+    }
 
 	public PropertyAspect? ExtractAspect(IPropertySymbol symbol, AnnotationContext annotations)
 	{
-		if (GeneralRule.Instance.IsDelegation(symbol, annotations)) return null;
+		if (!GeneralRule.Instance.IsDelegation(symbol, annotations, _logger))
+        {
+			var attributeNames = symbol.Type.GetAttributes()
+				.Select(x => $"{x.AttributeClass?.GetFullNameSpace()}.{x.AttributeClass?.Name}");
 
-		var methods = symbol.Type.GetMembers().OfType<IMethodSymbol>()
+            _logger.Debug($$"""
+				{{symbol.Name}} is property but not Delegation.
+				Attributes={{string.Join(", ", attributeNames)}}
+				""");
+            return null;
+        }
+
+        var methods = symbol.Type.GetMembers().OfType<IMethodSymbol>()
 			.Select(m => _methodRule.ExtractNotAsRootResolver(m))
 			.FilterNull()
 			.ToArray();

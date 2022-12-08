@@ -26,7 +26,7 @@ internal sealed class StepFactory
 
 		var classRule = new ClassRule(genContext,
 			methodRule,
-			new PropertyRule(methodRule));
+			new PropertyRule(methodRule, genContext.Logger));
 
 		return new AspectStep(classRule);
 	}
