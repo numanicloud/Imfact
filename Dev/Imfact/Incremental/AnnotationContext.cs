@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Imfact.Annotations;
+using Microsoft.CodeAnalysis;
+using System.Threading;
 
 namespace Imfact;
 
@@ -11,4 +13,26 @@ internal sealed class AnnotationContext
     public required INamedTypeSymbol CacheAttribute { get; init; }
     public required INamedTypeSymbol CachePerResolutionAttribute { get; init; }
     public required INamedTypeSymbol TransientAttribute { get; init; }
+
+    public static AnnotationContext FromCompilation(Compilation compilation, CancellationToken ct)
+    {
+        var ns = AnnotationDefinitions.NamespaceName;
+        return new AnnotationContext
+        {
+            FactoryAttribute = EnsureGetType(AnnotationDefinitions.FactoryAttributeName),
+            ResolutionAttribute = EnsureGetType(AnnotationDefinitions.ResolutionAttributeName),
+            HookAttribute = EnsureGetType(AnnotationDefinitions.HookAttributeName),
+            ExporterAttribute = EnsureGetType(AnnotationDefinitions.ExporterAttributeName),
+            CacheAttribute = EnsureGetType(AnnotationDefinitions.CacheAttributeName),
+            CachePerResolutionAttribute = EnsureGetType(AnnotationDefinitions.CachePerResolutionAttributeName),
+            TransientAttribute = EnsureGetType(AnnotationDefinitions.TransientAttributeName)
+        };
+
+        INamedTypeSymbol EnsureGetType(string typeName)
+        {
+            ct.ThrowIfCancellationRequested();
+            return compilation.GetTypeByMetadataName($"{ns}.{typeName}")
+                ?? throw new NullReferenceException($"{ns}.{typeName} not found.");
+        }
+    }
 }

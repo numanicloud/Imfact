@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using Imfact.Entities;
+﻿using Imfact.Entities;
 using Imfact.Incremental;
 using Imfact.Main;
 using Imfact.Steps.Ranking;
@@ -16,6 +13,7 @@ internal class ClassRule
 	private readonly MethodRule _methodRule;
 	private readonly PropertyRule _propertyRule;
 	private readonly FactoryCandidate[] _factoryCandidates;
+	private readonly GeneralRule _generalRule = new();
 
 	public ClassRule
 		(GenerationContext genContext, MethodRule methodRule,
@@ -29,7 +27,15 @@ internal class ClassRule
 
 	public ClassAspect Aggregate(RankedClass root)
 	{
-		return ExtractThis(root.Self, ExtractBases(root.Self));
+		try
+		{
+			return ExtractThis(root.Self, ExtractBases(root.Self));
+		}
+		catch (Exception ex)
+		{
+			throw new Exception($"Exception occured in extracting class aspect of {root.Self.Symbol.Name}.",
+				ex); 
+		}
 	}
 
 	private ClassAspect ExtractThis(FactoryCandidate factory, ClassAspect[] baseClasses)
@@ -52,9 +58,9 @@ internal class ClassRule
 			.Select(ExtractBase)
 			.ToArray();
 
-		static IEnumerable<INamedTypeSymbol> TraverseBase(INamedTypeSymbol pivot)
+		IEnumerable<INamedTypeSymbol> TraverseBase(INamedTypeSymbol pivot)
 		{
-			if (pivot.BaseType is not null)
+			if (pivot.BaseType is not null && _generalRule.IsInheritanceTarget(pivot.BaseType))
 			{
 				yield return pivot.BaseType;
 				foreach (var baseSymbol in TraverseBase(pivot.BaseType))
@@ -64,10 +70,11 @@ internal class ClassRule
 			}
 		}
 
-		static ResolverCandidate[] GetMethods(INamedTypeSymbol holder)
+		ResolverCandidate[] GetMethods(INamedTypeSymbol holder)
 		{
 			return holder.GetMembers()
 				.OfType<IMethodSymbol>()
+				.Where(_generalRule.IsIndirectResolver)
 				.Select(x => new ResolverCandidate(x, false))
 				.ToArray();
 		}
