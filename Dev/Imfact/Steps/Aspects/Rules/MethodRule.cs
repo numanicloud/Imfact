@@ -19,6 +19,11 @@ internal sealed class MethodRule
 				return null;
 			}
 
+			if (symbol.Parameters.Any(x => SymbolEqualityComparer.Default.Equals(x.Type, returnSymbol)))
+			{
+				throw new InvalidOperationException();
+			}
+
 			return new MethodAspect(symbol.Name,
 				symbol.DeclaredAccessibility,
 				GetKind(returnSymbol),

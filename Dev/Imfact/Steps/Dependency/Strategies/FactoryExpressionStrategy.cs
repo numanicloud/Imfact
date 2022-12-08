@@ -54,15 +54,6 @@ internal class FactoryExpressionStrategy<TFactory, TResolver> : IExpressionStrat
 			TypeToResolve = resolver.Parameters.Select(x => x.Type).ToArray()
 		};
 
-		if (resolver.Parameters.FirstOrDefault(x => x.Type == context.TypeToResolve[0]) is { } parameter)
-		{
-			throw new InvalidOperationException($$"""
-				Factory attempted to generate a method has same type in a return-type and a parameter.
-				Resolver: {{resolver}}
-				Parameter: {{parameter}}
-				""");
-		}
-
 		return context.Injector.GetExpression(childContext).ToArray();
 	}
 

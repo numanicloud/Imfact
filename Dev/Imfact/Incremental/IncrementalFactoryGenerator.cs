@@ -52,6 +52,11 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
     {
         ct.ThrowIfCancellationRequested();
         var syntax = (context.Node as TypeDeclarationSyntax)!;
+        if (syntax.Modifiers.IndexOf(SyntaxKind.PartialKeyword) == -1)
+		{
+			return null;
+		}
+
         var symbol = context.SemanticModel.GetDeclaredSymbol(syntax, ct);
         var methods = syntax.Members
             .OfType<MethodDeclarationSyntax>()

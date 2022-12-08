@@ -16,9 +16,8 @@ internal sealed class GeneralRule
 
     public bool IsFactoryClassDeclaration(SyntaxNode node)
     {
-        return node is TypeDeclarationSyntax { AttributeLists.Count: > 0 } syntax
-            && node is not InterfaceDeclarationSyntax
-            && syntax.Modifiers.IndexOf(SyntaxKind.PartialKeyword) != -1;
+        return node is TypeDeclarationSyntax { AttributeLists.Count: > 0 }
+			and not InterfaceDeclarationSyntax;
     }
 
     public bool IsIndirectResolver(IMethodSymbol method)

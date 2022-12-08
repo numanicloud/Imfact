@@ -48,6 +48,16 @@ internal sealed class ResolverRule
 			.FilterNull()
 			.ToArray();
 
+		if (parameters.FirstOrDefault(x => x.Type == method.ReturnType.Type.Info) is {} p)
+		{
+			throw new InvalidOperationException($$"""
+				Semantics step attempted to generate a method has same type in return-type and a parameter.
+				MethodAspect: {{method}}
+				Type: {{p.Type}}
+				Parameter: {{p.ParameterName}}
+				""");
+		}
+
 		return new ResolverCommon(method.Accessibility,
 			method.ReturnType.Type.Info,
 			method.Name,
