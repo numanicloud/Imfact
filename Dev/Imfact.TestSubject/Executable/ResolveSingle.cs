@@ -1,4 +1,5 @@
 ﻿using Imfact.Annotations;
+// ReSharper disable CheckNamespace
 
 namespace Imfact.TestSubject.Executable.ResolveSingle;
 

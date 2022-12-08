@@ -12,10 +12,10 @@ internal class DebugHelper
         if (!Debugger.IsAttached && !IsAttached)
         {
             Debugger.Launch();
-            Debugger.Break();
 
             IsAttached = true;
         }
+		Debugger.Break();
     }
 
     public static Diagnostic Info(string id, string title, string message)

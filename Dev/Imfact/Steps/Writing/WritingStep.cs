@@ -1,5 +1,4 @@
-﻿using Imfact.Main;
-using Imfact.Steps.Definitions;
+﻿using Imfact.Steps.Definitions;
 using Imfact.Steps.Definitions.Methods;
 using Imfact.Utilities;
 using Imfact.Utilities.Coding;
@@ -8,13 +7,11 @@ namespace Imfact.Steps.Writing;
 
 internal class WritingStep
 {
-	private readonly GenerationContext _genContext;
 	private readonly DefinitionRoot _definitionRoot;
 	private readonly ResolverWriter _resolverWriter;
 
-	public WritingStep(DefinitionResult definitionStepResult, GenerationContext genContext)
+	public WritingStep(DefinitionResult definitionStepResult)
 	{
-		_genContext = genContext;
 		_definitionRoot = definitionStepResult.DefinitionRoot;
 		_resolverWriter = new ResolverWriter();
 	}
@@ -28,7 +25,7 @@ internal class WritingStep
 
 	private string Render()
 	{
-		using var profiler = _genContext.Profiler.GetScope();
+		using var profiler = AggregationProfiler.GetScope();
 
 		var builder = CodeHelper.GetBuilder();
 

@@ -59,9 +59,9 @@ internal sealed class GeneralRule
         }
     }
 
-    public bool IsDelegation(IPropertySymbol property, AnnotationContext annotations, GenerationContext genContext)
+    public bool IsDelegation(IPropertySymbol property, AnnotationContext annotations)
     {
-		using var profiler = genContext.Profiler.GetScope();
+		using var profiler = AggregationProfiler.GetScope();
 
         var inSameModule = SymbolEqualityComparer.Default.Equals(
             property.Type.ContainingModule,

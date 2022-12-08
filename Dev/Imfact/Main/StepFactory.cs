@@ -30,15 +30,13 @@ internal sealed class StepFactory
 		var methodRule = new MethodRule
 		{
 			AttributeRule = new AttributeRule(typeRule, annotations),
-			TypeRule = typeRule,
-			GenContext = _genContext
+			TypeRule = typeRule
 		};
 
 		var classRule = new ClassRule(_genContext,
 			methodRule,
 			new PropertyRule
 			{
-				GenContext = _genContext,
 				Rule = methodRule
 			});
 
@@ -47,7 +45,7 @@ internal sealed class StepFactory
 
 	public SemanticsStep Semantics()
 	{
-		return new SemanticsStep(new FactoryRule(new ResolverRule()), _genContext);
+		return new SemanticsStep(new FactoryRule(new ResolverRule()));
 	}
 
 	public DefinitionStep Definition(DependencyResult dependency)
@@ -59,7 +57,7 @@ internal sealed class StepFactory
 				dependency.Injection,
 				new DisposeMethodBuilder(dependency),
 				new ConstructorBuilder(dependency, methodService)));
-		return new DefinitionStep(dependency, builder, _genContext);
+		return new DefinitionStep(dependency, builder);
 	}
 
 	public DependencyStep Dependency(SemanticsResult semantics, GenerationContext genContext)
@@ -70,7 +68,7 @@ internal sealed class StepFactory
 
 	public WritingStep Writing(DefinitionResult definition)
 	{
-		return new WritingStep(definition, _genContext);
+		return new WritingStep(definition);
 	}
 
 	private IEnumerable<IExpressionStrategy> GetCreations(

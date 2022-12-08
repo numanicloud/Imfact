@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Imfact.Main;
@@ -8,6 +9,7 @@ namespace Imfact.Utilities;
 internal static class AggregationProfiler
 {
 	private static readonly Dictionary<string, List<TimeSpan>> Profiles = new ();
+	private static readonly List<IDisposable> Subscriptions = new();
 
 	public static void Clear()
 	{
@@ -18,6 +20,10 @@ internal static class AggregationProfiler
 		[CallerMemberName]string memberName = "",
 		[CallerFilePath]string filePath = "")
 	{
+#if DEBUG
+		return NullDisposable.Instance;
+#endif
+
 		var fileName = Path.GetFileName(filePath);
 		var title = $"{fileName}:{memberName}:{subTitle}";
 
@@ -25,7 +31,10 @@ internal static class AggregationProfiler
 		{
 			Profiles[title] = new List<TimeSpan> ();
 		}
-		return Scope.Start(title, AddProfile);
+
+		var scope = Scope.Start(title);
+
+		return scope;
 	}
 
 	public static void WriteStats(Logger logger)
@@ -55,13 +64,15 @@ internal static class AggregationProfiler
 	{
 		private readonly string _title;
         private readonly DateTime _startTime;
-        private readonly Action<string, TimeSpan> _onFinished;
+		private readonly Subject<(string, TimeSpan)> _onMeasured = new();
+
         private bool _isFinished = false;
 
-        private Scope(DateTime startTime, Action<string, TimeSpan> onFinished, string title)
+		public IObservable<(string title, TimeSpan time)> OnMeasured => _onMeasured;
+
+        private Scope(DateTime startTime, string title)
         {
             _startTime = startTime;
-            _onFinished = onFinished;
 			_title = title;
 		}
 
@@ -70,15 +81,16 @@ internal static class AggregationProfiler
             if (!_isFinished)
             {
                 var timeElapsed = DateTime.Now - _startTime;
-                _onFinished(_title, timeElapsed);
+				_onMeasured.OnNext((_title, timeElapsed));
+				_onMeasured.OnCompleted();
                 _isFinished = true;
             }
         }
 
-        public static Scope Start(string title, Action<string, TimeSpan> onFinished)
+        public static Scope Start(string title)
         {
 #if DEBUG
-            return new Scope(DateTime.Now, onFinished, title);
+            return new Scope(DateTime.Now, title);
 #else
             return NullDisposable.Instance;
 #endif

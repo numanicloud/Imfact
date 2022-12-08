@@ -37,7 +37,7 @@ internal class ClassRule
 
 	private ClassAspect ExtractThis(FactoryCandidate factory, ClassAspect[] baseClasses)
 	{
-		using var profiler = _genContext.Profiler.GetScope();
+		using var profiler = AggregationProfiler.GetScope();
 
 		var symbol = factory.Symbol;
 		return new(TypeAnalysis.FromSymbol(symbol),
@@ -59,7 +59,7 @@ internal class ClassRule
 
 		IEnumerable<INamedTypeSymbol> TraverseBase(INamedTypeSymbol pivot)
 		{
-			using var profiler = _genContext.Profiler.GetScope();
+			using var profiler = AggregationProfiler.GetScope();
 
 			if (pivot.BaseType is not null 
 				&& GeneralRule.Instance.IsInheritanceTarget(pivot.BaseType))
@@ -86,7 +86,7 @@ internal class ClassRule
 	// 逆に、コンストラクタはこちらにしか無いので、BaseClassAspect みたいな型で区別してもいいかも
 	private ClassAspect ExtractBase(FactoryCandidate factory)
 	{
-		using var profiler = _genContext.Profiler.GetScope();
+		using var profiler = AggregationProfiler.GetScope();
 
 		var symbol = factory.Symbol;
 		return new(

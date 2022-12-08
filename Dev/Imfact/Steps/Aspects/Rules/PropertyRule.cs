@@ -1,20 +1,18 @@
 ﻿using Imfact.Entities;
 using Microsoft.CodeAnalysis;
 using Imfact.Utilities;
-using Imfact.Main;
 
 namespace Imfact.Steps.Aspects.Rules;
 
 internal class PropertyRule
 {
 	public required MethodRule Rule { private get; init; }
-	public required GenerationContext GenContext { private get; init; }
 
 	public PropertyAspect? ExtractAspect(IPropertySymbol symbol, AnnotationContext annotations)
 	{
-		using var profiler = GenContext.Profiler.GetScope();
+		using var profiler = AggregationProfiler.GetScope();
 
-		if (!GeneralRule.Instance.IsDelegation(symbol, annotations, GenContext))
+		if (!GeneralRule.Instance.IsDelegation(symbol, annotations))
         {
             return null;
         }

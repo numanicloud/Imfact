@@ -119,7 +119,9 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
         }
         catch (Exception ex)
         {
-            Debugger.Break();
+#if DEBUG
+			DebugHelper.Attach();
+#endif
             context.ReportDiagnostic(DebugHelper.Error(
                 "IMF001",
                 "Internal error",

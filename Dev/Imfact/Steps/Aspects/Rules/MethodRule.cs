@@ -1,5 +1,4 @@
 ﻿using Imfact.Entities;
-using Imfact.Main;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 
@@ -9,11 +8,10 @@ internal sealed class MethodRule
 {
 	public required AttributeRule AttributeRule { private get; init; }
 	public required TypeRule TypeRule { private get; init; }
-	public required GenerationContext GenContext { private get; init; }
 
 	public MethodAspect? ExtractAspect(IMethodSymbol symbol)
     {
-        using var profiler = GenContext.Profiler.GetScope();
+        using var profiler = AggregationProfiler.GetScope();
         try
 		{
 			if (symbol.ReturnType is not INamedTypeSymbol returnSymbol)

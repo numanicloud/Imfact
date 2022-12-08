@@ -27,6 +27,8 @@ internal class GenerationFacade
 
     public SourceFile[] Run(GenerationSource generationSource)
     {
+        AggregationProfiler.Clear();
+
         var ranking = new RankingStep();
         var ranked = ranking.Run(generationSource.Factories);
 
@@ -35,7 +37,7 @@ internal class GenerationFacade
             .FilterNull()
             .ToArray();
 
-        _genContext.Profiler.WriteStats(_genContext.Logger);
+        AggregationProfiler.WriteStats(_genContext.Logger);
 
 		return result;
 	}

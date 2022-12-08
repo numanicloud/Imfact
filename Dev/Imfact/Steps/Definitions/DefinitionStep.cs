@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Imfact.Entities;
-using Imfact.Main;
 using Imfact.Steps.Definitions.Builders;
 using Imfact.Steps.Definitions.Methods;
 using Imfact.Steps.Dependency;
@@ -12,23 +11,20 @@ namespace Imfact.Steps.Definitions;
 internal class DefinitionStep
 {
 	private readonly ClassBuilder _classBuilder;
-	private readonly GenerationContext _genContext;
 	private readonly SemanticsResult _semantics;
 	private readonly DependencyResult _dependency;
 
 	public DefinitionStep(DependencyResult dependency,
-		ClassBuilder classBuilder,
-		GenerationContext genContext)
+		ClassBuilder classBuilder)
 	{
 		_dependency = dependency;
 		_semantics = dependency.Semantics;
 		_classBuilder = classBuilder;
-		_genContext = genContext;
 	}
 
 	public DefinitionResult Build()
 	{
-		using var profiler = _genContext.Profiler.GetScope();
+		using var profiler = AggregationProfiler.GetScope();
 
 		var usings = _dependency.Usings
 			.Select(x => new Using(x))
