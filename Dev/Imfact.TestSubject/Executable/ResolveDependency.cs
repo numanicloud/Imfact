@@ -19,6 +19,7 @@ internal class Fuga
 internal partial class Factory
 {
 	public partial Hoge ResolveHoge();
+	public partial Fuga ResolveFuga();
 }
 
 internal class Test : ITest

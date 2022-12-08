@@ -15,7 +15,7 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
 #if DEBUG
-        //DebugHelper.Attach();
+        DebugHelper.Attach();
 #endif
 
         context.RegisterPostInitializationOutput(GenerateInitialCode);
@@ -119,9 +119,6 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
         }
         catch (Exception ex)
         {
-#if DEBUG
-			DebugHelper.Attach();
-#endif
             context.ReportDiagnostic(DebugHelper.Error(
                 "IMF001",
                 "Internal error",
