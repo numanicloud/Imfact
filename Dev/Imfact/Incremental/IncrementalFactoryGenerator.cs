@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using Imfact.Annotations;
 using Imfact.Main;
+using Imfact.Steps.Cacheability;
+using Imfact.Steps.Filter;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -15,7 +17,7 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
 #if DEBUG
-        DebugHelper.Attach();
+        //DebugHelper.Attach();
 #endif
 
         context.RegisterPostInitializationOutput(GenerateInitialCode);
@@ -31,7 +33,15 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
                 .Combine(annotations)
                 .Select(PostTransform);
 
-        context.RegisterSourceOutput(generationSource, GenerateFileEmbed);
+		IncrementalValuesProvider<CacheabilityResult> stepStyle =
+			context.SyntaxProvider
+				.CreateSyntaxProvider(FilterStep.Instance.IsFactory, FilterStep.Instance.Transform)
+				.Combine(annotations)
+				.Select(FilterStep.Instance.Match)
+				.FilterNull()
+				.Select(CacheabilityStep.Instance.Transform);
+
+		context.RegisterSourceOutput(generationSource, GenerateFileEmbed);
     }
 
     private void GenerateInitialCode(IncrementalGeneratorPostInitializationContext context)

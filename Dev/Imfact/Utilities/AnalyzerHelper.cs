@@ -81,4 +81,11 @@ internal static class AnalyzerHelper
 			_ => type.FullBoundName
 		};
 	}
+
+	public static IncrementalValuesProvider<T> FilterNull<T>
+		(this IncrementalValuesProvider<T?> provider)
+		where T : class
+	{
+		return provider.Where(x => x is not null)!;
+	}
 }

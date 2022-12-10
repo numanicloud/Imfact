@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Xml;
+using Imfact.Steps.Filter;
 
 namespace Imfact;
 
@@ -57,6 +58,21 @@ internal sealed class GeneralRule
                     annotations.FactoryAttribute);
         }
     }
+    
+	public bool IsFactoryCandidate(INamedTypeSymbol symbol, AnnotationContext annotations)
+	{
+		var attributes = symbol.GetAttributes();
+		if (!attributes.Any(IsFactoryAttribute)) return false;
+
+		return true;
+
+		bool IsFactoryAttribute(AttributeData attributeData)
+		{
+			return SymbolEqualityComparer.Default
+				.Equals(attributeData.AttributeClass,
+					annotations.FactoryAttribute);
+		}
+	}
 
     public bool IsDelegation(IPropertySymbol property, AnnotationContext annotations)
     {
