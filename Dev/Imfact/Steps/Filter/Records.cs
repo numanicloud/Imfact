@@ -12,8 +12,16 @@ internal record FilteredType(INamedTypeSymbol Symbol,
 	RecordArray<FilteredDependency> ResolutionFactories,
 	RecordArray<FilteredDelegation> Delegations);
 
-internal record FilteredMethod(IMethodSymbol Symbol);
+internal record FilteredMethod(IMethodSymbol Symbol, RecordArray<FilteredAttribute> Attributes);
 
 internal record FilteredDependency(INamedTypeSymbol Symbol);
 
 internal record FilteredDelegation(IPropertySymbol Symbol);
+
+internal record FilteredAttribute(AttributeData Data);
+
+internal record ResolutionAttribute(AttributeData Data, INamedTypeSymbol Resolution)
+	: FilteredAttribute(Data);
+
+internal record HookAttribute(AttributeData Data, INamedTypeSymbol HookType)
+	: FilteredAttribute(Data);

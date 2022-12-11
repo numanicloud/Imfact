@@ -50,4 +50,6 @@ internal record MethodAttributeAspect(AnnotationKind Kind,
 
 internal record ReturnTypeAspect(TypeToCreate Type, bool IsAbstract);
 
+// TODO: Hook系に対してはフィールドの生成を表すが、Resolutionに対しては解決する型を表すので混乱しそう
+// 型を分けたい
 internal record TypeToCreate(TypeAnalysis Info, TypeAnalysis[] ConstructorArguments);

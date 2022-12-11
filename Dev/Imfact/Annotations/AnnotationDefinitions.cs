@@ -14,6 +14,7 @@ internal class AnnotationDefinitions
 	public const string IResolverServiceName = "IResolverService";
 	public const string ResolverServiceName = "ResolverService";
 	public const string CacheName = "Cache";
+	public const string CachePerResolutionName = "CachePerResolution";
 	public const string CacheAttributeName = "CacheAttribute";
 	public const string CachePerResolutionAttributeName = "CachePerResolutionAttribute";
 	public const string TransientAttributeName = "TransientAttributeName";
@@ -129,14 +130,14 @@ internal class AnnotationDefinitions
 		}
 		""";
 
-	public static readonly string CachePerResolution = """
-		internal sealed class CachePerResolution<T> : IHook<T> where T : class
+	public static readonly string CachePerResolution = $$"""
+		internal sealed class {{CachePerResolutionName}}<T> : IHook<T> where T : class
 		{
 			private T? _cache;
-			private IResolverService? _service;
+			private {{IResolverServiceName}}? _service;
 			private int? _resolutionId = null;
 
-			public void RegisterService(IResolverService service)
+			public void RegisterService({{IResolverServiceName}} service)
 			{
 				_service = service;
 			}

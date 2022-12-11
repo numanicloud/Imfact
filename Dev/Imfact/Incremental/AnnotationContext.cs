@@ -14,6 +14,8 @@ internal sealed class AnnotationContext
     public required INamedTypeSymbol CacheAttribute { get; init; }
     public required INamedTypeSymbol CachePerResolutionAttribute { get; init; }
     public required INamedTypeSymbol TransientAttribute { get; init; }
+    public required INamedTypeSymbol Cache { get; init; }
+    public required INamedTypeSymbol CachePerResolution { get; init; }
 
     public static AnnotationContext FromCompilation(Compilation compilation, CancellationToken ct)
     {
@@ -27,7 +29,9 @@ internal sealed class AnnotationContext
             ExporterAttribute = EnsureGetType(AnnotationDefinitions.ExporterAttributeName),
             CacheAttribute = EnsureGetType(AnnotationDefinitions.CacheAttributeName),
             CachePerResolutionAttribute = EnsureGetType(AnnotationDefinitions.CachePerResolutionAttributeName),
-            TransientAttribute = EnsureGetType(AnnotationDefinitions.TransientAttributeName)
+            TransientAttribute = EnsureGetType(AnnotationDefinitions.TransientAttributeName),
+            Cache = EnsureGetType(AnnotationDefinitions.CacheName),
+            CachePerResolution = EnsureGetType(AnnotationDefinitions.CachePerResolutionAttributeName)
         };
 
         INamedTypeSymbol EnsureGetType(string typeName)

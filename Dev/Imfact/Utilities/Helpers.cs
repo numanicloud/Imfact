@@ -98,7 +98,7 @@ public static class Helpers
 		return maxItem ?? throw new InvalidOperationException("No item in the source.");
 	}
 
-	internal static RecordArray<T> AsRecordArray<T>(this T[] source)
+	internal static RecordArray<T> ToRecordArray<T>(this T[] source)
 		where T : class, IEquatable<T>
 	{
 		return new RecordArray<T>(source);

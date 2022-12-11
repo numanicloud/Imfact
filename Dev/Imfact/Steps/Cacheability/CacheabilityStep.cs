@@ -4,9 +4,6 @@ namespace Imfact.Steps.Cacheability;
 
 internal sealed class CacheabilityStep
 {
-	private static CacheabilityStep? _instance;
-	public static CacheabilityStep Instance => _instance ??= new CacheabilityStep();
-
 	public CacheabilityResult[] Transform(FilteredType type, CancellationToken ct)
 	{
 		ct.ThrowIfCancellationRequested();
