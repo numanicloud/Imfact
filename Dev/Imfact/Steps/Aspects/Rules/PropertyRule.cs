@@ -12,7 +12,7 @@ internal class PropertyRule
 	{
 		using var profiler = AggregationProfiler.GetScope();
 
-		if (!GeneralRule.Instance.IsDelegation(symbol, annotations))
+		if (!GeneralRule.Instance.IsFactoryReference(symbol.Type, annotations))
         {
             return null;
         }

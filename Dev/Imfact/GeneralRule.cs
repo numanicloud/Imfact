@@ -74,19 +74,19 @@ internal sealed class GeneralRule
 		}
 	}
 
-    public bool IsDelegation(IPropertySymbol property, AnnotationContext annotations)
+    public bool IsFactoryReference(ITypeSymbol type, AnnotationContext annotations)
     {
 		using var profiler = AggregationProfiler.GetScope();
 
-        var inSameModule = SymbolEqualityComparer.Default.Equals(
-            property.Type.ContainingModule,
+		var inSameModule = SymbolEqualityComparer.Default.Equals(
+            type.ContainingModule,
             annotations.FactoryAttribute.ContainingModule);
 
         var factoryAttributeFullName = annotations.FactoryAttribute.GetFullNameSpace()
             + "."
             + annotations.FactoryAttribute.Name;
 
-        return property.Type.GetAttributes()
+        return type.GetAttributes()
             .Select(x => x.AttributeClass)
             .FilterNull()
             .Any(x => inSameModule

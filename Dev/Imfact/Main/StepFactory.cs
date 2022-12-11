@@ -33,12 +33,14 @@ internal sealed class StepFactory
 			TypeRule = typeRule
 		};
 
-		var classRule = new ClassRule(_genContext,
-			methodRule,
-			new PropertyRule
+		var classRule = new ClassRule
+		{
+			MethodRule = methodRule,
+			PropertyRule = new PropertyRule
 			{
 				Rule = methodRule
-			});
+			}
+		};
 
 		return new AspectStep(classRule);
 	}

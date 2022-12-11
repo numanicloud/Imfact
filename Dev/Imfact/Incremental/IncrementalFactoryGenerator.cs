@@ -33,13 +33,13 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
                 .Combine(annotations)
                 .Select(PostTransform);
 
-		IncrementalValuesProvider<CacheabilityResult> stepStyle =
+		IncrementalValuesProvider<FilteredType> stepStyle =
 			context.SyntaxProvider
 				.CreateSyntaxProvider(FilterStep.Instance.IsFactory, FilterStep.Instance.Transform)
 				.Combine(annotations)
 				.Select(FilterStep.Instance.Match)
 				.FilterNull()
-				.Select(CacheabilityStep.Instance.Transform);
+				.SelectMany(CacheabilityStep.Instance.Transform);
 
 		context.RegisterSourceOutput(generationSource, GenerateFileEmbed);
     }

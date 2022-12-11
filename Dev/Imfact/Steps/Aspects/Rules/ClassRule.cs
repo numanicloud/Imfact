@@ -1,6 +1,6 @@
 ﻿using Imfact.Entities;
 using Imfact.Incremental;
-using Imfact.Main;
+using Imfact.Steps.Filter;
 using Imfact.Steps.Ranking;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
@@ -9,18 +9,8 @@ namespace Imfact.Steps.Aspects.Rules;
 
 internal class ClassRule
 {
-	private readonly GenerationContext _genContext;
-	private readonly MethodRule _methodRule;
-	private readonly PropertyRule _propertyRule;
-
-	public ClassRule(GenerationContext genContext,
-		MethodRule methodRule,
-		PropertyRule propertyRule)
-	{
-		_genContext = genContext;
-		_methodRule = methodRule;
-		_propertyRule = propertyRule;
-	}
+	public required MethodRule MethodRule { private get; init; }
+	public required PropertyRule PropertyRule { private get; init; }
 
 	public ClassAspect Aggregate(RankedClass root)
 	{
@@ -111,9 +101,16 @@ internal class ClassRule
 			? factory.Methods.Where(x => x.IsToGenerate)
 			: factory.Methods;
 
-		return members
-			.Select(x => x.Symbol)
-			.Select(_methodRule.ExtractAspect)
+		var methodSymbols = members
+			.Select(x => x.Symbol);
+
+		return ExtractMethods(methodSymbols);
+	}
+
+	private MethodAspect[] ExtractMethods(IEnumerable<IMethodSymbol> methodSymbols)
+	{
+		return methodSymbols
+			.Select(MethodRule.ExtractAspect)
 			.FilterNull()
 			.ToArray();
 	}
@@ -122,20 +119,24 @@ internal class ClassRule
 	{
 		return @class.GetMembers()
 			.OfType<IPropertySymbol>()
-			.Select(x => _propertyRule.ExtractAspect(x, annotations))
+			.Select(x => PropertyRule.ExtractAspect(x, annotations))
 			.FilterNull()
 			.ToArray();
 	}
 
 	private ConstructorAspect GetConstructor(INamedTypeSymbol symbol)
 	{
-		var type = TypeAnalysis.FromSymbol(symbol);
-		var ctor = _genContext.Constructors[type.Id];
+		var cc = symbol.Constructors.MaxItem(x => x.Arity);
 
-		var parameters = ctor.Parameters
-			.Select(x => new ParameterAspect(x.Type, x.Name))
+		var parameters = cc.Parameters
+			.Select(x => new ParameterAspect(TypeAnalysis.FromSymbol(x.Type), x.Name))
 			.ToArray();
 
-		return new ConstructorAspect(ctor.Accessibility, parameters);
+		return new ConstructorAspect(cc.DeclaredAccessibility, parameters);
+	}
+
+	public ClassAspect Transform(FilteredType filtered, CancellationToken ct)
+	{
+		throw new NotImplementedException();
 	}
 }

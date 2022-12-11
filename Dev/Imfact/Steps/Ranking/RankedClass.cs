@@ -1,5 +1,4 @@
 ﻿using Imfact.Incremental;
-using Microsoft.CodeAnalysis;
 
 namespace Imfact.Steps.Ranking;
 
