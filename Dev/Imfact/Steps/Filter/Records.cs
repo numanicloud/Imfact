@@ -8,10 +8,12 @@ namespace Imfact.Steps.Filter;
 // 基底クラスの情報は「コンストラクタ呼び出し」「リゾルバー呼び出し」両方で使うので後でさらに詳しくする必要がある
 internal record FilteredType(INamedTypeSymbol Symbol,
 	RecordArray<FilteredMethod> Methods,
-	RecordArray<FilteredDependency> BaseTypes,
-	RecordArray<FilteredDependency> Resolutions,
-	RecordArray<FilteredDependency> Delegations);
+	RecordArray<FilteredDependency> BaseFactories,
+	RecordArray<FilteredDependency> ResolutionFactories,
+	RecordArray<FilteredDelegation> Delegations);
 
 internal record FilteredMethod(IMethodSymbol Symbol);
 
 internal record FilteredDependency(INamedTypeSymbol Symbol);
+
+internal record FilteredDelegation(IPropertySymbol Symbol);

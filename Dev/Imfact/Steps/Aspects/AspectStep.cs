@@ -1,4 +1,5 @@
 ﻿using Imfact.Steps.Aspects.Rules;
+using Imfact.Steps.Cacheability;
 using Imfact.Steps.Filter;
 using Imfact.Steps.Ranking;
 
@@ -6,21 +7,16 @@ namespace Imfact.Steps.Aspects;
 
 internal sealed class AspectStep
 {
-	private readonly ClassRule _rule;
-
-	public AspectStep(ClassRule rule)
-	{
-		_rule = rule;
-	}
+	public required ClassRule ClassRule { private get; init; }
 
 	public AspectResult Run(RankedClass rankedClass)
 	{
-		return new AspectResult(_rule.Aggregate(rankedClass));
+		return new AspectResult(ClassRule.Aggregate(rankedClass));
 	}
 
-	public AspectResult Transform(FilteredType filtered, CancellationToken ct)
+	public AspectResult Transform(CacheabilityResult input, CancellationToken ct)
 	{
 		ct.ThrowIfCancellationRequested();
-		return new AspectResult(_rule.Transform(filtered, ct));
+		return new AspectResult(ClassRule.Transform(input, ct));
 	}
 }

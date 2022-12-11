@@ -1,11 +1,8 @@
 ﻿using Imfact.Incremental;
-using Imfact.Main;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Xml;
-using Imfact.Steps.Filter;
 
 namespace Imfact;
 

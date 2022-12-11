@@ -1,5 +1,6 @@
 ﻿using Imfact.Entities;
 using Imfact.Incremental;
+using Imfact.Steps.Cacheability;
 using Imfact.Steps.Filter;
 using Imfact.Steps.Ranking;
 using Imfact.Utilities;
@@ -135,8 +136,38 @@ internal class ClassRule
 		return new ConstructorAspect(cc.DeclaredAccessibility, parameters);
 	}
 
-	public ClassAspect Transform(FilteredType filtered, CancellationToken ct)
+	public ClassAspect Transform(CacheabilityResult input, CancellationToken ct)
 	{
-		throw new NotImplementedException();
+		var baseTypes = input.Type.BaseFactories
+			.Select(x => ExtractBaseType(x, ct))
+			.ToArray();
+
+		return ExtractThis(input.Type, baseTypes, ct);
+	}
+
+	private ClassAspect ExtractThis(FilteredType self, ClassAspect[] bases, CancellationToken ct)
+	{
+		return new ClassAspect(TypeAnalysis.FromSymbol(self.Symbol),
+			bases,
+			ExtractInterfaces(self.Symbol),
+			ExtractMethods(self.Methods.Select(x => x.Symbol)),
+			PropertyRule.ExtractAspect(self, ct),
+			null);
+	}
+
+	private ClassAspect ExtractBaseType(FilteredDependency baseType, CancellationToken ct)
+	{
+		ct.ThrowIfCancellationRequested();
+
+		var methods = baseType.Symbol.GetMembers()
+			.OfType<IMethodSymbol>()
+			.Where(GeneralRule.Instance.IsIndirectResolver);
+
+		return new ClassAspect(TypeAnalysis.FromSymbol(baseType.Symbol),
+			Array.Empty<ClassAspect>(),
+			ExtractInterfaces(baseType.Symbol),
+			ExtractMethods(methods),
+			Array.Empty<PropertyAspect>(),
+			GetConstructor(baseType.Symbol));
 	}
 }

@@ -10,10 +10,6 @@ internal sealed class FilterStep
 	private static FilterStep? _instance;
 	public static FilterStep Instance => _instance ??= new FilterStep();
 
-	private FilterStep()
-	{
-	}
-
 	public bool IsFactory(SyntaxNode node, CancellationToken ct)
 	{
 		ct.ThrowIfCancellationRequested();
@@ -90,7 +86,7 @@ internal sealed class FilterStep
 			.ToArray();
 	}
 
-	private FilteredDependency[] FilterDelegations(
+	private FilteredDelegation[] FilterDelegations(
 		INamedTypeSymbol owner,
 		CancellationToken ct)
 	{
@@ -100,11 +96,12 @@ internal sealed class FilterStep
 			.FilterNull()
 			.ToArray();
 
-		FilteredDependency? TransformProperty(IPropertySymbol property)
+		FilteredDelegation? TransformProperty(IPropertySymbol property)
 		{
-			ct.ThrowIfCancellationRequested();
 			return property.Type is INamedTypeSymbol named
-				? TransformDependency(named, ct)
+				? TransformDependency(named, ct) is not null
+					? new FilteredDelegation(property)
+					: null
 				: null;
 		}
 	}
@@ -130,22 +127,22 @@ internal sealed class FilterStep
 		if (!GeneralRule.Instance.IsFactoryCandidate(tuple.type.Symbol, tuple.annotations))
 			return null;
 
-		var baseTypes = tuple.type.BaseTypes
+		var baseTypes = tuple.type.BaseFactories
 			.Where(x => GeneralRule.Instance.IsFactoryReference(x.Symbol, tuple.annotations))
 			.ToArray();
 
-		var resolutions = tuple.type.Resolutions
+		var resolutions = tuple.type.ResolutionFactories
 			.Where(x => GeneralRule.Instance.IsFactoryReference(x.Symbol, tuple.annotations))
 			.ToArray();
 
 		var delegations = tuple.type.Delegations
-			.Where(x => GeneralRule.Instance.IsFactoryReference(x.Symbol, tuple.annotations))
+			.Where(x => GeneralRule.Instance.IsFactoryReference(x.Symbol.Type, tuple.annotations))
 			.ToArray();
 
 		return tuple.type with
 		{
-			BaseTypes = baseTypes.AsRecordArray(),
-			Resolutions = resolutions.AsRecordArray(),
+			BaseFactories = baseTypes.AsRecordArray(),
+			ResolutionFactories = resolutions.AsRecordArray(),
 			Delegations = delegations.AsRecordArray()
 		};
 	}

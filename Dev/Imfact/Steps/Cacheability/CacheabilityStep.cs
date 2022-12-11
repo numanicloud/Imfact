@@ -7,14 +7,16 @@ internal sealed class CacheabilityStep
 	private static CacheabilityStep? _instance;
 	public static CacheabilityStep Instance => _instance ??= new CacheabilityStep();
 
-	private CacheabilityStep()
-	{
-	}
-
-	public FilteredType[] Transform(FilteredType type, CancellationToken ct)
+	public CacheabilityResult[] Transform(FilteredType type, CancellationToken ct)
 	{
 		ct.ThrowIfCancellationRequested();
 
-		return new[] { type };
+		// TODO: コンストラクタを呼ぶような依存関係ごとにグループ化する
+		// ファクトリーの継承をしていればコンストラクタ宣言を隔離する
+		// リゾルバーの戻り値がファクトリーならそのリゾルバーを隔離する
+		return new[]
+		{
+			new CacheabilityResult(type, null)
+		};
 	}
 }

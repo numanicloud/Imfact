@@ -10,7 +10,7 @@ internal enum ResolverKind
 
 internal enum AnnotationKind
 {
-	Resolution, Hook, CacheHookPreset, CachePrHookPreset, Exporter
+	Resolution, Hook, CacheHookPreset, CachePrHookPreset
 }
 
 internal record ClassAspect(TypeAnalysis Type,

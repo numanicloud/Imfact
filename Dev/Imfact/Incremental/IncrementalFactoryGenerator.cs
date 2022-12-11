@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using Imfact.Annotations;
 using Imfact.Main;
+using Imfact.Steps.Aspects;
 using Imfact.Steps.Cacheability;
 using Imfact.Steps.Filter;
 using Imfact.Utilities;
@@ -33,13 +34,15 @@ public class IncrementalFactoryGenerator : IIncrementalGenerator
                 .Combine(annotations)
                 .Select(PostTransform);
 
-		IncrementalValuesProvider<FilteredType> stepStyle =
+		var steps = StepRepository.Instance;
+		IncrementalValuesProvider<AspectResult> stepStyle =
 			context.SyntaxProvider
-				.CreateSyntaxProvider(FilterStep.Instance.IsFactory, FilterStep.Instance.Transform)
+				.CreateSyntaxProvider(steps.Filter.IsFactory, steps.Filter.Transform)
 				.Combine(annotations)
-				.Select(FilterStep.Instance.Match)
+				.Select(steps.Filter.Match)
 				.FilterNull()
-				.SelectMany(CacheabilityStep.Instance.Transform);
+				.SelectMany(steps.Cacheability.Transform)
+				.Select(steps.Aspect.Transform);
 
 		context.RegisterSourceOutput(generationSource, GenerateFileEmbed);
     }
