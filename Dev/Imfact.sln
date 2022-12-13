@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imfact.TestSubject", "Imfac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imfact.Coding", "Imfact.Coding\Imfact.Coding.csproj", "{8B7F1979-8F23-4ACB-8778-051E217FAC43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imfact.TestSubject2", "Imfact.TestSubject2\Imfact.TestSubject2.csproj", "{C10E3611-4F89-4253-8C70-191DFC4B46A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imfact.TestSubject2", "Imfact.TestSubject2\Imfact.TestSubject2.csproj", "{C10E3611-4F89-4253-8C70-191DFC4B46A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imfact.Test", "Imfact.Test\Imfact.Test.csproj", "{7C07F462-BC77-40A1-B173-6A1FE4AC4756}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{C10E3611-4F89-4253-8C70-191DFC4B46A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C10E3611-4F89-4253-8C70-191DFC4B46A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C10E3611-4F89-4253-8C70-191DFC4B46A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C07F462-BC77-40A1-B173-6A1FE4AC4756}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C07F462-BC77-40A1-B173-6A1FE4AC4756}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C07F462-BC77-40A1-B173-6A1FE4AC4756}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C07F462-BC77-40A1-B173-6A1FE4AC4756}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
