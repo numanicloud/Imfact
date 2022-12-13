@@ -1,5 +1,4 @@
 ﻿using Imfact.Steps.Aspects;
-using Imfact.Steps.Aspects.Rules;
 using Imfact.Steps.Cacheability;
 using Imfact.Steps.Filter;
 
@@ -16,21 +15,31 @@ internal class StepRepository
 
 	private StepRepository()
 	{
-		Filter = new FilterStep();
+		// FilterStep
+		Filter = new FilterStep
+		{
+			ClassRule = new Steps.Filter.Rules.ClassRule
+			{
+				MethodRule = new Steps.Filter.Rules.MethodRule()
+			}
+		};
+
+		// CacheabilityStep
 		Cacheability = new CacheabilityStep();
 
-		var typeRule = new TypeRule();
-		var methodRule = new MethodRule()
+		// AspectStep
+		var typeRule = new Steps.Aspects.Rules.TypeRule();
+		var methodRule = new Steps.Aspects.Rules.MethodRule()
 		{
-			AttributeRule = new AttributeRule(typeRule, new AnnotationContext()),
+			AttributeRule = new Steps.Aspects.Rules.AttributeRule(typeRule, null),
 			TypeRule = typeRule
 		};
 		Aspect = new AspectStep
 		{
-			ClassRule = new ClassRule
+			ClassRule = new Steps.Aspects.Rules.ClassRule
 			{
 				MethodRule = methodRule,
-				PropertyRule = new PropertyRule
+				PropertyRule = new Steps.Aspects.Rules.PropertyRule
 				{
 					Rule = methodRule
 				}
