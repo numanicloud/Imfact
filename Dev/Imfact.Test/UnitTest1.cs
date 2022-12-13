@@ -1,6 +1,6 @@
 namespace Imfact.Test;
 
-public class Tests
+public class FilterStepTest
 {
 	[SetUp]
 	public void Setup()
