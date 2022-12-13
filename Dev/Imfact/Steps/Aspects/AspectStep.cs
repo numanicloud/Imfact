@@ -7,6 +7,7 @@ namespace Imfact.Steps.Aspects;
 internal sealed class AspectStep
 {
 	public required ClassRule ClassRule { private get; init; }
+	public required ClassRuleAlt ClassRuleAlt { private get; init; }
 
 	public AspectResult Run(RankedClass rankedClass)
 	{
@@ -16,6 +17,6 @@ internal sealed class AspectStep
 	public AspectResult Transform(CacheabilityResult input, CancellationToken ct)
 	{
 		ct.ThrowIfCancellationRequested();
-		return new AspectResult(ClassRule.Transform(input, ct));
+		return new AspectResult(ClassRuleAlt.Transform(input, ct));
 	}
 }

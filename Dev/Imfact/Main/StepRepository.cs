@@ -43,6 +43,14 @@ internal class StepRepository
 				{
 					Rule = methodRule
 				}
+			},
+			ClassRuleAlt = new Steps.Aspects.Rules.ClassRuleAlt()
+			{
+				MethodRule = methodRule,
+				PropertyRule = new Steps.Aspects.Rules.PropertyRule()
+				{
+					Rule = methodRule
+				}
 			}
 		};
 	}

@@ -1,7 +1,10 @@
 ﻿using Imfact.Annotations;
 using Imfact.Entities;
+using Imfact.Steps.Filter;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
+using HookAttribute = Imfact.Steps.Filter.HookAttribute;
+using ResolutionAttribute = Imfact.Steps.Filter.ResolutionAttribute;
 
 namespace Imfact.Steps.Aspects.Rules;
 
@@ -15,6 +18,33 @@ internal class AttributeRule
 		_typeRule = typeRule;
         _annotations = annotations;
     }
+
+	public MethodAttributeAspect ExtractAspect(FilteredAttribute attribute, INamedTypeSymbol ownerReturnType, string ownerName)
+	{
+		var typeToCreate = GetTypeOfResolution(attribute)
+			?? GetTypeOfHook(attribute)
+			?? throw new Exception();
+
+		return new MethodAttributeAspect(
+			attribute.Kind,
+			TypeAnalysis.FromSymbol(ownerReturnType),
+			ownerName,
+			typeToCreate);
+	}
+
+	private TypeToCreate? GetTypeOfResolution(FilteredAttribute attribute)
+	{
+		if (attribute is not ResolutionAttribute resolution) return null;
+
+		return _typeRule.ExtractTypeToCreate(resolution.Resolution);
+	}
+
+	private TypeToCreate? GetTypeOfHook(FilteredAttribute attribute)
+	{
+		if (attribute is not HookAttribute hook) return null;
+
+		return _typeRule.ExtractTypeToCreate(hook.HookType);
+	}
 
 	public MethodAttributeAspect? ExtractAspect(AttributeData data,
 		INamedTypeSymbol ownerReturn,

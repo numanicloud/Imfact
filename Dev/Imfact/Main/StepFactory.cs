@@ -42,7 +42,18 @@ internal sealed class StepFactory
 			}
 		};
 
-		return new AspectStep(classRule);
+		return new AspectStep
+		{
+			ClassRule = classRule,
+			ClassRuleAlt = new ClassRuleAlt
+			{
+				MethodRule = methodRule,
+				PropertyRule = new PropertyRule()
+				{
+					Rule = methodRule
+				}
+			}
+		};
 	}
 
 	public SemanticsStep Semantics()

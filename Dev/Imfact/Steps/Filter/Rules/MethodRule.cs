@@ -1,4 +1,5 @@
-﻿using Imfact.Utilities;
+﻿using Imfact.Entities;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,14 +13,19 @@ internal sealed class MethodRule
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
+		if (!GeneralRule.Instance.IsResolverToGenerate(method)) return null;
+
         return context.SemanticModel.GetDeclaredSymbol(method, ct) is { } ms
-            ? GeneralRule.Instance.IsResolverToGenerate(method)
-                ? new FilteredMethod(ms, ExtractAttributes(ms).ToRecordArray())
+            ? ms.ReturnType is INamedTypeSymbol returnType
+				? new FilteredMethod(ms, returnType, ExtractAttributes(ms).ToRecordArray())
                 : null
             : null;
     }
 
-    public FilteredMethod Match(FilteredMethod method, AnnotationContext annotations, CancellationToken ct)
+    public FilteredMethod Match(
+		FilteredMethod method,
+        AnnotationContext annotations,
+        CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         return method with
@@ -34,8 +40,9 @@ internal sealed class MethodRule
 
     private static FilteredAttribute[] ExtractAttributes(IMethodSymbol method)
     {
+        // AnnotationKind.Hook を使っているが、本当は Unidentified のような名前を使うべき
         return method.GetAttributes()
-            .Select(x => new FilteredAttribute(x))
+            .Select(x => new FilteredAttribute(x, AnnotationKind.Hook))
             .ToArray();
     }
 
@@ -70,7 +77,7 @@ internal sealed class MethodRule
             && data.ConstructorArguments[0].Kind == TypedConstantKind.Type
             && data.ConstructorArguments[0].Value is INamedTypeSymbol type)
         {
-            return new ResolutionAttribute(data, type);
+            return new ResolutionAttribute(data, type, AnnotationKind.Resolution);
         }
 
         return null;
@@ -85,7 +92,7 @@ internal sealed class MethodRule
         if (attr.TypeArguments.Length == 1
             && attr.TypeArguments[0] is INamedTypeSymbol type)
         {
-            return new ResolutionAttribute(context.AttributeData, type);
+            return new ResolutionAttribute(context.AttributeData, type, AnnotationKind.Resolution);
         }
 
         return null;
@@ -101,7 +108,7 @@ internal sealed class MethodRule
         if (attr.TypeArguments.Length == 1
             && attr.TypeArguments[0] is INamedTypeSymbol type)
         {
-            return new HookAttribute(context.AttributeData, type);
+            return new HookAttribute(context.AttributeData, type, AnnotationKind.Hook);
         }
 
         return null;
@@ -112,7 +119,7 @@ internal sealed class MethodRule
         var annotations = context.Annotations;
 
         return SymbolEquals(context.OriginalDefinition, annotations.CacheAttribute)
-            ? new HookAttribute(context.AttributeData, annotations.Cache)
+            ? new HookAttribute(context.AttributeData, annotations.Cache, AnnotationKind.CacheHookPreset)
             : null;
     }
 
@@ -121,7 +128,7 @@ internal sealed class MethodRule
         var annotations = context.Annotations;
 
         return SymbolEquals(context.OriginalDefinition, annotations.CachePerResolutionAttribute)
-            ? new HookAttribute(context.AttributeData, annotations.CachePerResolution)
+            ? new HookAttribute(context.AttributeData, annotations.CachePerResolution, AnnotationKind.CachePrHookPreset)
             : null;
     }
 

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Imfact.Entities;
 using Imfact.Steps.Aspects;
 using Imfact.Steps.Semanticses.Records;
 using Imfact.Utilities;

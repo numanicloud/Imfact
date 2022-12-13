@@ -8,11 +8,6 @@ internal enum ResolverKind
 	Single, Multi
 }
 
-internal enum AnnotationKind
-{
-	Resolution, Hook, CacheHookPreset, CachePrHookPreset
-}
-
 internal record ClassAspect(TypeAnalysis Type,
 	ClassAspect[] BaseClasses,
 	InterfaceAspect[] Implements,

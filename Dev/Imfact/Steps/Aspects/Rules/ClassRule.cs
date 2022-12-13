@@ -171,3 +171,70 @@ internal class ClassRule
 			GetConstructor(baseType.Symbol));
 	}
 }
+
+internal class ClassRuleAlt
+{
+	public required MethodRule MethodRule { private get; init; }
+	public required PropertyRule PropertyRule { private get; init; }
+
+	public ClassAspect Transform(CacheabilityResult input, CancellationToken ct)
+	{
+		var baseTypes = input.Type.BaseFactories
+			.Select(x => ExtractBaseType(x, ct))
+			.ToArray();
+
+		return ExtractThis(input.Type, baseTypes, ct);
+	}
+
+	private ClassAspect ExtractThis(FilteredType self, ClassAspect[] bases, CancellationToken ct)
+	{
+		return new ClassAspect(TypeAnalysis.FromSymbol(self.Symbol),
+			bases,
+			ExtractInterfaces(self.Symbol),
+			ExtractMethods(self.Methods.Select(x => x.Symbol)),
+			PropertyRule.ExtractAspect(self, ct),
+			null);
+	}
+
+	private ClassAspect ExtractBaseType(FilteredDependency baseType, CancellationToken ct)
+	{
+		ct.ThrowIfCancellationRequested();
+
+		var methods = baseType.Symbol.GetMembers()
+			.OfType<IMethodSymbol>()
+			.Where(GeneralRule.Instance.IsIndirectResolver);
+
+		return new ClassAspect(TypeAnalysis.FromSymbol(baseType.Symbol),
+			Array.Empty<ClassAspect>(),
+			ExtractInterfaces(baseType.Symbol),
+			ExtractMethods(methods),
+			Array.Empty<PropertyAspect>(),
+			GetConstructor(baseType.Symbol));
+	}
+
+	private InterfaceAspect[] ExtractInterfaces(INamedTypeSymbol thisSymbol)
+	{
+		return thisSymbol.AllInterfaces
+			.Select(x => new InterfaceAspect(TypeAnalysis.FromSymbol(x)))
+			.ToArray();
+	}
+
+	private MethodAspect[] ExtractMethods(IEnumerable<IMethodSymbol> methodSymbols)
+	{
+		return methodSymbols
+			.Select(MethodRule.ExtractAspect)
+			.FilterNull()
+			.ToArray();
+	}
+
+	private ConstructorAspect GetConstructor(INamedTypeSymbol symbol)
+	{
+		var cc = symbol.Constructors.MaxItem(x => x.Arity);
+
+		var parameters = cc.Parameters
+			.Select(x => new ParameterAspect(TypeAnalysis.FromSymbol(x.Type), x.Name))
+			.ToArray();
+
+		return new ConstructorAspect(cc.DeclaredAccessibility, parameters);
+	}
+}
