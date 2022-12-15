@@ -5,6 +5,7 @@ using Imfact.Steps.Filter.Wrappers;
 using Imfact.Test.Suite;
 using Imfact.Test.SymbolMock;
 using Imfact.Utilities;
+using Microsoft.CodeAnalysis;
 
 namespace Imfact.Test;
 
@@ -412,12 +413,159 @@ public class FilterStepTest
             .OnSequence(a => a.Methods,
                 a => a.OnSequence(b => b.Attributes));
     }
+
+    [Test]
+    public void 基底ファクトリーのリゾルバーのうちアクセシビリティにより見えないものは通さない()
+    {
+        EnsureInitialized();
+
+        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
+            baseFactory: new FilteredBaseType(new BaseFactoryMock("Test", "Fuga")
+                {
+                    AttributesMutable = new IAnnotationWrapper[]
+                    {
+                        new AnnotationMock(_annotations.FactoryAttribute, null, null)
+                    }
+                },
+                new FilteredMethod[]
+                {
+                    CreateMethodWithAccessibility(Accessibility.Private, "Private")
+                },
+                null));
+
+        var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
+
+        FluentAssertion.OnObject(actual)
+            .NotNull()
+            .OnObject(a => a.BaseFactory,
+                a => a.NotNull()
+                    .OnSequence(b => b.Methods));
+    }
+
+    [Test]
+    public void 基底ファクトリーのリゾルバーのうちアクセシビリティにより見えるものは通す()
+    {
+        EnsureInitialized();
+
+        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
+            baseFactory: new FilteredBaseType(new BaseFactoryMock("Test", "Fuga")
+                {
+                    AttributesMutable = new IAnnotationWrapper[]
+                    {
+                        new AnnotationMock(_annotations.FactoryAttribute, null, null)
+                    }
+                },
+                new FilteredMethod[]
+                {
+                    CreateMethodWithAccessibility(Accessibility.Public, "PublicMethod"),
+                    CreateMethodWithAccessibility(Accessibility.Protected, "ProtectedMethod"),
+                    CreateMethodWithAccessibility(Accessibility.Internal, "InternalMethod"),
+                    CreateMethodWithAccessibility(Accessibility.ProtectedOrInternal, "ProtectedOrInternalMethod"),
+                    CreateMethodWithAccessibility(Accessibility.ProtectedAndInternal, "ProtectedAndInternal")
+                },
+                null));
+
+        var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
+
+        FluentAssertion.OnObject(actual)
+            .NotNull()
+            .OnObject(a => a.BaseFactory,
+                a => a.NotNull()
+                    .OnSequence(b => b.Methods,
+                        b => AssertAccessibility(b, Accessibility.Public),
+                        b => AssertAccessibility(b, Accessibility.Protected),
+                        b => AssertAccessibility(b, Accessibility.Internal),
+                        b => AssertAccessibility(b, Accessibility.ProtectedOrInternal),
+                        b => AssertAccessibility(b, Accessibility.ProtectedAndInternal)));
+    }
+
+    [Test]
+    public void Factory属性のついていない委譲は取り除く()
+    {
+        EnsureInitialized();
+
+        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
+            delegations: new FilteredDelegation[]
+            {
+                new FilteredDelegation(new DelegationMock("Client", "Resolved")
+                {
+                    AttributesMutable = Array.Empty<IAnnotationWrapper>()
+                }),
+                new FilteredDelegation(new DelegationMock("Client", "Resolved2")
+                {
+                    AttributesMutable = new IAnnotationWrapper[]
+                    {
+                        new AnnotationMock(_annotations.FactoryAttribute, null, null)
+                    }
+                })
+            });
+
+        var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
+
+        FluentAssertion.OnObject(actual)
+            .NotNull()
+            .OnSequence(a => a.Delegations,
+                a => a.OnObject(b => b.Wrapper,
+                    b => b.AssertType<DelegationMock>(c =>
+                        Assert.That(c.Context.TypeAnalysisMutable.Name, Is.EqualTo("Resolved2")))));
+    }
+
+    [Test]
+    public void 委譲ファクトリーのリゾルバーのうちアクセシビリティにより見えないものは消す()
+    {
+        EnsureInitialized();
+
+        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
+            delegations: new FilteredDelegation[]
+            {
+                new FilteredDelegation(new DelegationMock("Client", "Resolved"))
+            });
+
+        Assert.Fail();
+    }
+
+    private static FilteredMethod CreateMethodWithAccessibility(Accessibility accessibility, string name)
+    {
+        return new FilteredMethod(new ResolverMock()
+            {
+                IsIndirectResolverMutable = true,
+                Accessibility = accessibility,
+            },
+            new ReturnTypeMock("Client", name),
+            Array.Empty<FilteredAttribute>());
+    }
+
+    private static void AssertAccessibility(FluentAssertionContext<FilteredMethod> context,
+        Accessibility accessibility)
+    {
+        Assert.That(context.Context.Symbol.Accessibility, Is.EqualTo(accessibility));
+    }
     
-    static void AssertAnnotation(FluentAssertionContext<FilteredAttribute> context,
+    private static void AssertAnnotation(FluentAssertionContext<FilteredAttribute> context,
         string name)
     {
         context.OnObject(a => a.Wrapper,
             a => a.AssertType<AnnotationMock>(b =>
                 b.AssertThat(c => c.Attribute.Name, Is.EqualTo(name))));
     }
+}
+
+internal class DelegationMock : IDelegationFactoryWrapper
+{
+    public bool IsConstructableClass { get; set; } = true;
+    public IEnumerable<IAnnotationWrapper> AttributesMutable { get; set; }
+    public TypeAnalysis TypeAnalysisMutable { get; set; }
+
+    public DelegationMock(string fullNamespace, string name)
+    {
+        AttributesMutable = Array.Empty<IAnnotationWrapper>();
+        TypeAnalysisMutable = new TypeAnalysis(
+            new TypeId(fullNamespace, name, RecordArray<TypeId>.Empty),
+            Accessibility.Public,
+            DisposableType.NonDisposable);
+    }
+
+    public IEnumerable<IAnnotationWrapper> GetAttributes() => AttributesMutable;
+
+    public TypeAnalysis GetTypeAnalysis() => TypeAnalysisMutable;
 }

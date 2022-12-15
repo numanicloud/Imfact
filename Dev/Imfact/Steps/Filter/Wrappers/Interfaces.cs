@@ -1,4 +1,5 @@
 ﻿using Imfact.Entities;
+using Microsoft.CodeAnalysis;
 
 namespace Imfact.Steps.Filter.Wrappers;
 
@@ -23,6 +24,7 @@ internal interface IFactoryClassWrapper : IInterfaceImplementor
 internal interface IResolverWrapper
 {
 	bool IsIndirectResolver();
+	Accessibility Accessibility { get; }
 }
 
 internal interface IReturnTypeWrapper : ITypeWrapper

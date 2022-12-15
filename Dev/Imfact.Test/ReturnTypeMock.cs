@@ -7,7 +7,7 @@ namespace Imfact.Test;
 
 internal class ReturnTypeMock : IReturnTypeWrapper
 {
-	public bool IsConstructableClass { get; set; }
+    public bool IsConstructableClass { get; set; } = true;
 	public IEnumerable<IAnnotationWrapper> AttributesMutable { get; set; }
 	public TypeAnalysis TypeAnalysisMutable { get; set; }
 

@@ -42,6 +42,8 @@ internal class FactorySymbolWrapper : TypeSymbolWrapper, IFactoryClassWrapper
 internal class ResolverSymbolWrapper : IResolverWrapper
 {
     public required IMethodSymbol Symbol { get; init; }
+    public required Accessibility Accessibility { get; init; }
+
     public bool IsIndirectResolver()
     {
         return Symbol.ReturnType.SpecialType == SpecialType.None;

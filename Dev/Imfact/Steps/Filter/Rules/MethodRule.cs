@@ -26,7 +26,11 @@ internal sealed class MethodRule
 	{
 		return method.ReturnType is not INamedTypeSymbol returnType
 			? null
-			: new FilteredMethod(new ResolverSymbolWrapper { Symbol = method },
+			: new FilteredMethod(new ResolverSymbolWrapper
+                {
+                    Symbol = method,
+                    Accessibility = method.DeclaredAccessibility
+                },
 				new ReturnTypeSymbolWrapper { Symbol = returnType },
 				ExtractAttributes(method));
 	}
@@ -36,7 +40,11 @@ internal sealed class MethodRule
         if (m.ReturnType is not INamedTypeSymbol { SpecialType: SpecialType.None } returnType)
             return null;
 
-        return new FilteredMethod(new ResolverSymbolWrapper { Symbol = m },
+        return new FilteredMethod(new ResolverSymbolWrapper
+            {
+                Symbol = m,
+                Accessibility = m.DeclaredAccessibility
+            },
             new ReturnTypeSymbolWrapper { Symbol = returnType },
             Array.Empty<FilteredAttribute>());
     }
@@ -58,6 +66,21 @@ internal sealed class MethodRule
 					.ToArray()
 			};
 	}
+
+    public FilteredMethod? MatchAsInheritance(FilteredMethod method,
+        AnnotationContext annotations,
+        CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        return method.Symbol.Accessibility is Accessibility.Public
+            or Accessibility.Protected
+            or Accessibility.Internal
+            or Accessibility.ProtectedOrInternal
+            or Accessibility.ProtectedAndInternal
+            ? Match(method, annotations, ct)
+            : null;
+    }
 
     private static FilteredAttribute[] ExtractAttributes(IMethodSymbol method)
     {

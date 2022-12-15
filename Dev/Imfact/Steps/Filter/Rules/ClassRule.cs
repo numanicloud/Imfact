@@ -76,7 +76,11 @@ internal sealed class ClassRule
 				{
 					BaseFactory = pivot.BaseFactory is not { } bt
 						? null
-						: MatchBaseType(bt)
+						: MatchBaseType(bt),
+                    Methods = pivot.Methods
+                        .Select(x => MethodRule.MatchAsInheritance(x, annotations, ct))
+                        .FilterNull()
+                        .ToArray()
 				};
 		}
 	}
