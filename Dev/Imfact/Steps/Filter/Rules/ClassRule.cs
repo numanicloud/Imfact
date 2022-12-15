@@ -25,10 +25,10 @@ internal sealed class ClassRule
         var delegations = FilterDelegations(symbol, ct);
 
         return new FilteredType(new FactorySymbolWrapper { Symbol = symbol },
-            methods.ToRecordArray(),
-            baseTypes.ToRecordArray(),
-            resolutions.ToRecordArray(),
-            delegations.ToRecordArray());
+            methods,
+            baseTypes,
+            resolutions,
+            delegations);
     }
 
     public FilteredType? Match(FilteredType type, AnnotationContext annotations, CancellationToken ct)
@@ -44,23 +44,19 @@ internal sealed class ClassRule
         {
             BaseFactories = type.BaseFactories
                 .Where(x => IsFactoryReference(x.Wrapper))
-                .ToArray()
-                .ToRecordArray(),
+                .ToArray(),
 
             ResolutionFactories = type.ResolutionFactories
                 .Where(x => IsFactoryReference(x.Type))
-                .ToArray()
-                .ToRecordArray(),
+                .ToArray(),
 
             Delegations = type.Delegations
                 .Where(x => IsFactoryReference(x.Wrapper))
-                .ToArray()
-                .ToRecordArray(),
+                .ToArray(),
 
             Methods = type.Methods
                 .Select(m => MethodRule.Match(m, annotations, ct))
                 .ToArray()
-                .ToRecordArray()
         };
 
 		bool IsFactoryReference(ITypeWrapper reference) =>

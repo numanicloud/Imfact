@@ -22,7 +22,7 @@ internal sealed class MethodRule
 
         return new FilteredMethod(new ResolverSymbolWrapper { Symbol = ms },
             new ReturnTypeSymbolWrapper() { Symbol = returnType },
-            ExtractAttributes(ms).ToRecordArray());
+            ExtractAttributes(ms));
     }
 
     public FilteredMethod? TransformIndirectResolver(IMethodSymbol m)
@@ -32,7 +32,7 @@ internal sealed class MethodRule
 
         return new FilteredMethod(new ResolverSymbolWrapper { Symbol = m },
             new ReturnTypeSymbolWrapper { Symbol = returnType },
-            RecordArray<FilteredAttribute>.Empty);
+            Array.Empty<FilteredAttribute>());
     }
 
     public FilteredMethod Match(
@@ -47,7 +47,6 @@ internal sealed class MethodRule
                 .Select(x => TransformAttribute(x, annotations))
                 .FilterNull()
                 .ToArray()
-                .ToRecordArray()
         };
     }
 

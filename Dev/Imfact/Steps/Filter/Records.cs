@@ -1,6 +1,5 @@
 ﻿using Imfact.Entities;
 using Imfact.Steps.Filter.Wrappers;
-using Imfact.Utilities;
 
 namespace Imfact.Steps.Filter;
 
@@ -8,14 +7,14 @@ namespace Imfact.Steps.Filter;
 // このステップで消化することで後続のステップではAnnotationを見ずに済む
 // 基底クラスの情報は「コンストラクタ呼び出し」「リゾルバー呼び出し」両方で使うので後でさらに詳しくする必要がある
 internal record FilteredType(IFactoryClassWrapper Symbol,
-    RecordArray<FilteredMethod> Methods,
-    RecordArray<FilteredBaseType> BaseFactories,
-    RecordArray<FilteredResolution> ResolutionFactories,
-    RecordArray<FilteredDelegation> Delegations);
+    FilteredMethod[] Methods,
+    FilteredBaseType[] BaseFactories,
+    FilteredResolution[] ResolutionFactories,
+    FilteredDelegation[] Delegations);
 
 internal record FilteredMethod(IResolverWrapper Symbol,
     IReturnTypeWrapper ReturnType,
-    RecordArray<FilteredAttribute> Attributes);
+    FilteredAttribute[] Attributes);
 
 internal record FilteredBaseType(IBaseFactoryWrapper Wrapper,
 	FilteredMethod[] Methods);
