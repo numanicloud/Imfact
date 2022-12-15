@@ -38,6 +38,21 @@ internal class FluentAssertionContext<T>
         return this;
     }
 
+	public FluentAssertionContext<T> AssertType<TExpected>(
+		Action<FluentAssertionContext<TExpected>>? assertion = null)
+	{
+        Assert.That(Context, Is.TypeOf<TExpected>());
+
+		if (assertion is not null && Context is TExpected expected)
+		{
+			assertion(new FluentAssertionContext<TExpected>()
+			{
+                Context = expected
+			});
+		}
+
+        return this;
+	}
 
     public FluentAssertionContext<T> OnObject<TNext>(
         Func<T, TNext> selector,
@@ -46,4 +61,22 @@ internal class FluentAssertionContext<T>
         assertion(new FluentAssertionContext<TNext> { Context = selector(Context) });
         return this;
     }
+
+	public FluentAssertionContext<T> OnSequence<TNext>(
+		Func<T, IEnumerable<TNext>> selector,
+		params Action<FluentAssertionContext<TNext>>[] assertions)
+	{
+		var array = selector(Context).ToArray();
+        Assert.That(array.Length, Is.EqualTo(assertions.Length));
+
+		for (int i = 0; i < assertions.Length; i++)
+		{
+			assertions[i].Invoke(new FluentAssertionContext<TNext>()
+			{
+                Context = array[i],
+			});
+		}
+
+        return this;
+	}
 }

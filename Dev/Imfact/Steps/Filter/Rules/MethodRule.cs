@@ -41,20 +41,23 @@ internal sealed class MethodRule
             Array.Empty<FilteredAttribute>());
     }
 
-    public FilteredMethod Match(
+    public FilteredMethod? Match(
         FilteredMethod method,
         AnnotationContext annotations,
         CancellationToken ct)
-    {
-        ct.ThrowIfCancellationRequested();
-        return method with
-        {
-            Attributes = method.Attributes
-                .Select(x => TransformAttribute(x, annotations))
-                .FilterNull()
-                .ToArray()
-        };
-    }
+	{
+		ct.ThrowIfCancellationRequested();
+
+		return !method.Symbol.IsIndirectResolver()
+			? null
+			: method with
+			{
+				Attributes = method.Attributes
+					.Select(x => TransformAttribute(x, annotations))
+					.FilterNull()
+					.ToArray()
+			};
+	}
 
     private static FilteredAttribute[] ExtractAttributes(IMethodSymbol method)
     {

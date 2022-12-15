@@ -57,6 +57,7 @@ internal sealed class ClassRule
 
             Methods = type.Methods
                 .Select(m => MethodRule.Match(m, annotations, ct))
+				.FilterNull()
                 .ToArray()
         };
 
