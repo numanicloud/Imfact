@@ -33,7 +33,7 @@ internal sealed class ClassRule
     }
 
     public FilteredType? Match(FilteredType type, AnnotationContext annotations, CancellationToken ct)
-    {
+	{
         if (!IsFactoryCandidate(type.Symbol, annotations))
             return null;
 
