@@ -1,4 +1,5 @@
-﻿using Imfact.Utilities;
+﻿using Imfact.Steps.Filter.Wrappers;
+using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -23,7 +24,7 @@ internal sealed class ClassRule
         var resolutions = FilterResolutions(methods, ct);
         var delegations = FilterDelegations(symbol, ct);
 
-        return new FilteredType(symbol,
+        return new FilteredType(new FactorySymbolWrapper { Symbol = symbol },
             methods.ToRecordArray(),
             baseTypes.ToRecordArray(),
             resolutions.ToRecordArray(),
@@ -32,23 +33,27 @@ internal sealed class ClassRule
 
     public FilteredType? Match(FilteredType type, AnnotationContext annotations, CancellationToken ct)
     {
-        if (!GeneralRule.Instance.IsFactoryCandidate(type.Symbol, annotations))
+        if (!IsFactoryCandidate(type.Symbol, annotations))
             return null;
+        
+		var factoryAttributeFullName = annotations.FactoryAttribute.GetFullNameSpace()
+			+ "."
+			+ annotations.FactoryAttribute.Name;
 
         return type with
         {
             BaseFactories = type.BaseFactories
-                .Where(x => GeneralRule.Instance.IsFactoryReference(x.Symbol, annotations))
+                .Where(x => IsFactoryReference(x.Wrapper))
                 .ToArray()
                 .ToRecordArray(),
 
             ResolutionFactories = type.ResolutionFactories
-                .Where(x => GeneralRule.Instance.IsFactoryReference(x.Symbol, annotations))
+                .Where(x => IsFactoryReference(x.Type))
                 .ToArray()
                 .ToRecordArray(),
 
             Delegations = type.Delegations
-                .Where(x => GeneralRule.Instance.IsFactoryReference(x.Symbol.Type, annotations))
+                .Where(x => IsFactoryReference(x.Wrapper))
                 .ToArray()
                 .ToRecordArray(),
 
@@ -57,6 +62,18 @@ internal sealed class ClassRule
                 .ToArray()
                 .ToRecordArray()
         };
+
+		bool IsFactoryReference(ITypeWrapper reference) =>
+			reference.GetAttributes()
+				.Any(attr => annotations.FactoryAttribute.IsInSameModuleWith(reference)
+					? annotations.FactoryAttribute.IsUsedAs(attr)
+					: attr.FullName == factoryAttributeFullName);
+	}
+
+    private bool IsFactoryCandidate(IFactoryClassWrapper symbol, AnnotationContext annotations)
+    {
+        return symbol.GetAttributes()
+            .Any(annotations.FactoryAttribute.IsUsedAs);
     }
 
     private FilteredMethod[] FilteredMethods(
@@ -71,11 +88,14 @@ internal sealed class ClassRule
             .ToArray();
     }
 
-    private static FilteredDependency[] FilterBaseTypes(INamedTypeSymbol symbol, CancellationToken ct)
+    private FilteredBaseType[] FilterBaseTypes(INamedTypeSymbol symbol, CancellationToken ct)
     {
-        return TraverseBase(symbol)
-            .Select(x => TransformDependency(x, ct))
-            .FilterNull()
+        ct.ThrowIfCancellationRequested();
+
+		return TraverseBase(symbol)
+            .Select(x => new BaseFactorySymbolWrapper { Symbol = x })
+            .Where(x => x.IsConstructableClass)
+            .Select(x => new FilteredBaseType(x, FilterIndirectResolvers(x)))
             .ToArray();
 
         static IEnumerable<INamedTypeSymbol> TraverseBase(INamedTypeSymbol pivot)
@@ -88,15 +108,25 @@ internal sealed class ClassRule
                 yield return child;
             }
         }
+
+        FilteredMethod[] FilterIndirectResolvers(BaseFactorySymbolWrapper x)
+        {
+            ct.ThrowIfCancellationRequested();
+            return x.Symbol.GetMembers()
+                .OfType<IMethodSymbol>()
+                .Select(MethodRule.TransformIndirectResolver)
+                .FilterNull()
+                .ToArray();
+        }
     }
 
-    private static FilteredDependency[] FilterResolutions(FilteredMethod[] methods, CancellationToken ct)
+    private static FilteredResolution[] FilterResolutions(FilteredMethod[] methods, CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
         return methods
-            .Select(x => x.Symbol.ReturnType as INamedTypeSymbol)
-            .FilterNull()
-            .Select(x => TransformDependency(x, ct))
-            .FilterNull()
+            .Select(x => x.ReturnType)
+            .Where(x => x.IsConstructableClass)
+            .Select(x => new FilteredResolution(x))
             .ToArray();
     }
 
@@ -104,31 +134,14 @@ internal sealed class ClassRule
         INamedTypeSymbol owner,
         CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
         return owner.GetMembers()
             .OfType<IPropertySymbol>()
-            .Select(TransformProperty)
+            .Select(property => property.Type is not INamedTypeSymbol named
+				? null
+				: new FilteredDelegation(new DelegationSymbolWrapper { Symbol = named }))
             .FilterNull()
+			.Where(x => x.Wrapper.IsConstructableClass)
             .ToArray();
-
-        FilteredDelegation? TransformProperty(IPropertySymbol property)
-        {
-            return property.Type is INamedTypeSymbol named
-                ? TransformDependency(named, ct) is not null
-                    ? new FilteredDelegation(property)
-                    : null
-                : null;
-        }
-    }
-
-    private static FilteredDependency? TransformDependency(
-        INamedTypeSymbol typeToConstruct,
-        CancellationToken ct)
-    {
-        ct.ThrowIfCancellationRequested();
-        return typeToConstruct.IsReferenceType
-            && !typeToConstruct.IsRecord
-            && !typeToConstruct.IsAbstract
-                ? new FilteredDependency(typeToConstruct)
-                : null;
-    }
+	}
 }

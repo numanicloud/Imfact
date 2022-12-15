@@ -31,7 +31,7 @@ internal class StepRepository
 		var typeRule = new Steps.Aspects.Rules.TypeRule();
 		var methodRule = new Steps.Aspects.Rules.MethodRule()
 		{
-			AttributeRule = new Steps.Aspects.Rules.AttributeRule(typeRule, null),
+			AttributeRule = new Steps.Aspects.Rules.AttributeRule(typeRule),
 			TypeRule = typeRule
 		};
 		Aspect = new AspectStep

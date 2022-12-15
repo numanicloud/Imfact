@@ -2,6 +2,7 @@
 using Imfact.Incremental;
 using Imfact.Steps.Cacheability;
 using Imfact.Steps.Filter;
+using Imfact.Steps.Filter.Wrappers;
 using Imfact.Steps.Ranking;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
@@ -110,10 +111,7 @@ internal class ClassRule
 
 	private MethodAspect[] ExtractMethods(IEnumerable<IMethodSymbol> methodSymbols)
 	{
-		return methodSymbols
-			.Select(MethodRule.ExtractAspect)
-			.FilterNull()
-			.ToArray();
+		throw new NotImplementedException();
 	}
 
 	private PropertyAspect[] GetPropertyAspects(INamedTypeSymbol @class, AnnotationContext annotations)
@@ -135,41 +133,6 @@ internal class ClassRule
 
 		return new ConstructorAspect(cc.DeclaredAccessibility, parameters);
 	}
-
-	public ClassAspect Transform(CacheabilityResult input, CancellationToken ct)
-	{
-		var baseTypes = input.Type.BaseFactories
-			.Select(x => ExtractBaseType(x, ct))
-			.ToArray();
-
-		return ExtractThis(input.Type, baseTypes, ct);
-	}
-
-	private ClassAspect ExtractThis(FilteredType self, ClassAspect[] bases, CancellationToken ct)
-	{
-		return new ClassAspect(TypeAnalysis.FromSymbol(self.Symbol),
-			bases,
-			ExtractInterfaces(self.Symbol),
-			ExtractMethods(self.Methods.Select(x => x.Symbol)),
-			PropertyRule.ExtractAspect(self, ct),
-			null);
-	}
-
-	private ClassAspect ExtractBaseType(FilteredDependency baseType, CancellationToken ct)
-	{
-		ct.ThrowIfCancellationRequested();
-
-		var methods = baseType.Symbol.GetMembers()
-			.OfType<IMethodSymbol>()
-			.Where(GeneralRule.Instance.IsIndirectResolver);
-
-		return new ClassAspect(TypeAnalysis.FromSymbol(baseType.Symbol),
-			Array.Empty<ClassAspect>(),
-			ExtractInterfaces(baseType.Symbol),
-			ExtractMethods(methods),
-			Array.Empty<PropertyAspect>(),
-			GetConstructor(baseType.Symbol));
-	}
 }
 
 internal class ClassRuleAlt
@@ -188,38 +151,37 @@ internal class ClassRuleAlt
 
 	private ClassAspect ExtractThis(FilteredType self, ClassAspect[] bases, CancellationToken ct)
 	{
-		return new ClassAspect(TypeAnalysis.FromSymbol(self.Symbol),
+		return new ClassAspect(self.Symbol.GetTypeAnalysis(),
 			bases,
 			ExtractInterfaces(self.Symbol),
-			ExtractMethods(self.Methods.Select(x => x.Symbol)),
+			ExtractMethods(self.Methods),
 			PropertyRule.ExtractAspect(self, ct),
 			null);
 	}
 
-	private ClassAspect ExtractBaseType(FilteredDependency baseType, CancellationToken ct)
+	private ClassAspect ExtractBaseType(FilteredBaseType baseType, CancellationToken ct)
 	{
 		ct.ThrowIfCancellationRequested();
 
-		var methods = baseType.Symbol.GetMembers()
-			.OfType<IMethodSymbol>()
-			.Where(GeneralRule.Instance.IsIndirectResolver);
+		var methods = baseType.Methods
+			.Where(x => x.Symbol.IsIndirectResolver());
 
-		return new ClassAspect(TypeAnalysis.FromSymbol(baseType.Symbol),
+		return new ClassAspect(baseType.Wrapper.GetTypeAnalysis(),
 			Array.Empty<ClassAspect>(),
-			ExtractInterfaces(baseType.Symbol),
+			ExtractInterfaces(baseType.Wrapper),
 			ExtractMethods(methods),
 			Array.Empty<PropertyAspect>(),
-			GetConstructor(baseType.Symbol));
+			null);
 	}
 
-	private InterfaceAspect[] ExtractInterfaces(INamedTypeSymbol thisSymbol)
+	private InterfaceAspect[] ExtractInterfaces(IInterfaceImplementor thisSymbol)
 	{
 		return thisSymbol.AllInterfaces
-			.Select(x => new InterfaceAspect(TypeAnalysis.FromSymbol(x)))
+			.Select(x => new InterfaceAspect(x.GetTypeAnalysis()))
 			.ToArray();
 	}
 
-	private MethodAspect[] ExtractMethods(IEnumerable<IMethodSymbol> methodSymbols)
+	private MethodAspect[] ExtractMethods(IEnumerable<FilteredMethod> methodSymbols)
 	{
 		return methodSymbols
 			.Select(MethodRule.ExtractAspect)

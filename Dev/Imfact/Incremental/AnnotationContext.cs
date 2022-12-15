@@ -1,21 +1,21 @@
 ﻿using Imfact.Annotations;
+using Imfact.Steps.Filter.Wrappers;
 using Microsoft.CodeAnalysis;
-using System.Threading;
 
 namespace Imfact;
 
 internal sealed class AnnotationContext
 {
-    public required INamedTypeSymbol FactoryAttribute { get; init; }
-    public required INamedTypeSymbol ResolutionAttribute { get; init; }
-    public required INamedTypeSymbol ResolutionAttributeT { get; init; }
-    public required INamedTypeSymbol HookAttribute { get; init; }
-    public required INamedTypeSymbol ExporterAttribute { get; init; }
-    public required INamedTypeSymbol CacheAttribute { get; init; }
-    public required INamedTypeSymbol CachePerResolutionAttribute { get; init; }
-    public required INamedTypeSymbol TransientAttribute { get; init; }
-    public required INamedTypeSymbol Cache { get; init; }
-    public required INamedTypeSymbol CachePerResolution { get; init; }
+    public required IAttributeWrapper FactoryAttribute { get; init; }
+    public required IAttributeWrapper ResolutionAttribute { get; init; }
+    public required IAttributeWrapper ResolutionAttributeT { get; init; }
+    public required IAttributeWrapper HookAttribute { get; init; }
+    public required IAttributeWrapper ExporterAttribute { get; init; }
+    public required IAttributeWrapper CacheAttribute { get; init; }
+    public required IAttributeWrapper CachePerResolutionAttribute { get; init; }
+    public required IAttributeWrapper TransientAttribute { get; init; }
+    public required IAttributeWrapper Cache { get; init; }
+    public required IAttributeWrapper CachePerResolution { get; init; }
 
     public static AnnotationContext FromCompilation(Compilation compilation, CancellationToken ct)
     {
@@ -34,11 +34,18 @@ internal sealed class AnnotationContext
             CachePerResolution = EnsureGetType(AnnotationDefinitions.CachePerResolutionAttributeName)
         };
 
-        INamedTypeSymbol EnsureGetType(string typeName)
+		IAttributeWrapper EnsureGetType(string typeName)
         {
             ct.ThrowIfCancellationRequested();
-            return compilation.GetTypeByMetadataName($"{ns}.{typeName}")
-                ?? throw new NullReferenceException($"{ns}.{typeName} not found.");
+			var metadataName = $"{ns}.{typeName}";
+
+			if (compilation.GetTypeByMetadataName(metadataName) is not { } symbol)
+				throw new NullReferenceException($"{metadataName} not found.");
+
+            return new AttributeSymbolWrapper
+			{
+                Symbol = symbol
+			};
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Imfact.Entities;
 using Imfact.Steps.Filter;
+using Imfact.Steps.Filter.Wrappers;
+using Imfact.Steps.Semanticses.Records;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 
@@ -10,32 +12,37 @@ internal sealed class MethodRule
     public required AttributeRule AttributeRule { private get; init; }
     public required TypeRule TypeRule { private get; init; }
 
-    public MethodAspect? ExtractAspect(IMethodSymbol symbol)
+    public MethodAspect? ExtractAspect(FilteredMethod symbol)
     {
         using var profiler = AggregationProfiler.GetScope();
         try
         {
-            if (symbol.ReturnType is not INamedTypeSymbol returnSymbol)
+            if (symbol.ReturnType is not ReturnTypeSymbolWrapper { Symbol: var returnSymbol } )
             {
                 return null;
             }
 
-            if (symbol.Parameters.Any(x => SymbolEqualityComparer.Default.Equals(x.Type, returnSymbol)))
+			if (symbol.Symbol is not ResolverSymbolWrapper { Symbol: var resolver })
+			{
+				return null;
+			}
+
+            if (resolver.Parameters.Any(x => SymbolEqualityComparer.Default.Equals(x.Type, returnSymbol)))
             {
                 throw new InvalidOperationException();
             }
 
-            return new MethodAspect(symbol.Name,
-                symbol.DeclaredAccessibility,
+            return new MethodAspect(resolver.Name,
+				resolver.DeclaredAccessibility,
                 GetKind(returnSymbol),
                 GetReturnType(returnSymbol),
-                GetAttributes(symbol, returnSymbol),
-                GetParameters(symbol));
+                GetAttributes(resolver, returnSymbol),
+                GetParameters(resolver));
         }
         catch (Exception ex)
         {
             throw new Exception(
-                $"Exception occured in extracting aspect of a method {symbol.Name}.",
+                $"Exception occured in extracting aspect of a method {symbol}.",
                 ex);
         }
     }
@@ -54,30 +61,6 @@ internal sealed class MethodRule
             GetAttributes(symbol, returnSymbol),
             GetParameters(symbol));
     }
-
-    public MethodAspect ExtractAspect(FilteredMethod method)
-    {
-        var comparer = SymbolEqualityComparer.Default;
-        if (method.Symbol.Parameters.Any(x => comparer.Equals(x.Type, method.ReturnType)))
-        {
-            // 開発段階で避けるべき無限再帰エラー
-            throw new InvalidOperationException();
-        }
-
-        return new MethodAspect(method.Symbol.Name,
-            method.Symbol.DeclaredAccessibility,
-            GetKind(method.ReturnType),
-            GetReturnType(method.ReturnType),
-            GetAttributes(method),
-            GetParameters(method.Symbol));
-    }
-
-	private MethodAttributeAspect[] GetAttributes(FilteredMethod method)
-	{
-		return method.Attributes
-			.Select(x => AttributeRule.ExtractAspect(x, method.ReturnType, method.Symbol.Name))
-			.ToArray();
-	}
 
     private ParameterAspect[] GetParameters(IMethodSymbol symbol)
     {

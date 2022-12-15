@@ -1,33 +1,39 @@
 ﻿using Imfact.Entities;
+using Imfact.Steps.Filter.Wrappers;
 using Imfact.Utilities;
-using Microsoft.CodeAnalysis;
 
 namespace Imfact.Steps.Filter;
 
 // コンストラクタを呼ぶ必要があるもの、属性を見る必要があるものは依存関係なので、このステップで収集しておく
 // このステップで消化することで後続のステップではAnnotationを見ずに済む
 // 基底クラスの情報は「コンストラクタ呼び出し」「リゾルバー呼び出し」両方で使うので後でさらに詳しくする必要がある
-internal record FilteredType(INamedTypeSymbol Symbol,
+internal record FilteredType(IFactoryClassWrapper Symbol,
     RecordArray<FilteredMethod> Methods,
-    RecordArray<FilteredDependency> BaseFactories,
-    RecordArray<FilteredDependency> ResolutionFactories,
+    RecordArray<FilteredBaseType> BaseFactories,
+    RecordArray<FilteredResolution> ResolutionFactories,
     RecordArray<FilteredDelegation> Delegations);
 
-internal record FilteredMethod(IMethodSymbol Symbol,
-    INamedTypeSymbol ReturnType,
+internal record FilteredMethod(IResolverWrapper Symbol,
+    IReturnTypeWrapper ReturnType,
     RecordArray<FilteredAttribute> Attributes);
 
-internal record FilteredDependency(INamedTypeSymbol Symbol);
+internal record FilteredBaseType(IBaseFactoryWrapper Wrapper,
+	FilteredMethod[] Methods);
 
-internal record FilteredDelegation(IPropertySymbol Symbol);
+internal record FilteredResolution(IReturnTypeWrapper Type);
 
-internal record FilteredAttribute(AttributeData Data, AnnotationKind Kind);
+internal record FilteredDelegation(IDelegationFactoryWrapper Wrapper);
+
+internal record FilteredAttribute(IAnnotationWrapper Wrapper, AnnotationKind Kind);
 
 internal record ResolutionAttribute(
-	AttributeData Data,
-	INamedTypeSymbol Resolution,
+	IAnnotationWrapper Wrapper,
+	ITypeWrapper Resolution,
 	AnnotationKind Kind)
-    : FilteredAttribute(Data, Kind);
+    : FilteredAttribute(Wrapper, Kind);
 
-internal record HookAttribute(AttributeData Data, INamedTypeSymbol HookType, AnnotationKind Kind)
-    : FilteredAttribute(Data, Kind);
+internal record HookAttribute(
+	IAnnotationWrapper Wrapper,
+	ITypeWrapper HookType,
+	AnnotationKind Kind)
+    : FilteredAttribute(Wrapper, Kind);

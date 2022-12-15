@@ -1,111 +1,25 @@
 ﻿using Imfact.Annotations;
 using Imfact.Entities;
-using Imfact.Steps.Filter;
+using Imfact.Steps.Filter.Wrappers;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
-using HookAttribute = Imfact.Steps.Filter.HookAttribute;
-using ResolutionAttribute = Imfact.Steps.Filter.ResolutionAttribute;
 
 namespace Imfact.Steps.Aspects.Rules;
 
 internal class AttributeRule
 {
 	private readonly TypeRule _typeRule;
-    private readonly AnnotationContext _annotations;
 
-	public AttributeRule(TypeRule typeRule, AnnotationContext annotations)
+	public AttributeRule(TypeRule typeRule)
 	{
 		_typeRule = typeRule;
-        _annotations = annotations;
-    }
-
-	public MethodAttributeAspect ExtractAspect(FilteredAttribute attribute, INamedTypeSymbol ownerReturnType, string ownerName)
-	{
-		var typeToCreate = GetTypeOfResolution(attribute)
-			?? GetTypeOfHook(attribute)
-			?? throw new Exception();
-
-		return new MethodAttributeAspect(
-			attribute.Kind,
-			TypeAnalysis.FromSymbol(ownerReturnType),
-			ownerName,
-			typeToCreate);
-	}
-
-	private TypeToCreate? GetTypeOfResolution(FilteredAttribute attribute)
-	{
-		if (attribute is not ResolutionAttribute resolution) return null;
-
-		return _typeRule.ExtractTypeToCreate(resolution.Resolution);
-	}
-
-	private TypeToCreate? GetTypeOfHook(FilteredAttribute attribute)
-	{
-		if (attribute is not HookAttribute hook) return null;
-
-		return _typeRule.ExtractTypeToCreate(hook.HookType);
 	}
 
 	public MethodAttributeAspect? ExtractAspect(AttributeData data,
 		INamedTypeSymbol ownerReturn,
 		string ownerName)
 	{
-		if (data.AttributeClass is not { } attr)
-		{
-			return null;
-		}
-
-		AnnotationKind kind;
-		TypeToCreate? type;
-
-		if (Match(_annotations.ResolutionAttribute, attr))
-		{
-			if (Resolution(data, ownerReturn) is not { } tuple)
-			{
-				return null;
-			}
-
-			(kind, type) = tuple;
-		}
-		else if (Match(_annotations.ResolutionAttributeT, attr.OriginalDefinition))
-		{
-			if (ResolutionT(data, ownerReturn) is not { } tuple)
-			{
-				return null;
-			}
-
-			(kind, type) = tuple;
-		}
-		else if (Match(_annotations.HookAttribute, attr))
-		{
-			if (Hook(data, ownerReturn) is not {} tuple)
-			{
-				return null;
-			}
-
-			(kind, type) = tuple;
-		}
-		else if (Match(_annotations.CacheAttribute, attr))
-		{
-			kind = AnnotationKind.CacheHookPreset;
-			type = PresetCache(typeof(Cache<>), ownerReturn);
-		}
-		else if (Match(_annotations.CachePerResolutionAttribute, attr))
-		{
-			kind = AnnotationKind.CachePrHookPreset;
-			type = PresetCache(typeof(CachePerResolution<>), ownerReturn);
-		}
-		else
-		{
-			return null;
-		}
-
-		return new MethodAttributeAspect(kind, TypeAnalysis.FromSymbol(ownerReturn), ownerName, type);
-
-		bool Match(INamedTypeSymbol actual, INamedTypeSymbol expected)
-		{
-			return SymbolEqualityComparer.Default.Equals(actual, expected);
-		}
+		throw new NotImplementedException();
 	}
 
 	private (AnnotationKind, TypeToCreate)? Resolution(AttributeData data,

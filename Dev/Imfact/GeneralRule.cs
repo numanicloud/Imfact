@@ -1,5 +1,4 @@
 ﻿using Imfact.Incremental;
-using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -50,44 +49,7 @@ internal sealed class GeneralRule
 
         bool IsFactoryAttribute(AttributeData attributeData)
         {
-            return SymbolEqualityComparer.Default
-                .Equals(attributeData.AttributeClass,
-                    annotations.FactoryAttribute);
+            return false;
         }
-    }
-    
-	public bool IsFactoryCandidate(INamedTypeSymbol symbol, AnnotationContext annotations)
-	{
-		var attributes = symbol.GetAttributes();
-		if (!attributes.Any(IsFactoryAttribute)) return false;
-
-		return true;
-
-		bool IsFactoryAttribute(AttributeData attributeData)
-		{
-			return SymbolEqualityComparer.Default
-				.Equals(attributeData.AttributeClass,
-					annotations.FactoryAttribute);
-		}
-	}
-
-    public bool IsFactoryReference(ITypeSymbol type, AnnotationContext annotations)
-    {
-		using var profiler = AggregationProfiler.GetScope();
-
-		var inSameModule = SymbolEqualityComparer.Default.Equals(
-            type.ContainingModule,
-            annotations.FactoryAttribute.ContainingModule);
-
-        var factoryAttributeFullName = annotations.FactoryAttribute.GetFullNameSpace()
-            + "."
-            + annotations.FactoryAttribute.Name;
-
-        return type.GetAttributes()
-            .Select(x => x.AttributeClass)
-            .FilterNull()
-            .Any(x => inSameModule
-                ? SymbolEqualityComparer.Default.Equals(x.OriginalDefinition, annotations.FactoryAttribute)
-                : $"{x.GetFullNameSpace()}.{x.Name}" == factoryAttributeFullName);
     }
 }

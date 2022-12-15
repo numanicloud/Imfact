@@ -1,4 +1,5 @@
 ﻿using Imfact.Entities;
+using Imfact.Steps.Filter.Wrappers;
 using Imfact.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -13,17 +14,29 @@ internal sealed class MethodRule
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-		if (!GeneralRule.Instance.IsResolverToGenerate(method)) return null;
+        if (!GeneralRule.Instance.IsResolverToGenerate(method)) return null;
 
-        return context.SemanticModel.GetDeclaredSymbol(method, ct) is { } ms
-            ? ms.ReturnType is INamedTypeSymbol returnType
-				? new FilteredMethod(ms, returnType, ExtractAttributes(ms).ToRecordArray())
-                : null
-            : null;
+        if (context.SemanticModel.GetDeclaredSymbol(method, ct) is not { } ms) return null;
+
+        if (ms.ReturnType is not INamedTypeSymbol returnType) return null;
+
+        return new FilteredMethod(new ResolverSymbolWrapper { Symbol = ms },
+            new ReturnTypeSymbolWrapper() { Symbol = returnType },
+            ExtractAttributes(ms).ToRecordArray());
+    }
+
+    public FilteredMethod? TransformIndirectResolver(IMethodSymbol m)
+    {
+        if (m.ReturnType is not INamedTypeSymbol { SpecialType: SpecialType.None } returnType)
+            return null;
+
+        return new FilteredMethod(new ResolverSymbolWrapper { Symbol = m },
+            new ReturnTypeSymbolWrapper { Symbol = returnType },
+            RecordArray<FilteredAttribute>.Empty);
     }
 
     public FilteredMethod Match(
-		FilteredMethod method,
+        FilteredMethod method,
         AnnotationContext annotations,
         CancellationToken ct)
     {
@@ -40,8 +53,9 @@ internal sealed class MethodRule
 
     private static FilteredAttribute[] ExtractAttributes(IMethodSymbol method)
     {
-        // AnnotationKind.Hook を使っているが、本当は Unidentified のような名前を使うべき
+        // TODO: AnnotationKind.Hook を使っているが、本当は Unidentified のような名前を使うべき
         return method.GetAttributes()
+            .Select(x => new AnnotationSymbolWrapper { Data = x })
             .Select(x => new FilteredAttribute(x, AnnotationKind.Hook))
             .ToArray();
     }
@@ -50,14 +64,10 @@ internal sealed class MethodRule
         FilteredAttribute source,
         AnnotationContext annotations)
     {
-        if (source.Data.AttributeClass is not { } attr) return null;
-
         var context = new AttributeExtractionContext
         {
-            Annotations = annotations,
-            Attribute = attr,
-            AttributeData = source.Data,
-            OriginalDefinition = attr.OriginalDefinition
+            Annotation = source.Wrapper,
+            Master = annotations,
         };
 
         return GetResolutionAttribute(in context)
@@ -69,13 +79,11 @@ internal sealed class MethodRule
 
     private static FilteredAttribute? GetResolutionAttribute(in AttributeExtractionContext context)
     {
-        if (!SymbolEquals(context.OriginalDefinition, context.Annotations.ResolutionAttribute))
+        if (!SymbolEquals(context.Annotation, context.Master.ResolutionAttribute))
             return null;
 
-        var data = context.AttributeData;
-        if (data.ConstructorArguments.Length == 1
-            && data.ConstructorArguments[0].Kind == TypedConstantKind.Type
-            && data.ConstructorArguments[0].Value is INamedTypeSymbol type)
+        var data = context.Annotation;
+        if (data.GetSingleConstructorArgumentAsType() is {} type)
         {
             return new ResolutionAttribute(data, type, AnnotationKind.Resolution);
         }
@@ -85,14 +93,12 @@ internal sealed class MethodRule
 
     private static FilteredAttribute? GetResolutionTAttribute(in AttributeExtractionContext context)
     {
-        if (!SymbolEquals(context.OriginalDefinition, context.Annotations.ResolutionAttributeT))
+        if (!SymbolEquals(context.Annotation, context.Master.ResolutionAttributeT))
             return null;
-
-        var attr = context.Attribute;
-        if (attr.TypeArguments.Length == 1
-            && attr.TypeArguments[0] is INamedTypeSymbol type)
+        
+        if (context.Annotation.GetSingleTypeArgument() is { } type)
         {
-            return new ResolutionAttribute(context.AttributeData, type, AnnotationKind.Resolution);
+            return new ResolutionAttribute(context.Annotation, type, AnnotationKind.Resolution);
         }
 
         return null;
@@ -101,14 +107,12 @@ internal sealed class MethodRule
     private static FilteredAttribute? GetHookAttribute(in AttributeExtractionContext context)
     {
 
-        if (!SymbolEquals(context.OriginalDefinition, context.Annotations.HookAttribute))
+        if (!SymbolEquals(context.Annotation, context.Master.HookAttribute))
             return null;
-
-        var attr = context.Attribute;
-        if (attr.TypeArguments.Length == 1
-            && attr.TypeArguments[0] is INamedTypeSymbol type)
+        
+        if (context.Annotation.GetSingleTypeArgument() is {} type)
         {
-            return new HookAttribute(context.AttributeData, type, AnnotationKind.Hook);
+            return new HookAttribute(context.Annotation, type, AnnotationKind.Hook);
         }
 
         return null;
@@ -116,32 +120,30 @@ internal sealed class MethodRule
 
     private static FilteredAttribute? GetCacheAttribute(in AttributeExtractionContext context)
     {
-        var annotations = context.Annotations;
+        var master = context.Master;
 
-        return SymbolEquals(context.OriginalDefinition, annotations.CacheAttribute)
-            ? new HookAttribute(context.AttributeData, annotations.Cache, AnnotationKind.CacheHookPreset)
+        return SymbolEquals(context.Annotation, master.CacheAttribute)
+            ? new HookAttribute(context.Annotation, master.Cache, AnnotationKind.CacheHookPreset)
             : null;
     }
 
     private static FilteredAttribute? GetCachePerResolutionAttribute(in AttributeExtractionContext context)
     {
-        var annotations = context.Annotations;
+        var master = context.Master;
 
-        return SymbolEquals(context.OriginalDefinition, annotations.CachePerResolutionAttribute)
-            ? new HookAttribute(context.AttributeData, annotations.CachePerResolution, AnnotationKind.CachePrHookPreset)
+        return SymbolEquals(context.Annotation, master.CachePerResolutionAttribute)
+            ? new HookAttribute(context.Annotation, master.CachePerResolution, AnnotationKind.CachePrHookPreset)
             : null;
     }
 
-    private static bool SymbolEquals(ISymbol? x, ISymbol? y)
+    private static bool SymbolEquals(IAnnotationWrapper? x, IAttributeWrapper y)
     {
-        return SymbolEqualityComparer.Default.Equals(x, y);
+        return x is not null && y.IsUsedAs(x);
     }
 
     private readonly struct AttributeExtractionContext
     {
-        public required INamedTypeSymbol OriginalDefinition { get; init; }
-        public required AttributeData AttributeData { get; init; }
-        public required INamedTypeSymbol Attribute { get; init; }
-        public required AnnotationContext Annotations { get; init; }
+        public required IAnnotationWrapper Annotation { get; init; }
+        public required AnnotationContext Master { get; init; }
     }
 }

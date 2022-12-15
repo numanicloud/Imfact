@@ -29,7 +29,7 @@ internal sealed class StepFactory
 		
 		var methodRule = new MethodRule
 		{
-			AttributeRule = new AttributeRule(typeRule, annotations),
+			AttributeRule = new AttributeRule(typeRule),
 			TypeRule = typeRule
 		};
 

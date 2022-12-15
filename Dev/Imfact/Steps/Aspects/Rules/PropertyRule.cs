@@ -1,5 +1,6 @@
 ﻿using Imfact.Entities;
 using Imfact.Steps.Filter;
+using Imfact.Steps.Filter.Wrappers;
 using Microsoft.CodeAnalysis;
 using Imfact.Utilities;
 
@@ -7,56 +8,58 @@ namespace Imfact.Steps.Aspects.Rules;
 
 internal class PropertyRule
 {
-	public required MethodRule Rule { private get; init; }
+    public required MethodRule Rule { private get; init; }
 
-	public PropertyAspect? ExtractAspect(IPropertySymbol symbol, AnnotationContext annotations)
-	{
-		using var profiler = AggregationProfiler.GetScope();
-
-		if (!GeneralRule.Instance.IsFactoryReference(symbol.Type, annotations))
-        {
-            return null;
-        }
+    public PropertyAspect? ExtractAspect(IPropertySymbol symbol, AnnotationContext annotations)
+    {
+        using var profiler = AggregationProfiler.GetScope();
 
         var methods = symbol.Type.GetMembers().OfType<IMethodSymbol>()
-			.Select(m => Rule.ExtractNotAsRootResolver(m))
-			.FilterNull()
-			.ToArray();
+            .Select(m => Rule.ExtractNotAsRootResolver(m))
+            .FilterNull()
+            .ToArray();
 
-		var fields = symbol.ContainingType.GetMembers().OfType<IFieldSymbol>();
-		var isAutoImplemented = fields
-			.Any(f => SymbolEqualityComparer.Default.Equals(f.AssociatedSymbol, symbol));
+        var fields = symbol.ContainingType.GetMembers().OfType<IFieldSymbol>();
+        var isAutoImplemented = fields
+            .Any(f => SymbolEqualityComparer.Default.Equals(f.AssociatedSymbol, symbol));
 
-		return new PropertyAspect(TypeAnalysis.FromSymbol(symbol.Type),
-			symbol.Name,
-			methods,
-			isAutoImplemented);
-	}
+        return new PropertyAspect(TypeAnalysis.FromSymbol(symbol.Type),
+            symbol.Name,
+            methods,
+            isAutoImplemented);
+    }
 
-	public PropertyAspect[] ExtractAspect(FilteredType self, CancellationToken ct)
-	{
-		return self.Delegations
-			.Select(x => ExtractAspect(x.Symbol, ct))
-			.ToArray();
-	}
+    public PropertyAspect[] ExtractAspect(FilteredType self, CancellationToken ct)
+    {
+        return self.Delegations
+            .Select(x => ExtractAspect(x.Wrapper, ct))
+            .ToArray();
+    }
 
-	private PropertyAspect ExtractAspect(IPropertySymbol symbol, CancellationToken ct)
-	{
-		ct.ThrowIfCancellationRequested();
+    private PropertyAspect ExtractAspect(IDelegationFactoryWrapper wrapper, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
 
-		var methods = symbol.Type.GetMembers()
-			.OfType<IMethodSymbol>()
-			.Select(Rule.ExtractNotAsRootResolver)
-			.FilterNull()
-			.ToArray();
+        if (wrapper is not DelegationSymbolWrapper { Symbol: var symbol })
+        {
+            throw new NotImplementedException();
+        }
 
-		var isAutoImplemented = symbol.ContainingType.GetMembers()
-			.OfType<IFieldSymbol>()
-			.Any(f => SymbolEqualityComparer.Default.Equals(f.AssociatedSymbol, symbol));
+        // symbolがINamedTypeSymbolと化しているが、本当はIPropertyTypeだったのでこれは動作しない。
+        // 今はリファクタリング中で仕方ないが、いずれ要らなくなるコードなので消す予定
+		var methods = symbol.GetMembers()
+            .OfType<IMethodSymbol>()
+            .Select(Rule.ExtractNotAsRootResolver)
+            .FilterNull()
+            .ToArray();
 
-		return new PropertyAspect(TypeAnalysis.FromSymbol(symbol.Type),
-			symbol.Name,
-			methods,
-			isAutoImplemented);
-	}
+        var isAutoImplemented = symbol.ContainingType.GetMembers()
+            .OfType<IFieldSymbol>()
+            .Any(f => SymbolEqualityComparer.Default.Equals(f.AssociatedSymbol, symbol));
+
+        return new PropertyAspect(TypeAnalysis.FromSymbol(symbol),
+            symbol.Name,
+            methods,
+            isAutoImplemented);
+    }
 }
