@@ -6,11 +6,27 @@ namespace Imfact.Steps.Filter;
 // コンストラクタを呼ぶ必要があるもの、属性を見る必要があるものは依存関係なので、このステップで収集しておく
 // このステップで消化することで後続のステップではAnnotationを見ずに済む
 // 基底クラスの情報は「コンストラクタ呼び出し」「リゾルバー呼び出し」両方で使うので後でさらに詳しくする必要がある
-internal record FilteredType(IFactoryClassWrapper Symbol,
-    FilteredMethod[] Methods,
-    FilteredBaseType? BaseFactory,
-    FilteredResolution[] ResolutionFactories,
-    FilteredDelegation[] Delegations);
+internal record FilteredType(
+	IFactoryClassWrapper Symbol,
+	FilteredMethod[] Methods,
+	FilteredBaseType? BaseFactory,
+	FilteredResolution[] ResolutionFactories,
+	FilteredDelegation[] Delegations)
+{
+	public static FilteredType New(
+		IFactoryClassWrapper symbol,
+		FilteredMethod[]? methods = null,
+		FilteredBaseType? baseFactory = null,
+		FilteredResolution[]? resolutions = null,
+		FilteredDelegation[]? delegations = null)
+	{
+		return new FilteredType(symbol,
+			methods ?? Array.Empty<FilteredMethod>(),
+			baseFactory,
+			resolutions ?? Array.Empty<FilteredResolution>(),
+			delegations ?? Array.Empty<FilteredDelegation>());
+	}
+}
 
 internal record FilteredMethod(IResolverWrapper Symbol,
     IReturnTypeWrapper ReturnType,

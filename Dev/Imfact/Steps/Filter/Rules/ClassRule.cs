@@ -63,16 +63,21 @@ internal sealed class ClassRule
         bool IsFactoryReference(ITypeWrapper reference) =>
             reference.IsConstructableClass
              && reference.GetAttributes()
-	                .Any(attr => annotations.FactoryAttribute.IsInSameModuleWith(reference)
-	                    ? annotations.FactoryAttribute.IsUsedAs(attr)
-	                    : attr.FullName == factoryAttributeFullName);
+                .Any(attr => annotations.FactoryAttribute.IsInSameModuleWith(reference)
+                    ? annotations.FactoryAttribute.IsUsedAs(attr)
+                    : attr.FullName == factoryAttributeFullName);
 
-        FilteredBaseType? MatchBaseType(FilteredBaseType pivot) =>
-			pivot.BaseFactory is not { } baseFactory
+        FilteredBaseType? MatchBaseType(FilteredBaseType pivot)
+		{
+			return !IsFactoryReference(pivot.Wrapper)
 				? null
-				: !IsFactoryReference(baseFactory.Wrapper)
-					? null
-					: pivot with { BaseFactory = MatchBaseType(baseFactory) };
+				: pivot with
+				{
+					BaseFactory = pivot.BaseFactory is not { } bt
+						? null
+						: MatchBaseType(bt)
+				};
+		}
 	}
 
     private bool IsFactoryCandidate(IFactoryClassWrapper symbol, AnnotationContext annotations)
