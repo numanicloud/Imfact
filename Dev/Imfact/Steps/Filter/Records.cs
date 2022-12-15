@@ -8,7 +8,7 @@ namespace Imfact.Steps.Filter;
 // 基底クラスの情報は「コンストラクタ呼び出し」「リゾルバー呼び出し」両方で使うので後でさらに詳しくする必要がある
 internal record FilteredType(IFactoryClassWrapper Symbol,
     FilteredMethod[] Methods,
-    FilteredBaseType[] BaseFactories,
+    FilteredBaseType? BaseFactory,
     FilteredResolution[] ResolutionFactories,
     FilteredDelegation[] Delegations);
 
@@ -17,7 +17,8 @@ internal record FilteredMethod(IResolverWrapper Symbol,
     FilteredAttribute[] Attributes);
 
 internal record FilteredBaseType(IBaseFactoryWrapper Wrapper,
-	FilteredMethod[] Methods);
+	FilteredMethod[] Methods,
+	FilteredBaseType? BaseFactory);
 
 internal record FilteredResolution(IReturnTypeWrapper Type);
 

@@ -142,11 +142,22 @@ internal class ClassRuleAlt
 
 	public ClassAspect Transform(CacheabilityResult input, CancellationToken ct)
 	{
-		var baseTypes = input.Type.BaseFactories
+		var baseTypes = Traverse(input.Type.BaseFactory)
 			.Select(x => ExtractBaseType(x, ct))
 			.ToArray();
 
 		return ExtractThis(input.Type, baseTypes, ct);
+
+		IEnumerable<FilteredBaseType> Traverse(FilteredBaseType? pivot)
+		{
+			if (pivot is null) yield break;
+
+			yield return pivot;
+			foreach (var type in Traverse(pivot.BaseFactory))
+			{
+				yield return type;
+			}
+		}
 	}
 
 	private ClassAspect ExtractThis(FilteredType self, ClassAspect[] bases, CancellationToken ct)

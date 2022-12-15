@@ -12,18 +12,24 @@ internal sealed class MethodRule
     public FilteredMethod? TransformResolver(MethodDeclarationSyntax method,
         GeneratorSyntaxContext context,
         CancellationToken ct)
-    {
-        ct.ThrowIfCancellationRequested();
-        if (!GeneralRule.Instance.IsResolverToGenerate(method)) return null;
+	{
+		ct.ThrowIfCancellationRequested();
 
-        if (context.SemanticModel.GetDeclaredSymbol(method, ct) is not { } ms) return null;
+		return method.Modifiers.IndexOf(SyntaxKind.PartialKeyword) == -1
+			? null
+			: context.SemanticModel.GetDeclaredSymbol(method, ct) is not { } ms
+				? null
+				: TransformResolver(ms);
+	}
 
-        if (ms.ReturnType is not INamedTypeSymbol returnType) return null;
-
-        return new FilteredMethod(new ResolverSymbolWrapper { Symbol = ms },
-            new ReturnTypeSymbolWrapper() { Symbol = returnType },
-            ExtractAttributes(ms));
-    }
+	public FilteredMethod? TransformResolver(IMethodSymbol method)
+	{
+		return method.ReturnType is not INamedTypeSymbol returnType
+			? null
+			: new FilteredMethod(new ResolverSymbolWrapper { Symbol = method },
+				new ReturnTypeSymbolWrapper { Symbol = returnType },
+				ExtractAttributes(method));
+	}
 
     public FilteredMethod? TransformIndirectResolver(IMethodSymbol m)
     {

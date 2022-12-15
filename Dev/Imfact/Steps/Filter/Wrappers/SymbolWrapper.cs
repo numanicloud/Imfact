@@ -30,18 +30,7 @@ internal class TypeSymbolWrapper : ITypeWrapper
 
 internal class FactorySymbolWrapper : TypeSymbolWrapper, IFactoryClassWrapper
 {
-    private ITypeWrapper[]? _allInterfaces = null;
-
-    public IEnumerable<IAnnotationWrapper> GetAttributes()
-    {
-        return Symbol.GetAttributes()
-            .Where(x => x.AttributeClass is not null)
-            .Select(x => new AnnotationSymbolWrapper()
-            {
-                Data = x
-            })
-            .FilterNull();
-    }
+    private ITypeWrapper[]? _allInterfaces;
 
     public IEnumerable<ITypeWrapper> AllInterfaces =>
         _allInterfaces ??= Symbol.AllInterfaces

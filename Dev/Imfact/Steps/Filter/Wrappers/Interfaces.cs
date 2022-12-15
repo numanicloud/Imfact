@@ -4,7 +4,6 @@ namespace Imfact.Steps.Filter.Wrappers;
 
 internal interface ITypeWrapper
 {
-	bool IsInSameModuleWith(ITypeWrapper other);
 	bool IsConstructableClass { get; }
 	IEnumerable<IAnnotationWrapper> GetAttributes();
 	TypeAnalysis GetTypeAnalysis();
@@ -37,8 +36,9 @@ internal interface IAnnotationWrapper
 	ITypeWrapper? GetSingleTypeArgument();
 }
 
-internal interface IAttributeWrapper : ITypeWrapper
+internal interface IAttributeWrapper
 {
+	bool IsInSameModuleWith(ITypeWrapper other);
 	bool IsUsedAs(IAnnotationWrapper annotation);
 	string GetFullNameSpace();
 	string Name { get; }

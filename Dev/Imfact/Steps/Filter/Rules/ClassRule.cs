@@ -19,11 +19,12 @@ internal sealed class ClassRule
         var symbol = context.SemanticModel.GetDeclaredSymbol(type, ct);
         if (symbol is null) return null;
 
-        var methods = FilteredMethods(type, context, ct);
-        var baseTypes = FilterBaseTypes(symbol, ct);
-        var resolutions = FilterResolutions(methods, ct);
-        var delegations = FilterDelegations(symbol, ct);
-
+        // TODO: Testabilityのために、フィルタリングはTransformではやらずMatchでやる
+        var methods = TransformMethods(type, context, ct);
+        var baseTypes = TransformBaseType(symbol, ct);
+        var resolutions = TransformResolutions(methods, ct);
+        var delegations = TransformDelegations(symbol, ct);
+        
         return new FilteredType(new FactorySymbolWrapper { Symbol = symbol },
             methods,
             baseTypes,
@@ -35,16 +36,16 @@ internal sealed class ClassRule
     {
         if (!IsFactoryCandidate(type.Symbol, annotations))
             return null;
-        
-		var factoryAttributeFullName = annotations.FactoryAttribute.GetFullNameSpace()
-			+ "."
-			+ annotations.FactoryAttribute.Name;
+
+        var factoryAttributeFullName = annotations.FactoryAttribute.GetFullNameSpace()
+            + "."
+            + annotations.FactoryAttribute.Name;
 
         return type with
         {
-            BaseFactories = type.BaseFactories
-                .Where(x => IsFactoryReference(x.Wrapper))
-                .ToArray(),
+            BaseFactory = type.BaseFactory is not { } b
+				? null
+				: MatchBaseType(b),
 
             ResolutionFactories = type.ResolutionFactories
                 .Where(x => IsFactoryReference(x.Type))
@@ -59,11 +60,19 @@ internal sealed class ClassRule
                 .ToArray()
         };
 
-		bool IsFactoryReference(ITypeWrapper reference) =>
-			reference.GetAttributes()
-				.Any(attr => annotations.FactoryAttribute.IsInSameModuleWith(reference)
-					? annotations.FactoryAttribute.IsUsedAs(attr)
-					: attr.FullName == factoryAttributeFullName);
+        bool IsFactoryReference(ITypeWrapper reference) =>
+            reference.IsConstructableClass
+             && reference.GetAttributes()
+	                .Any(attr => annotations.FactoryAttribute.IsInSameModuleWith(reference)
+	                    ? annotations.FactoryAttribute.IsUsedAs(attr)
+	                    : attr.FullName == factoryAttributeFullName);
+
+        FilteredBaseType? MatchBaseType(FilteredBaseType pivot) =>
+			pivot.BaseFactory is not { } baseFactory
+				? null
+				: !IsFactoryReference(baseFactory.Wrapper)
+					? null
+					: pivot with { BaseFactory = MatchBaseType(baseFactory) };
 	}
 
     private bool IsFactoryCandidate(IFactoryClassWrapper symbol, AnnotationContext annotations)
@@ -72,7 +81,7 @@ internal sealed class ClassRule
             .Any(annotations.FactoryAttribute.IsUsedAs);
     }
 
-    private FilteredMethod[] FilteredMethods(
+    private FilteredMethod[] TransformMethods(
         TypeDeclarationSyntax syntax,
         GeneratorSyntaxContext context,
         CancellationToken ct)
@@ -84,49 +93,42 @@ internal sealed class ClassRule
             .ToArray();
     }
 
-    private FilteredBaseType[] FilterBaseTypes(INamedTypeSymbol symbol, CancellationToken ct)
+    private FilteredBaseType? TransformBaseType(INamedTypeSymbol symbol, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
-		return TraverseBase(symbol)
-            .Select(x => new BaseFactorySymbolWrapper { Symbol = x })
-            .Where(x => x.IsConstructableClass)
-            .Select(x => new FilteredBaseType(x, FilterIndirectResolvers(x)))
-            .ToArray();
+        return Traverse(symbol);
 
-        static IEnumerable<INamedTypeSymbol> TraverseBase(INamedTypeSymbol pivot)
+        FilteredBaseType? Traverse(INamedTypeSymbol pivot)
         {
-            if (pivot.BaseType is not { } baseType) yield break;
+            if (pivot.BaseType is not { } baseType) return null;
 
-            yield return baseType;
-            foreach (var child in TraverseBase(baseType))
-            {
-                yield return child;
-            }
+            return new FilteredBaseType(new BaseFactorySymbolWrapper { Symbol = baseType },
+                TransformIndirectResolvers(baseType),
+                Traverse(baseType));
         }
 
-        FilteredMethod[] FilterIndirectResolvers(BaseFactorySymbolWrapper x)
+        FilteredMethod[] TransformIndirectResolvers(INamedTypeSymbol x)
         {
             ct.ThrowIfCancellationRequested();
-            return x.Symbol.GetMembers()
+            return x.GetMembers()
                 .OfType<IMethodSymbol>()
-                .Select(MethodRule.TransformIndirectResolver)
+                .Select(MethodRule.TransformResolver)
                 .FilterNull()
                 .ToArray();
         }
     }
 
-    private static FilteredResolution[] FilterResolutions(FilteredMethod[] methods, CancellationToken ct)
+	private static FilteredResolution[] TransformResolutions(FilteredMethod[] methods, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         return methods
             .Select(x => x.ReturnType)
-            .Where(x => x.IsConstructableClass)
             .Select(x => new FilteredResolution(x))
             .ToArray();
     }
 
-    private static FilteredDelegation[] FilterDelegations(
+    private static FilteredDelegation[] TransformDelegations(
         INamedTypeSymbol owner,
         CancellationToken ct)
     {
@@ -134,10 +136,9 @@ internal sealed class ClassRule
         return owner.GetMembers()
             .OfType<IPropertySymbol>()
             .Select(property => property.Type is not INamedTypeSymbol named
-				? null
-				: new FilteredDelegation(new DelegationSymbolWrapper { Symbol = named }))
+                ? null
+                : new FilteredDelegation(new DelegationSymbolWrapper { Symbol = named }))
             .FilterNull()
-			.Where(x => x.Wrapper.IsConstructableClass)
             .ToArray();
-	}
+    }
 }
