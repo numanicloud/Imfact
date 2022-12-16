@@ -31,9 +31,7 @@ internal class PropertyRule
 
     public PropertyAspect[] ExtractAspect(FilteredType self, CancellationToken ct)
     {
-        return self.Delegations
-            .Select(x => ExtractAspect(x.Wrapper, ct))
-            .ToArray();
+        throw new NotImplementedException();
     }
 
     private PropertyAspect ExtractAspect(IDelegationFactoryWrapper wrapper, CancellationToken ct)

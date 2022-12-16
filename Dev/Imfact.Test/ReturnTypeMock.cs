@@ -23,4 +23,12 @@ internal class ReturnTypeMock : IReturnTypeWrapper
 	public IEnumerable<IAnnotationWrapper> GetAttributes() => AttributesMutable;
 
 	public TypeAnalysis GetTypeAnalysis() => TypeAnalysisMutable;
+
+    public IResolutionFactoryWrapper ToResolution()
+    {
+        return new ResolutionMock(TypeAnalysisMutable.FullNamespace, TypeAnalysisMutable.Name)
+        {
+			AttributeMutable = AttributesMutable
+        };
+    }
 }

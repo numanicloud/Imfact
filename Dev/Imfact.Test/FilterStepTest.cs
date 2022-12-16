@@ -13,6 +13,7 @@ public class FilterStepTest
 {
     private AnnotationContext? _annotations;
     private FilterStep? _filterStep;
+    private IAnnotationWrapper[]? _factoryAnnotationSet;
 
     [SetUp]
     public void Setup()
@@ -40,6 +41,11 @@ public class FilterStepTest
             }
         };
 
+        _factoryAnnotationSet = new IAnnotationWrapper[]
+        {
+            new AnnotationMock(_annotations.FactoryAttribute, null, null)
+        };
+
         TypeMock SingleUnboundType(string fullNamespace, string name)
         {
             return new TypeMock(fullNamespace, name, new[]
@@ -49,11 +55,12 @@ public class FilterStepTest
         }
     }
 
-    [MemberNotNull(nameof(_annotations), nameof(_filterStep))]
+    [MemberNotNull(nameof(_annotations), nameof(_filterStep), nameof(_factoryAnnotationSet))]
     private void EnsureInitialized()
     {
         if (_annotations is null) throw new Exception();
         if (_filterStep is null) throw new Exception();
+        if (_factoryAnnotationSet is null) throw new Exception();
     }
 
     private FactoryMock CreateGeneralFactory(string fullNamespace, string name)
@@ -73,13 +80,14 @@ public class FilterStepTest
     {
         EnsureInitialized();
 
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"));
+        var root = CreateGeneralFactory("Test", "Hoge");
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
         FluentAssertion.OnObject(actual)
             .NotNull()
-            .AssertThat(x => x.Symbol, Is.EqualTo(root.Symbol));
+            .AssertThat(x => x.Type.FullNamespace, Is.EqualTo("Test"))
+            .AssertThat(x => x.Type.Name, Is.EqualTo("Hoge"));
     }
 
     [Test]
@@ -87,8 +95,7 @@ public class FilterStepTest
     {
         EnsureInitialized();
 
-        var root = FilteredType.New(
-            new FactoryMock("Test", "Hoge"));
+        var root = new FactoryMock("Test", "Hoge");
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
@@ -101,25 +108,23 @@ public class FilterStepTest
     {
         EnsureInitialized();
 
-        var baseType = new FilteredBaseType(
-            new BaseFactoryMock("Test", "HogeBase")
-            {
-                AttributesMutable = new[]
-                {
-                    new AnnotationMock(_annotations.FactoryAttribute, null, null)
-                }
-            },
-            Array.Empty<FilteredMethod>(),
-            null);
+        var baseType = new BaseFactoryMock("Test", "HogeBase")
+        {
+            AttributesMutable = _factoryAnnotationSet
+        };
 
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
-            baseFactory: baseType);
+        var root = new FactoryMock("Test", "Hoge")
+        {
+            AttributesMutable = _factoryAnnotationSet,
+            BaseType = baseType
+        };
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
         FluentAssertion.OnObject(actual)
             .NotNull()
-            .AssertThat(x => x.BaseFactory, Is.EqualTo(baseType));
+            .Do(x => Assert.That(x.BaseFactory?.Type.FullNamespace, Is.EqualTo("Test")))
+            .Do(x => Assert.That(x.BaseFactory?.Type.Name, Is.EqualTo("HogeBase")));
     }
 
     [Test]
@@ -127,12 +132,13 @@ public class FilterStepTest
     {
         EnsureInitialized();
 
-        var baseType = new FilteredBaseType(new BaseFactoryMock("Test", "HogeBase"),
-            Array.Empty<FilteredMethod>(),
-            null);
+        var baseType = new BaseFactoryMock("Test", "HogeBase");
 
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
-            baseFactory: baseType);
+        var root = new FactoryMock("Test", "Hoge")
+        {
+            AttributesMutable = _factoryAnnotationSet,
+            BaseType = baseType
+        };
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
@@ -146,27 +152,22 @@ public class FilterStepTest
     {
         EnsureInitialized();
 
-        var factoryAnnotation = new[]
+        var base2 = new BaseFactoryMock("Test", "Base2")
         {
-            new AnnotationMock(_annotations.FactoryAttribute, null, null)
+            AttributesMutable = _factoryAnnotationSet
         };
 
-        var base2 = new FilteredBaseType(new BaseFactoryMock("Test", "Base2")
+        var base1 = new BaseFactoryMock("Test", "Base1")
         {
-            AttributesMutable = factoryAnnotation
-        },
-            Array.Empty<FilteredMethod>(),
-            null);
+            AttributesMutable = _factoryAnnotationSet,
+            BaseType = base2
+        };
 
-        var base1 = new FilteredBaseType(new BaseFactoryMock("Test", "Base1")
+        var root = new FactoryMock("Test", "Hoge")
         {
-            AttributesMutable = factoryAnnotation
-        },
-            Array.Empty<FilteredMethod>(),
-            base2);
-
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
-            baseFactory: base1);
+            AttributesMutable = _factoryAnnotationSet,
+            BaseType = base1
+        };
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
@@ -183,22 +184,21 @@ public class FilterStepTest
     {
         EnsureInitialized();
 
-        var base2 = new FilteredBaseType(new BaseFactoryMock("Test", "Base2")
+        var base2 = new BaseFactoryMock("Test", "Base2")
         {
-            AttributesMutable = new[]
-                {
-                    new AnnotationMock(_annotations.FactoryAttribute, null, null)
-                }
-        },
-            Array.Empty<FilteredMethod>(),
-            null);
+            AttributesMutable = _factoryAnnotationSet
+        };
 
-        var base1 = new FilteredBaseType(new BaseFactoryMock("Test", "Base1"),
-            Array.Empty<FilteredMethod>(),
-            base2);
+        var base1 = new BaseFactoryMock("Test", "Base1")
+        {
+            BaseType = base2
+        };
 
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
-            baseFactory: base1);
+        var root = new FactoryMock("Test", "Hoge")
+        {
+            AttributesMutable = _factoryAnnotationSet,
+            BaseType = base1
+        };
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
@@ -213,64 +213,61 @@ public class FilterStepTest
     {
         EnsureInitialized();
 
-        var resolver1 = new ResolverMock { IsIndirectResolverMutable = true };
-        var resolver2 = new ResolverMock { IsIndirectResolverMutable = false };
-
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
-            new FilteredMethod[]
+        var root = new FactoryMock("Test", "Hoge")
+        {
+            AttributesMutable = _factoryAnnotationSet,
+            Methods = new IResolverWrapper[]
             {
-                new FilteredMethod(resolver1,
-                    new ReturnTypeMock("Client", "Foo"),
-                    Array.Empty<FilteredAttribute>()),
-                new FilteredMethod(resolver2,
-                    new ReturnTypeMock("System", "Int32"),
-                    Array.Empty<FilteredAttribute>())
-            });
+                new ResolverMock("Resolver1")
+                {
+                    IsIndirectResolverMutable = true,
+                    ReturnType = new ReturnTypeMock("Client", "Foo")
+                },
+                new ResolverMock("Resolver2")
+                {
+                    IsIndirectResolverMutable = false,
+                    ReturnType = new ReturnTypeMock("System", "Int32")
+                }
+            }
+        };
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
         FluentAssertion.OnObject(actual)
             .NotNull()
             .OnSequence(a => a.Methods,
-                a => a.OnObject(b => b.Symbol,
-                    b => b.AssertType<ResolverMock>()));
+                a => Assert.Pass());
     }
 
     [Test]
     public void Resolutionsのうちファクトリーを返すものだけを採用する()
     {
         EnsureInitialized();
-
-        var factoryAnnotation = new[]
+        
+        var root = new FactoryMock("Test", "Hoge")
         {
-            new AnnotationMock(_annotations.FactoryAttribute, null, null)
-        };
-
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
-            resolutions: new[]
+            AttributesMutable = _factoryAnnotationSet,
+            Resolutions = new IResolutionFactoryWrapper[]
             {
-                new FilteredResolution(new ReturnTypeMock("Client", "Return")
+                new ResolutionMock("Client", "Return")
                 {
-                    AttributesMutable = factoryAnnotation,
-                    IsConstructableClass = true
-                }),
-                new FilteredResolution(new ReturnTypeMock("Client", "Return2")
+                    AttributeMutable = _factoryAnnotationSet
+                },
+                new ResolutionMock("Client", "Return2")
                 {
-                    IsConstructableClass = true
-                })
-            });
+                    AttributeMutable = Array.Empty<IAnnotationWrapper>()
+                }
+            }
+        };
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
         FluentAssertion.OnObject(actual)
             .NotNull()
             .OnSequence(a => a.ResolutionFactories,
-                b => b.OnObject(c => c.Type,
-                    c => c.AssertType<ReturnTypeMock>(
-                        d => d.AssertThat(e => e.TypeAnalysisMutable.FullNamespace,
-                                Is.EqualTo("Client"))
-                            .AssertThat(e => e.TypeAnalysisMutable.Name,
-                                Is.EqualTo("Return")))));
+                a => a.OnObject(b => b.Type,
+                    b => b.AssertThat(c => c.FullNamespace, Is.EqualTo("Client"))
+                        .AssertThat(c => c.Name, Is.EqualTo("Return"))));
     }
 
     [Test]
@@ -278,38 +275,33 @@ public class FilterStepTest
     {
         EnsureInitialized();
 
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
-            new FilteredMethod[]
+        var root = new FactoryMock("Test", "Hoge")
+        {
+            AttributesMutable = _factoryAnnotationSet,
+            Methods = new IResolverWrapper[]
             {
-                new(new ResolverMock()
+                new ResolverMock("Resolve")
+                {
+                    IsIndirectResolverMutable = true,
+                    ReturnType = new ReturnTypeMock("Client", "Return"),
+                    Annotations = new IAnnotationWrapper[]
                     {
-                        IsIndirectResolverMutable = true
-                    },
-                    new ReturnTypeMock("Client", "Return"),
-                    new FilteredAttribute[]
-                    {
-                        new(new AnnotationMock(_annotations.CacheAttribute, null, null),
-                            AnnotationKind.CacheHookPreset),
-                        new(new AnnotationMock(_annotations.CachePerResolutionAttribute,
-                                null,
-                                null),
-                            AnnotationKind.CachePrHookPreset),
-                        new(new AnnotationMock(new AttributeMock("Test", "Attr"), null, null),
-                            AnnotationKind.Hook),
-                        new(new AnnotationMock(_annotations.ResolutionAttribute,
-                                new TypeMock("Client", "ResolutionHoge", new TypeId[0]),
-                                null),
-                            AnnotationKind.Resolution),
-                        new(new AnnotationMock(_annotations.ResolutionAttributeT,
-                                null,
-                                new TypeMock("Client", "ResolutionHoge", new TypeId[0])),
-                            AnnotationKind.Resolution),
-                        new(new AnnotationMock(_annotations.HookAttribute,
+                        new AnnotationMock(_annotations.CacheAttribute, null, null),
+                        new AnnotationMock(_annotations.CachePerResolutionAttribute, null, null),
+                        new AnnotationMock(new AttributeMock("Test", "Dummy"), null, null),
+                        new AnnotationMock(_annotations.ResolutionAttribute,
+                            new TypeMock("Client", "ResolutionHoge", new TypeId[0]),
+                            null),
+                        new AnnotationMock(_annotations.ResolutionAttributeT,
                             null,
-                            new TypeMock("Client", "HookHoge", new TypeId[0])),
-                            AnnotationKind.Hook)
-                    })
-            });
+                            new TypeMock("Client", "ResolutionHoge", new TypeId[0])),
+                        new AnnotationMock(_annotations.HookAttribute,
+                            null,
+                            new TypeMock("Client", "HookHoge", new TypeId[0]))
+                    }
+                }
+            }
+        };
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
@@ -328,23 +320,23 @@ public class FilterStepTest
     public void 引数が指定されていないResolution属性は無視される()
     {
         EnsureInitialized();
-
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
-            new FilteredMethod[]
+        
+        var root = new FactoryMock("Test", "Hoge")
+        {
+            AttributesMutable = _factoryAnnotationSet,
+            Methods = new IResolverWrapper[]
             {
-                new(new ResolverMock()
+                new ResolverMock("Resolve")
+                {
+                    IsIndirectResolverMutable = true,
+                    ReturnType = new ReturnTypeMock("Client", "Resolved"),
+                    Annotations = new IAnnotationWrapper[]
                     {
-                        IsIndirectResolverMutable = true
-                    },
-                    new ReturnTypeMock("Client", "Resolved"),
-                    new FilteredAttribute[]
-                    {
-                        new(new AnnotationMock(_annotations.ResolutionAttribute,
-                                null,
-                                null),
-                            AnnotationKind.Resolution)
-                    })
-            });
+                        new AnnotationMock(_annotations.ResolutionAttribute, null, null)
+                    }
+                }
+            }
+        };
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
@@ -358,23 +350,23 @@ public class FilterStepTest
     public void 型引数が指定されていないResolution属性は無視される()
     {
         EnsureInitialized();
-
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
-            new FilteredMethod[]
+        
+        var root = new FactoryMock("Test", "Hoge")
+        {
+            AttributesMutable = _factoryAnnotationSet,
+            Methods = new IResolverWrapper[]
             {
-                new(new ResolverMock
+                new ResolverMock("Resolve")
+                {
+                    IsIndirectResolverMutable = true,
+                    ReturnType = new ReturnTypeMock("Client", "Resolved"),
+                    Annotations = new IAnnotationWrapper[]
                     {
-                        IsIndirectResolverMutable = true
-                    },
-                    new ReturnTypeMock("Client", "Resolved"),
-                    new FilteredAttribute[]
-                    {
-                        new(new AnnotationMock(_annotations.ResolutionAttributeT,
-                                null,
-                                null),
-                            AnnotationKind.Resolution)
-                    })
-            });
+                        new AnnotationMock(_annotations.ResolutionAttributeT, null, null)
+                    }
+                }
+            }
+        };
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
@@ -388,23 +380,23 @@ public class FilterStepTest
     public void 型引数が指定されていないHook属性は無視される()
     {
         EnsureInitialized();
-
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
-            new FilteredMethod[]
+        
+        var root = new FactoryMock("Test", "Hoge")
+        {
+            AttributesMutable = _factoryAnnotationSet,
+            Methods = new IResolverWrapper[]
             {
-                new(new ResolverMock()
+                new ResolverMock("Resolve")
+                {
+                    IsIndirectResolverMutable = true,
+                    ReturnType = new ReturnTypeMock("Client", "Resolved"),
+                    Annotations = new []
                     {
-                        IsIndirectResolverMutable = true,
-                    },
-                    new ReturnTypeMock("Client", "Resolved"),
-                    new FilteredAttribute[]
-                    {
-                        new(new AnnotationMock(_annotations.HookAttribute,
-                                null,
-                                null),
-                            AnnotationKind.Hook)
-                    })
-            });
+                        new AnnotationMock(_annotations.HookAttribute, null, null)
+                    }
+                }
+            }
+        };
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
@@ -418,20 +410,19 @@ public class FilterStepTest
     public void 基底ファクトリーのリゾルバーのうちアクセシビリティにより見えないものは通さない()
     {
         EnsureInitialized();
-
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
-            baseFactory: new FilteredBaseType(new BaseFactoryMock("Test", "Fuga")
-                {
-                    AttributesMutable = new IAnnotationWrapper[]
-                    {
-                        new AnnotationMock(_annotations.FactoryAttribute, null, null)
-                    }
-                },
-                new FilteredMethod[]
+        
+        var root = new FactoryMock("Test", "Hoge")
+        {
+            AttributesMutable = _factoryAnnotationSet,
+            BaseType = new BaseFactoryMock("Test", "Fuga")
+            {
+                AttributesMutable = _factoryAnnotationSet,
+                Methods = new IResolverWrapper[]
                 {
                     CreateMethodWithAccessibility(Accessibility.Private, "Private")
-                },
-                null));
+                }
+            }
+        };
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
@@ -447,23 +438,22 @@ public class FilterStepTest
     {
         EnsureInitialized();
 
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
-            baseFactory: new FilteredBaseType(new BaseFactoryMock("Test", "Fuga")
+        var root = new FactoryMock("Test", "Hoge")
+        {
+            AttributesMutable = _factoryAnnotationSet,
+            BaseType = new BaseFactoryMock("Test", "Fuga")
+            {
+                AttributesMutable = _factoryAnnotationSet,
+                Methods = new IResolverWrapper[]
                 {
-                    AttributesMutable = new IAnnotationWrapper[]
-                    {
-                        new AnnotationMock(_annotations.FactoryAttribute, null, null)
-                    }
-                },
-                new FilteredMethod[]
-                {
-                    CreateMethodWithAccessibility(Accessibility.Public, "PublicMethod"),
-                    CreateMethodWithAccessibility(Accessibility.Protected, "ProtectedMethod"),
-                    CreateMethodWithAccessibility(Accessibility.Internal, "InternalMethod"),
-                    CreateMethodWithAccessibility(Accessibility.ProtectedOrInternal, "ProtectedOrInternalMethod"),
-                    CreateMethodWithAccessibility(Accessibility.ProtectedAndInternal, "ProtectedAndInternal")
-                },
-                null));
+                    CreateMethodWithAccessibility(Accessibility.Public, "M1"),
+                    CreateMethodWithAccessibility(Accessibility.Protected, "M2"),
+                    CreateMethodWithAccessibility(Accessibility.Internal, "M4"),
+                    CreateMethodWithAccessibility(Accessibility.ProtectedOrInternal, "M8"),
+                    CreateMethodWithAccessibility(Accessibility.ProtectedAndInternal, "M19")
+                }
+            }
+        };
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
@@ -472,42 +462,41 @@ public class FilterStepTest
             .OnObject(a => a.BaseFactory,
                 a => a.NotNull()
                     .OnSequence(b => b.Methods,
-                        b => AssertAccessibility(b, Accessibility.Public),
-                        b => AssertAccessibility(b, Accessibility.Protected),
-                        b => AssertAccessibility(b, Accessibility.Internal),
-                        b => AssertAccessibility(b, Accessibility.ProtectedOrInternal),
-                        b => AssertAccessibility(b, Accessibility.ProtectedAndInternal)));
+                        b => AssertMethodName(b, "M1"),
+                        b => AssertMethodName(b, "M2"),
+                        b => AssertMethodName(b, "M4"),
+                        b => AssertMethodName(b, "M8"),
+                        b => AssertMethodName(b, "M19")));
     }
 
     [Test]
     public void Factory属性のついていない委譲は取り除く()
     {
         EnsureInitialized();
-
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
-            delegations: new FilteredDelegation[]
+        
+        var root = new FactoryMock("Test", "Hoge")
+        {
+            AttributesMutable = _factoryAnnotationSet,
+            Delegations = new IDelegationFactoryWrapper[]
             {
-                new FilteredDelegation(new DelegationMock("Client", "Resolved")
+                new DelegationMock("Client", "Delegation1")
                 {
                     AttributesMutable = Array.Empty<IAnnotationWrapper>()
-                }),
-                new FilteredDelegation(new DelegationMock("Client", "Resolved2")
+                },
+                new DelegationMock("Client", "Delegation2")
                 {
-                    AttributesMutable = new IAnnotationWrapper[]
-                    {
-                        new AnnotationMock(_annotations.FactoryAttribute, null, null)
-                    }
-                })
-            });
+                    AttributesMutable = _factoryAnnotationSet
+                }
+            }
+        };
 
         var actual = _filterStep.Match((root, _annotations), CancellationToken.None);
 
         FluentAssertion.OnObject(actual)
             .NotNull()
             .OnSequence(a => a.Delegations,
-                a => a.OnObject(b => b.Wrapper,
-                    b => b.AssertType<DelegationMock>(c =>
-                        Assert.That(c.Context.TypeAnalysisMutable.Name, Is.EqualTo("Resolved2")))));
+                a => a.AssertThat(b => b.Type.FullNamespace, Is.EqualTo("Client"))
+                    .AssertThat(b => b.Type.Name, Is.EqualTo("Delegation2")));
     }
 
     [Test]
@@ -515,38 +504,41 @@ public class FilterStepTest
     {
         EnsureInitialized();
 
-        var root = FilteredType.New(CreateGeneralFactory("Test", "Hoge"),
-            delegations: new FilteredDelegation[]
+        var root = new FactoryMock("Test", "Hoge")
+        {
+            AttributesMutable = _factoryAnnotationSet,
+            Delegations = new IDelegationFactoryWrapper[]
             {
-                new FilteredDelegation(new DelegationMock("Client", "Resolved"))
-            });
-
+                new DelegationMock("Client", "Delegation")
+                {
+                    AttributesMutable = _factoryAnnotationSet
+                }
+            }
+        };
+        
+        // Delegationにメソッド情報を持たせる機構がまだない
         Assert.Fail();
     }
 
-    private static FilteredMethod CreateMethodWithAccessibility(Accessibility accessibility, string name)
+    private static IResolverWrapper CreateMethodWithAccessibility(Accessibility accessibility, string name)
     {
-        return new FilteredMethod(new ResolverMock()
-            {
-                IsIndirectResolverMutable = true,
-                Accessibility = accessibility,
-            },
-            new ReturnTypeMock("Client", name),
-            Array.Empty<FilteredAttribute>());
+        return new ResolverMock(name)
+        {
+            IsIndirectResolverMutable = true,
+            Accessibility = accessibility,
+            ReturnType = new ReturnTypeMock("Client", "Resolution")
+        };
     }
 
-    private static void AssertAccessibility(FluentAssertionContext<FilteredMethod> context,
-        Accessibility accessibility)
+    private static void AssertMethodName(FluentAssertionContext<FilteredMethod> context, string name)
     {
-        Assert.That(context.Context.Symbol.Accessibility, Is.EqualTo(accessibility));
+        Assert.That(context.Context.Name, Is.EqualTo(name));
     }
     
     private static void AssertAnnotation(FluentAssertionContext<FilteredAttribute> context,
         string name)
     {
-        context.OnObject(a => a.Wrapper,
-            a => a.AssertType<AnnotationMock>(b =>
-                b.AssertThat(c => c.Attribute.Name, Is.EqualTo(name))));
+        context.AssertThat(a => a.Type.Name, Is.EqualTo(name));
     }
 }
 
@@ -568,4 +560,26 @@ internal class DelegationMock : IDelegationFactoryWrapper
     public IEnumerable<IAnnotationWrapper> GetAttributes() => AttributesMutable;
 
     public TypeAnalysis GetTypeAnalysis() => TypeAnalysisMutable;
+}
+
+internal class ResolutionMock : IResolutionFactoryWrapper
+{
+    public bool IsConstructableClass { get; } = true;
+
+    public IEnumerable<IAnnotationWrapper> AttributeMutable { get; set; } =
+        Array.Empty<IAnnotationWrapper>();
+
+    public TypeAnalysis AnalysisMutable { get; set; }
+
+    public ResolutionMock(string fullNamespace, string name)
+    {
+        AnalysisMutable = new TypeAnalysis(
+            new TypeId(fullNamespace, name, RecordArray<TypeId>.Empty),
+            Accessibility.Public,
+            DisposableType.NonDisposable);
+    }
+
+    public IEnumerable<IAnnotationWrapper> GetAttributes() => AttributeMutable;
+
+    public TypeAnalysis GetTypeAnalysis() => AnalysisMutable;
 }

@@ -9,71 +9,66 @@ namespace Imfact.Steps.Filter.Rules;
 
 internal sealed class MethodRule
 {
-    public FilteredMethod? TransformResolver(MethodDeclarationSyntax method,
+    public IResolverWrapper? TransformResolver(MethodDeclarationSyntax method,
         GeneratorSyntaxContext context,
         CancellationToken ct)
-	{
-		ct.ThrowIfCancellationRequested();
-
-		return method.Modifiers.IndexOf(SyntaxKind.PartialKeyword) == -1
-			? null
-			: context.SemanticModel.GetDeclaredSymbol(method, ct) is not { } ms
-				? null
-				: TransformResolver(ms);
-	}
-
-	public FilteredMethod? TransformResolver(IMethodSymbol method)
-	{
-		return method.ReturnType is not INamedTypeSymbol returnType
-			? null
-			: new FilteredMethod(new ResolverSymbolWrapper
-                {
-                    Symbol = method,
-                    Accessibility = method.DeclaredAccessibility
-                },
-				new ReturnTypeSymbolWrapper { Symbol = returnType },
-				ExtractAttributes(method));
-	}
-
-    public FilteredMethod? TransformIndirectResolver(IMethodSymbol m)
     {
-        if (m.ReturnType is not INamedTypeSymbol { SpecialType: SpecialType.None } returnType)
-            return null;
+        ct.ThrowIfCancellationRequested();
 
-        return new FilteredMethod(new ResolverSymbolWrapper
+        return method.Modifiers.IndexOf(SyntaxKind.PartialKeyword) == -1
+            ? null
+            : context.SemanticModel.GetDeclaredSymbol(method, ct) is not { } ms
+                ? null
+                : TransformResolver(ms);
+    }
+
+    public IResolverWrapper? TransformResolver(IMethodSymbol method)
+    {
+        return method.ReturnType is not INamedTypeSymbol returnType
+            ? null
+            : new ResolverSymbolWrapper
             {
-                Symbol = m,
-                Accessibility = m.DeclaredAccessibility
-            },
-            new ReturnTypeSymbolWrapper { Symbol = returnType },
-            Array.Empty<FilteredAttribute>());
+                Name = method.Name,
+                Symbol = method,
+                Accessibility = method.DeclaredAccessibility,
+                ReturnType = new ReturnTypeSymbolWrapper()
+                {
+                    Symbol = returnType
+                }
+            };
     }
 
     public FilteredMethod? Match(
-        FilteredMethod method,
-        AnnotationContext annotations,
-        CancellationToken ct)
-	{
-		ct.ThrowIfCancellationRequested();
-
-		return !method.Symbol.IsIndirectResolver()
-			? null
-			: method with
-			{
-				Attributes = method.Attributes
-					.Select(x => TransformAttribute(x, annotations))
-					.FilterNull()
-					.ToArray()
-			};
-	}
-
-    public FilteredMethod? MatchAsInheritance(FilteredMethod method,
+        IResolverWrapper method,
         AnnotationContext annotations,
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
-        return method.Symbol.Accessibility is Accessibility.Public
+        var attrs = method.Annotations
+            .Select(x => TransformAttribute(x, annotations))
+            .FilterNull()
+            .ToArray();
+        return !method.IsIndirectResolver()
+            ? null
+            : new FilteredMethod
+            {
+                Name = method.Name,
+                ReturnType = method.ReturnType.GetTypeAnalysis(),
+                Attributes = method.Annotations
+                    .Select(a => TransformAttribute(a, annotations))
+                    .FilterNull()
+                    .ToArray()
+            };
+    }
+
+    public FilteredMethod? MatchAsInheritance(IResolverWrapper method,
+        AnnotationContext annotations,
+        CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        return method.Accessibility is Accessibility.Public
             or Accessibility.Protected
             or Accessibility.Internal
             or Accessibility.ProtectedOrInternal
@@ -82,22 +77,13 @@ internal sealed class MethodRule
             : null;
     }
 
-    private static FilteredAttribute[] ExtractAttributes(IMethodSymbol method)
-    {
-        // TODO: AnnotationKind.Hook を使っているが、本当は Unidentified のような名前を使うべき
-        return method.GetAttributes()
-            .Select(x => new AnnotationSymbolWrapper { Data = x })
-            .Select(x => new FilteredAttribute(x, AnnotationKind.Hook))
-            .ToArray();
-    }
-
     private static FilteredAttribute? TransformAttribute(
-        FilteredAttribute source,
+        IAnnotationWrapper source,
         AnnotationContext annotations)
     {
         var context = new AttributeExtractionContext
         {
-            Annotation = source.Wrapper,
+            Annotation = source,
             Master = annotations,
         };
 
@@ -114,9 +100,9 @@ internal sealed class MethodRule
             return null;
 
         var data = context.Annotation;
-        if (data.GetSingleConstructorArgumentAsType() is {} type)
+        if (data.GetSingleConstructorArgumentAsType() is { } type)
         {
-            return new ResolutionAttribute(data, type, AnnotationKind.Resolution);
+            return new ResolutionAttribute(data.GetTypeAnalysis(), type, AnnotationKind.Resolution);
         }
 
         return null;
@@ -124,12 +110,14 @@ internal sealed class MethodRule
 
     private static FilteredAttribute? GetResolutionTAttribute(in AttributeExtractionContext context)
     {
-        if (!SymbolEquals(context.Annotation, context.Master.ResolutionAttributeT))
+        var annotation = context.Annotation;
+
+        if (!SymbolEquals(annotation, context.Master.ResolutionAttributeT))
             return null;
-        
-        if (context.Annotation.GetSingleTypeArgument() is { } type)
+
+        if (annotation.GetSingleTypeArgument() is { } type)
         {
-            return new ResolutionAttribute(context.Annotation, type, AnnotationKind.Resolution);
+            return new ResolutionAttribute(annotation.GetTypeAnalysis(), type, AnnotationKind.Resolution);
         }
 
         return null;
@@ -140,10 +128,10 @@ internal sealed class MethodRule
 
         if (!SymbolEquals(context.Annotation, context.Master.HookAttribute))
             return null;
-        
-        if (context.Annotation.GetSingleTypeArgument() is {} type)
+
+        if (context.Annotation.GetSingleTypeArgument() is { } type)
         {
-            return new HookAttribute(context.Annotation, type, AnnotationKind.Hook);
+            return new HookAttribute(context.Annotation.GetTypeAnalysis(), type, AnnotationKind.Hook);
         }
 
         return null;
@@ -154,7 +142,7 @@ internal sealed class MethodRule
         var master = context.Master;
 
         return SymbolEquals(context.Annotation, master.CacheAttribute)
-            ? new HookAttribute(context.Annotation, master.Cache, AnnotationKind.CacheHookPreset)
+            ? new HookAttribute(context.Annotation.GetTypeAnalysis(), master.Cache, AnnotationKind.CacheHookPreset)
             : null;
     }
 
@@ -163,7 +151,7 @@ internal sealed class MethodRule
         var master = context.Master;
 
         return SymbolEquals(context.Annotation, master.CachePerResolutionAttribute)
-            ? new HookAttribute(context.Annotation, master.CachePerResolution, AnnotationKind.CachePrHookPreset)
+            ? new HookAttribute(context.Annotation.GetTypeAnalysis(), master.CachePerResolution, AnnotationKind.CachePrHookPreset)
             : null;
     }
 

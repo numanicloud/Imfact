@@ -25,4 +25,7 @@ internal class BaseFactoryMock : IBaseFactoryWrapper
 	public IEnumerable<IAnnotationWrapper> GetAttributes() => AttributesMutable;
 
 	public TypeAnalysis GetTypeAnalysis() => TypeAnalysisMutable;
+
+    public IEnumerable<IResolverWrapper> Methods { get; init; } = Array.Empty<IResolverWrapper>();
+    public IBaseFactoryWrapper? BaseType { get; init; }
 }

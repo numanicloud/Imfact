@@ -161,28 +161,13 @@ internal class ClassRuleAlt
 	}
 
 	private ClassAspect ExtractThis(FilteredType self, ClassAspect[] bases, CancellationToken ct)
-	{
-		return new ClassAspect(self.Symbol.GetTypeAnalysis(),
-			bases,
-			ExtractInterfaces(self.Symbol),
-			ExtractMethods(self.Methods),
-			PropertyRule.ExtractAspect(self, ct),
-			null);
-	}
+    {
+        throw new NotImplementedException();
+    }
 
 	private ClassAspect ExtractBaseType(FilteredBaseType baseType, CancellationToken ct)
 	{
-		ct.ThrowIfCancellationRequested();
-
-		var methods = baseType.Methods
-			.Where(x => x.Symbol.IsIndirectResolver());
-
-		return new ClassAspect(baseType.Wrapper.GetTypeAnalysis(),
-			Array.Empty<ClassAspect>(),
-			ExtractInterfaces(baseType.Wrapper),
-			ExtractMethods(methods),
-			Array.Empty<PropertyAspect>(),
-			null);
+        throw new NotImplementedException();
 	}
 
 	private InterfaceAspect[] ExtractInterfaces(IInterfaceImplementor thisSymbol)

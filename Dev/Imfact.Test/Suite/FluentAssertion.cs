@@ -38,6 +38,12 @@ internal class FluentAssertionContext<T>
         return this;
     }
 
+    public FluentAssertionContext<T> Do(Action<T> assertion)
+    {
+        assertion(Context);
+        return this;
+    }
+
 	public FluentAssertionContext<T> AssertType<TExpected>(
 		Action<FluentAssertionContext<TExpected>>? assertion = null)
 	{

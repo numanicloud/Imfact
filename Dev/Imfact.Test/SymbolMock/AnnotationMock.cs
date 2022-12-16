@@ -1,4 +1,7 @@
+using Imfact.Entities;
 using Imfact.Steps.Filter.Wrappers;
+using Imfact.Utilities;
+using Microsoft.CodeAnalysis;
 
 namespace Imfact.Test.SymbolMock;
 
@@ -19,4 +22,10 @@ internal class AnnotationMock : IAnnotationWrapper
     public ITypeWrapper? GetSingleConstructorArgumentAsType() => _ctorArg;
 
     public ITypeWrapper? GetSingleTypeArgument() => _typeArg;
+
+    public TypeAnalysis GetTypeAnalysis() => Attribute is not AttributeMock mock
+        ? throw new Exception()
+        : new TypeAnalysis(new TypeId(mock.FullNameSpace, mock.Name, RecordArray<TypeId>.Empty),
+            Accessibility.Public,
+            DisposableType.NonDisposable);
 }

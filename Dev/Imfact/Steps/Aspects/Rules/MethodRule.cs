@@ -14,37 +14,7 @@ internal sealed class MethodRule
 
     public MethodAspect? ExtractAspect(FilteredMethod symbol)
     {
-        using var profiler = AggregationProfiler.GetScope();
-        try
-        {
-            if (symbol.ReturnType is not ReturnTypeSymbolWrapper { Symbol: var returnSymbol } )
-            {
-                return null;
-            }
-
-			if (symbol.Symbol is not ResolverSymbolWrapper { Symbol: var resolver })
-			{
-				return null;
-			}
-
-            if (resolver.Parameters.Any(x => SymbolEqualityComparer.Default.Equals(x.Type, returnSymbol)))
-            {
-                throw new InvalidOperationException();
-            }
-
-            return new MethodAspect(resolver.Name,
-				resolver.DeclaredAccessibility,
-                GetKind(returnSymbol),
-                GetReturnType(returnSymbol),
-                GetAttributes(resolver, returnSymbol),
-                GetParameters(resolver));
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(
-                $"Exception occured in extracting aspect of a method {symbol}.",
-                ex);
-        }
+        throw new NotImplementedException();
     }
 
     public MethodAspect? ExtractNotAsRootResolver(IMethodSymbol symbol)

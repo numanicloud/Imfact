@@ -32,6 +32,11 @@ internal class FactorySymbolWrapper : TypeSymbolWrapper, IFactoryClassWrapper
 {
     private ITypeWrapper[]? _allInterfaces;
 
+    public required IResolverWrapper[] Methods { get; init; }
+    public required IBaseFactoryWrapper? BaseType { get; init; }
+    public required IResolutionFactoryWrapper[] Resolutions { get; init; }
+    public required IDelegationFactoryWrapper[] Delegations { get; init; }
+
     public IEnumerable<ITypeWrapper> AllInterfaces =>
         _allInterfaces ??= Symbol.AllInterfaces
             .Select(x => new ReturnTypeSymbolWrapper { Symbol = x })
@@ -42,7 +47,16 @@ internal class FactorySymbolWrapper : TypeSymbolWrapper, IFactoryClassWrapper
 internal class ResolverSymbolWrapper : IResolverWrapper
 {
     public required IMethodSymbol Symbol { get; init; }
+    public required string Name { get; init; }
     public required Accessibility Accessibility { get; init; }
+    public required IReturnTypeWrapper ReturnType { get; init; }
+
+    public IEnumerable<IAnnotationWrapper> Annotations =>
+        Symbol.GetAttributes()
+            .Select(x => new AnnotationSymbolWrapper()
+            {
+                Data = x
+            });
 
     public bool IsIndirectResolver()
     {
@@ -52,6 +66,13 @@ internal class ResolverSymbolWrapper : IResolverWrapper
 
 internal class ReturnTypeSymbolWrapper : TypeSymbolWrapper, IReturnTypeWrapper
 {
+    public IResolutionFactoryWrapper ToResolution()
+    {
+        return new ResolutionSymbolWrapper()
+        {
+            Symbol = Symbol
+        };
+    }
 }
 
 internal class AnnotationSymbolWrapper : IAnnotationWrapper
@@ -80,6 +101,11 @@ internal class AnnotationSymbolWrapper : IAnnotationWrapper
                     ? new TypeSymbolWrapper { Symbol = type }
                     : null;
     }
+
+    public TypeAnalysis GetTypeAnalysis()
+    {
+        return TypeAnalysis.FromSymbol(Data.AttributeClass ?? throw new Exception());
+    }
 }
 
 internal class AttributeSymbolWrapper : TypeSymbolWrapper, IAttributeWrapper
@@ -99,6 +125,9 @@ internal class AttributeSymbolWrapper : TypeSymbolWrapper, IAttributeWrapper
 internal class BaseFactorySymbolWrapper : TypeSymbolWrapper, IBaseFactoryWrapper
 {
     private ITypeWrapper[]? _allInterfaces = null;
+
+    public required IEnumerable<IResolverWrapper> Methods { get; init; }
+    public required IBaseFactoryWrapper? BaseType { get; init; }
 
     public IEnumerable<ITypeWrapper> AllInterfaces =>
         _allInterfaces ??= Symbol.AllInterfaces

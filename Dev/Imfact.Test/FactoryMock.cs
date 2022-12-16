@@ -25,4 +25,13 @@ internal class FactoryMock : IFactoryClassWrapper
 	public IEnumerable<IAnnotationWrapper> GetAttributes() => AttributesMutable;
 
 	public TypeAnalysis GetTypeAnalysis() => _analysis;
+
+    public IResolverWrapper[] Methods { get; init; } = Array.Empty<IResolverWrapper>();
+
+    public IBaseFactoryWrapper? BaseType { get; init; }
+
+    public IResolutionFactoryWrapper[] Resolutions { get; init; } =
+        Array.Empty<IResolutionFactoryWrapper>();
+
+    public IDelegationFactoryWrapper[] Delegations { get; init; } = Array.Empty<IDelegationFactoryWrapper>();
 }

@@ -10,7 +10,7 @@ internal sealed class ClassRule
 {
     public required MethodRule MethodRule { private get; init; }
 
-    public FilteredType? TransformClass(TypeDeclarationSyntax type,
+    public IFactoryClassWrapper? TransformClass(TypeDeclarationSyntax type,
         GeneratorSyntaxContext context,
         CancellationToken ct)
     {
@@ -21,43 +21,56 @@ internal sealed class ClassRule
 
         // TODO: Testabilityのために、フィルタリングはTransformではやらずMatchでやる
         var methods = TransformMethods(type, context, ct);
-        var baseTypes = TransformBaseType(symbol, ct);
+        var baseType = TransformBaseType(symbol, ct);
         var resolutions = TransformResolutions(methods, ct);
         var delegations = TransformDelegations(symbol, ct);
-        
-        return new FilteredType(new FactorySymbolWrapper { Symbol = symbol },
-            methods,
-            baseTypes,
-            resolutions,
-            delegations);
+
+        return new FactorySymbolWrapper()
+        {
+            Symbol = symbol,
+            Methods = methods,
+            BaseType = baseType,
+            Resolutions = resolutions,
+            Delegations = delegations
+        };
     }
 
-    public FilteredType? Match(FilteredType type, AnnotationContext annotations, CancellationToken ct)
+    public FilteredType? Match(IFactoryClassWrapper type, AnnotationContext annotations, CancellationToken ct)
 	{
-        if (!IsFactoryCandidate(type.Symbol, annotations))
+        if (!IsFactoryCandidate(type, annotations))
             return null;
 
         var factoryAttributeFullName = annotations.FactoryAttribute.GetFullNameSpace()
             + "."
             + annotations.FactoryAttribute.Name;
 
-        return type with
+        return new FilteredType
         {
-            BaseFactory = type.BaseFactory is not { } b
-				? null
-				: MatchBaseType(b),
-
-            ResolutionFactories = type.ResolutionFactories
-                .Where(x => IsFactoryReference(x.Type))
-                .ToArray(),
-
-            Delegations = type.Delegations
-                .Where(x => IsFactoryReference(x.Wrapper))
-                .ToArray(),
+            Type = type.GetTypeAnalysis(),
 
             Methods = type.Methods
                 .Select(m => MethodRule.Match(m, annotations, ct))
-				.FilterNull()
+                .FilterNull()
+                .ToArray(),
+
+            BaseFactory = type.BaseType is not { } baseType
+                ? null
+                : MatchBaseType(baseType),
+
+            ResolutionFactories = type.Resolutions
+                .Where(IsFactoryReference)
+                .Select(x => new FilteredResolution()
+                {
+                    Type = x.GetTypeAnalysis(),
+                })
+                .ToArray(),
+
+            Delegations = type.Delegations
+                .Where(IsFactoryReference)
+                .Select(x => new FilteredDelegation()
+                {
+                    Type = x.GetTypeAnalysis()
+                })
                 .ToArray()
         };
 
@@ -68,20 +81,21 @@ internal sealed class ClassRule
                     ? annotations.FactoryAttribute.IsUsedAs(attr)
                     : attr.FullName == factoryAttributeFullName);
 
-        FilteredBaseType? MatchBaseType(FilteredBaseType pivot)
-		{
-			return !IsFactoryReference(pivot.Wrapper)
-				? null
-				: pivot with
-				{
-					BaseFactory = pivot.BaseFactory is not { } bt
-						? null
-						: MatchBaseType(bt),
+        FilteredBaseType? MatchBaseType(IBaseFactoryWrapper pivot)
+        {
+            return !IsFactoryReference(pivot)
+                ? null
+                : new FilteredBaseType
+                {
+                    Type = pivot.GetTypeAnalysis(),
+                    BaseFactory = pivot.BaseType is not { } bt
+                        ? null
+                        : MatchBaseType(bt),
                     Methods = pivot.Methods
                         .Select(x => MethodRule.MatchAsInheritance(x, annotations, ct))
                         .FilterNull()
                         .ToArray()
-				};
+                };
 		}
 	}
 
@@ -91,7 +105,7 @@ internal sealed class ClassRule
             .Any(annotations.FactoryAttribute.IsUsedAs);
     }
 
-    private FilteredMethod[] TransformMethods(
+    private IResolverWrapper[] TransformMethods(
         TypeDeclarationSyntax syntax,
         GeneratorSyntaxContext context,
         CancellationToken ct)
@@ -103,22 +117,25 @@ internal sealed class ClassRule
             .ToArray();
     }
 
-    private FilteredBaseType? TransformBaseType(INamedTypeSymbol symbol, CancellationToken ct)
+    private IBaseFactoryWrapper? TransformBaseType(INamedTypeSymbol symbol, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
         return Traverse(symbol);
 
-        FilteredBaseType? Traverse(INamedTypeSymbol pivot)
+        IBaseFactoryWrapper? Traverse(INamedTypeSymbol pivot)
         {
             if (pivot.BaseType is not { } baseType) return null;
 
-            return new FilteredBaseType(new BaseFactorySymbolWrapper { Symbol = baseType },
-                TransformIndirectResolvers(baseType),
-                Traverse(baseType));
+            return new BaseFactorySymbolWrapper
+            {
+                Symbol = baseType,
+                Methods = TransformIndirectResolvers(baseType),
+                BaseType = Traverse(baseType)
+            };
         }
 
-        FilteredMethod[] TransformIndirectResolvers(INamedTypeSymbol x)
+        IResolverWrapper[] TransformIndirectResolvers(INamedTypeSymbol x)
         {
             ct.ThrowIfCancellationRequested();
             return x.GetMembers()
@@ -129,16 +146,15 @@ internal sealed class ClassRule
         }
     }
 
-	private static FilteredResolution[] TransformResolutions(FilteredMethod[] methods, CancellationToken ct)
+	private static IResolutionFactoryWrapper[] TransformResolutions(IResolverWrapper[] methods, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         return methods
-            .Select(x => x.ReturnType)
-            .Select(x => new FilteredResolution(x))
+            .Select(x => x.ReturnType.ToResolution())
             .ToArray();
     }
 
-    private static FilteredDelegation[] TransformDelegations(
+    private static IDelegationFactoryWrapper[] TransformDelegations(
         INamedTypeSymbol owner,
         CancellationToken ct)
     {
@@ -147,8 +163,9 @@ internal sealed class ClassRule
             .OfType<IPropertySymbol>()
             .Select(property => property.Type is not INamedTypeSymbol named
                 ? null
-                : new FilteredDelegation(new DelegationSymbolWrapper { Symbol = named }))
+                : new DelegationSymbolWrapper { Symbol = named })
             .FilterNull()
+            .Cast<IDelegationFactoryWrapper>()
             .ToArray();
     }
 }

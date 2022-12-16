@@ -1,4 +1,5 @@
 ﻿using Imfact.Steps.Filter.Rules;
+using Imfact.Steps.Filter.Wrappers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -14,7 +15,7 @@ internal sealed class FilterStep
         return GeneralRule.Instance.IsFactoryClassDeclaration(node);
     }
 
-    public FilteredType? Transform(GeneratorSyntaxContext context, CancellationToken ct)
+    public IFactoryClassWrapper? Transform(GeneratorSyntaxContext context, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         var syntax = (context.Node as TypeDeclarationSyntax)!;
@@ -22,7 +23,7 @@ internal sealed class FilterStep
 	}
 
 	public FilteredType? Match(
-        (FilteredType? type, AnnotationContext annotations) tuple,
+        (IFactoryClassWrapper? type, AnnotationContext annotations) tuple,
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();

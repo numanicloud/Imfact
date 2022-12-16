@@ -19,16 +19,25 @@ internal interface IFactoryClassWrapper : IInterfaceImplementor
 {
 	IEnumerable<IAnnotationWrapper> GetAttributes();
 	TypeAnalysis GetTypeAnalysis();
+
+	IResolverWrapper[] Methods { get; }
+	IBaseFactoryWrapper? BaseType { get; }
+	IResolutionFactoryWrapper[] Resolutions { get; }
+	IDelegationFactoryWrapper[] Delegations { get; }
 }
 
 internal interface IResolverWrapper
 {
-	bool IsIndirectResolver();
+	string Name { get; }
 	Accessibility Accessibility { get; }
+	IReturnTypeWrapper ReturnType { get; }
+	IEnumerable<IAnnotationWrapper> Annotations { get; }
+    bool IsIndirectResolver();
 }
 
 internal interface IReturnTypeWrapper : ITypeWrapper
 {
+    IResolutionFactoryWrapper ToResolution();
 }
 
 internal interface IAnnotationWrapper
@@ -36,6 +45,7 @@ internal interface IAnnotationWrapper
 	string FullName { get; }
 	ITypeWrapper? GetSingleConstructorArgumentAsType();
 	ITypeWrapper? GetSingleTypeArgument();
+    TypeAnalysis GetTypeAnalysis();
 }
 
 internal interface IAttributeWrapper
@@ -48,6 +58,8 @@ internal interface IAttributeWrapper
 
 internal interface IBaseFactoryWrapper : ITypeWrapper, IInterfaceImplementor
 {
+	public IEnumerable<IResolverWrapper> Methods { get; }
+	public IBaseFactoryWrapper? BaseType { get; }
 }
 
 internal interface IResolutionFactoryWrapper : ITypeWrapper
